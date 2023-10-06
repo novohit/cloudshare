@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -100,6 +101,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 非Java bean(如路径参数等)参数错误产生的异常
+     * 只作用于参数已传但是不符合要求的情况
      *
      * @param request request
      * @param e       exception
@@ -114,7 +116,30 @@ public class GlobalExceptionHandler {
 
         // ConstraintViolationException自带的getMessage()也是可以用的，如果对错误信息没有严格的格式要求可以不用通过这种循环来自定义拼接
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-        String message = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(";"));
+        String message = violations.stream().map(constraintViolation -> {
+            // register.username
+            String paramPath = constraintViolation.getPropertyPath().toString();
+            String param = paramPath.substring(paramPath.indexOf('.') + 1);
+            return "%s %s".formatted(param, constraintViolation.getMessage());
+        }).collect(Collectors.joining(";"));
+        log.error("[参数异常] url:[{}]", requestUrl, e);
+        return Response.error(message);
+    }
+
+    /**
+     * 作用于参数未传
+     *
+     * @param request request
+     * @param e       exception
+     * @return Response<Void>
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public Response<Void> missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException e) {
+        String requestUrl = request.getRequestURI();
+        String method = request.getMethod();
+        String message = "Required request parameter '%s'".formatted(e.getParameterName());
         log.error("[参数异常] url:[{}]", requestUrl, e);
         return Response.error(message);
     }
