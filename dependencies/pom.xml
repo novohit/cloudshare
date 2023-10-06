@@ -21,6 +21,7 @@
         <lombok.version>1.18.24</lombok.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <guava.version>20.0</guava.version>
+        <hutool.version>5.8.22</hutool.version>
         <commons.math3.version>3.6.1</commons.math3.version>
         <commons.codec.version>1.15</commons.codec.version>
 
@@ -164,6 +165,18 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-core</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-crypto</artifactId>
+                <version>${hutool.version}</version>
             </dependency>
 
             <dependency>

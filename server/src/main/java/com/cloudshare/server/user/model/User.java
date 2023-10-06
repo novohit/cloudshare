@@ -34,7 +34,7 @@ public class User extends BaseModel {
     @Column(length = 64, nullable = false)
     private String salt;
 
-    @Column(length = 64, nullable = false)
+    @Column(length = 64)
     private String phone;
 
     @Column(length = 64)

@@ -1,5 +1,8 @@
 package com.cloudshare.server.user.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.SecureUtil;
+import com.cloudshare.lock.lock.ILock;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
@@ -17,19 +20,32 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    private final ILock lock;
+
+    public UserServiceImpl(UserRepository userRepository, ILock lock) {
         this.userRepository = userRepository;
+        this.lock = lock;
     }
 
     @Override
     public Long register(UserRegisterReqDTO reqDTO) {
-        userRepository.findByUsername(reqDTO.username()).ifPresent(user -> {
+        if (!lock.tryLock(reqDTO.username(), 30)) {
             throw new BizException("用户名已存在");
-        });
-        User user = new User();
-        BeanUtils.copyProperties(reqDTO, user);
-        user.setSalt("test");
-        userRepository.save(user);
-        return user.getId();
+        }
+        try {
+            userRepository.findByUsername(reqDTO.username()).ifPresent(user -> {
+                throw new BizException("用户名已存在");
+            });
+            User user = new User();
+            BeanUtils.copyProperties(reqDTO, user);
+            String salt = RandomUtil.randomString(8);
+            String cryptPassword = SecureUtil.md5(salt + reqDTO.password());
+            user.setSalt(salt);
+            user.setPassword(cryptPassword);
+            userRepository.save(user);
+            return user.getId();
+        } finally {
+            lock.unlock(reqDTO.username());
+        }
     }
 }
