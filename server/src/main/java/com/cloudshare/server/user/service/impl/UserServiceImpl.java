@@ -4,11 +4,15 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.lock.lock.ILock;
+import com.cloudshare.server.auth.UserContext;
+import com.cloudshare.server.auth.UserContextThreadHolder;
+import com.cloudshare.server.user.api.request.UserInfoRepDTO;
 import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
 import com.cloudshare.server.user.service.UserService;
+import com.cloudshare.web.enums.BizCodeEnum;
 import com.cloudshare.web.exception.BizException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -34,11 +38,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long register(UserRegisterReqDTO reqDTO) {
         if (!lock.tryLock(reqDTO.username(), 30)) {
-            throw new BizException("用户名已存在");
+            throw new BizException(BizCodeEnum.USER_REPEAT);
         }
         try {
             userRepository.findByUsername(reqDTO.username()).ifPresent(user -> {
-                throw new BizException("用户名已存在");
+                throw new BizException(BizCodeEnum.USER_REPEAT);
             });
             User user = new User();
             BeanUtils.copyProperties(reqDTO, user);
@@ -56,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean checkUsername(String username) {
         userRepository.findByUsername(username).ifPresent(user -> {
-            throw new BizException("用户名已存在");
+            throw new BizException(BizCodeEnum.USER_REPEAT);
         });
         return true;
     }
@@ -68,10 +72,29 @@ public class UserServiceImpl implements UserService {
             User user = optional.get();
             String cryptPassword = SecureUtil.md5(user.getSalt() + reqDTO.password());
             if (!cryptPassword.equals(user.getPassword())) {
-                throw new BizException("用户名或密码不正确");
+                throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
             }
             return TokenUtil.generateAccessToken(user.getId());
         }
-        throw new BizException("用户名或密码不正确");
+        throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
+    }
+
+    @Override
+    public User findById(Long userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        if (optional.isEmpty()) {
+            throw new BizException(BizCodeEnum.USER_NOT_EXIST);
+        }
+        return optional.get();
+    }
+
+    @Override
+    public UserInfoRepDTO getUserInfo() {
+        UserContext userContext = UserContextThreadHolder.getUserContext();
+        UserInfoRepDTO repDTO = new UserInfoRepDTO(
+                userContext.id(),
+                userContext.username(),
+                userContext.phone());
+        return repDTO;
     }
 }

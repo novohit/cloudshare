@@ -1,5 +1,6 @@
 package com.cloudshare.server.user.api;
 
+import com.cloudshare.server.user.api.request.UserInfoRepDTO;
 import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.service.UserService;
@@ -33,6 +34,12 @@ public class UserController {
     public Response<Boolean> checkUsername(@RequestParam("username") @NotBlank String username) {
         Boolean valid = userService.checkUsername(username);
         return Response.success(valid);
+    }
+
+    @GetMapping
+    public Response<UserInfoRepDTO> getUserInfo() {
+        UserInfoRepDTO repDTO = userService.getUserInfo();
+        return Response.success(repDTO);
     }
 
     @PostMapping("/register")
