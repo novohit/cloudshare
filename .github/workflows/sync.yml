@@ -1,0 +1,21 @@
+name: Sync to Destination Repository
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  sync_gitee:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        with:
+          source-repo: "git@github.com:novohit/cloudshare.git"
+          destination-repo: "git@gitee.com:novohit/cloudshare.git"
