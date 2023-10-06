@@ -55,7 +55,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 )
                 .map(uri -> "/api" + uri)
                 .collect(Collectors.toList());
-        exclude.add("/");
+        exclude.add("/*");
         return exclude;
     }
 

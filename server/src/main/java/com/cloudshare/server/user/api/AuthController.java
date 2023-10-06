@@ -2,6 +2,7 @@ package com.cloudshare.server.user.api;
 
 import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.service.UserService;
+import com.cloudshare.web.response.Response;
 import com.xkcoding.http.config.HttpConfig;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
@@ -42,11 +43,12 @@ public class AuthController {
 
     @GetMapping("/callback/{source}")
     @SuppressWarnings("unchecked")
-    public Object login(@PathVariable("source") String source, AuthCallback callback) {
-        AuthRequest authRequest = getAuthRequest(LoginType.fromString(source));
+    public Response<String> login(@PathVariable("source") String source, AuthCallback callback) {
+        LoginType loginType = LoginType.fromString(source);
+        AuthRequest authRequest = getAuthRequest(loginType);
         AuthResponse<AuthUser> authResponse = authRequest.login(callback);
-
-        return authResponse;
+        String accessToken = userService.login(loginType, authResponse.getData());
+        return Response.success(accessToken);
     }
 
     private AuthRequest getAuthRequest(LoginType loginType) {

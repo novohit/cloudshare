@@ -9,13 +9,18 @@ import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.user.api.request.UserInfoRepDTO;
 import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.model.User;
+import com.cloudshare.server.user.model.UserAuth;
+import com.cloudshare.server.user.repository.UserAuthRepository;
 import com.cloudshare.server.user.repository.UserRepository;
 import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.enums.BizCodeEnum;
 import com.cloudshare.web.exception.BizException;
+import me.zhyd.oauth.model.AuthUser;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,10 +33,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final UserAuthRepository userAuthRepository;
+
     private final ILock lock;
 
-    public UserServiceImpl(UserRepository userRepository, ILock lock) {
+    public UserServiceImpl(UserRepository userRepository, UserAuthRepository userAuthRepository, ILock lock) {
         this.userRepository = userRepository;
+        this.userAuthRepository = userAuthRepository;
         this.lock = lock;
     }
 
@@ -96,5 +104,20 @@ public class UserServiceImpl implements UserService {
                 userContext.username(),
                 userContext.phone());
         return repDTO;
+    }
+
+    @Override
+    @Transactional
+    public String login(LoginType loginType, AuthUser authUser) {
+        Optional<UserAuth> optional = userAuthRepository.findByLoginTypeAndIdentify(loginType, authUser.getUuid());
+        if (optional.isPresent()) {
+            return TokenUtil.generateAccessToken(optional.get().getUserId());
+        } else {
+            UserRegisterReqDTO reqDTO = new UserRegisterReqDTO(authUser.getUsername(), "123456");
+            Long userId = register(reqDTO);
+            UserAuth userAuth = new UserAuth(null, userId, LoginType.GOOGLE, authUser.getUuid());
+            userAuthRepository.save(userAuth);
+            return TokenUtil.generateAccessToken(userId);
+        }
     }
 }

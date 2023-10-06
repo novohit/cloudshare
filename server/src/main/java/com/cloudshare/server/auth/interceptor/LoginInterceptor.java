@@ -40,6 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
+        System.out.println(request.getRequestURI());
         // token为空
         if (!StringUtils.hasText(authorization)) {
             log.info("token为空");
