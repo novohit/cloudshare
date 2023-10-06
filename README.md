@@ -12,11 +12,19 @@ cloudshare
 
 ## Environment
 
+### backend
+
 - JDK 17
 - MySQL 8
 - SpringBoot 2.7
 - Redis
 - JPA
+
+
+
+### frondend
+
+- Vue 3 + Ts
 
 
 
