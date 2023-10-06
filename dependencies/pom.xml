@@ -30,6 +30,7 @@
         <jwt.version>0.9.1</jwt.version>
         <fastjson.version>2.0.15</fastjson.version>
         <kaptcha.version>2.3.2</kaptcha.version>
+        <justauth.version>1.16.4</justauth.version>
 
         <aliyun.oss.version>3.10.2</aliyun.oss.version>
         <alipay-sdk-java.version>4.38.10.ALL</alipay-sdk-java.version>
@@ -137,6 +138,12 @@
                 <groupId>com.github.penggle</groupId>
                 <artifactId>kaptcha</artifactId>
                 <version>${kaptcha.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>me.zhyd.oauth</groupId>
+                <artifactId>JustAuth</artifactId>
+                <version>${justauth.version}</version>
             </dependency>
 
             <!-- 阿里JSON解析器 -->

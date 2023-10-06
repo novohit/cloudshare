@@ -45,6 +45,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private List<String> getExcludePath() {
         List<String> exclude = Stream.of(
+                        "/oauth/**",
                         "/user/**/register",
                         "/user/**/login",
                         "/user/**/captcha",
