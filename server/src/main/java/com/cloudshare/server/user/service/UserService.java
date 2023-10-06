@@ -8,4 +8,6 @@ import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
  */
 public interface UserService {
     Long register(UserRegisterReqDTO reqDTO);
+
+    Boolean checkUsername(String username);
 }

@@ -48,4 +48,12 @@ public class UserServiceImpl implements UserService {
             lock.unlock(reqDTO.username());
         }
     }
+
+    @Override
+    public Boolean checkUsername(String username) {
+        userRepository.findByUsername(username).ifPresent(user -> {
+            throw new BizException("用户名已存在");
+        });
+        return true;
+    }
 }

@@ -28,6 +28,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/check-username")
+    public Response<Boolean> checkUsername(@RequestParam("username") @NotBlank String username) {
+        Boolean valid = userService.checkUsername(username);
+        return Response.success(valid);
+    }
+
     @PostMapping("/register")
     public Response<Long> register(@Validated @RequestBody UserRegisterReqDTO reqDTO) {
         Long userId = userService.register(reqDTO);
