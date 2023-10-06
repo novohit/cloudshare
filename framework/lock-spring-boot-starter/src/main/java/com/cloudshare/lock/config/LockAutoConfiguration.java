@@ -1,7 +1,7 @@
-package com.cloudshare.cache.config;
+package com.cloudshare.lock.config;
 
-import com.cloudshare.cache.lock.ILock;
-import com.cloudshare.cache.lock.RedisLock;
+import com.cloudshare.lock.lock.ILock;
+import com.cloudshare.lock.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
@@ -14,7 +14,7 @@ import org.springframework.scripting.support.ResourceScriptSource;
  * @author novo
  * @since 2023/10/5
  */
-public class CacheAutoConfiguration {
+public class LockAutoConfiguration {
 
     @Bean
     public ILock redisLock(StringRedisTemplate stringRedisTemplate, @Qualifier("unlock") RedisScript<Long> unlockScript) {

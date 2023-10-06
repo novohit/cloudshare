@@ -1,4 +1,4 @@
-package com.cloudshare.cache.lock;
+package com.cloudshare.lock.lock;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -51,8 +51,9 @@ public class RedisLock implements ILock {
      * 当 A 阻塞完后再释放锁会导致 A 解除了 B 的锁
      */
     @Override
-    public void unlock(String key) {
+    public boolean unlock(String key) {
         String threadId = "%s-%d".formatted(GLOBAL_THREAD_ID_PREFIX, Thread.currentThread().getId());
-        stringRedisTemplate.execute(unlockScript, Collections.singletonList(KEY_PREFIX + key), threadId);
+        Long res = stringRedisTemplate.execute(unlockScript, Collections.singletonList(KEY_PREFIX + key), threadId);
+        return Long.valueOf(1).equals(res);
     }
 }

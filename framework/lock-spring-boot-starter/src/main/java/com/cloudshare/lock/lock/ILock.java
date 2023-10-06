@@ -1,4 +1,4 @@
-package com.cloudshare.cache.lock;
+package com.cloudshare.lock.lock;
 
 /**
  * @author novo
@@ -8,5 +8,5 @@ public interface ILock {
 
     boolean tryLock(String key, long timeout);
 
-    void unlock(String key);
+    boolean unlock(String key);
 }

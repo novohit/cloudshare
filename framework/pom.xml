@@ -14,7 +14,7 @@
 
     <modules>
         <module>web-spring-boot-starter</module>
-        <module>cache-spring-boot-starter</module>
+        <module>lock-spring-boot-starter</module>
     </modules>
 
     <properties>
