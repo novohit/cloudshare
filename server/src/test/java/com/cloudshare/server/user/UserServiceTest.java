@@ -1,5 +1,6 @@
 package com.cloudshare.server.user;
 
+import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.exception.BizException;
@@ -21,13 +22,33 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
-    void registerTest() {
-        UserRegisterReqDTO reqDTO = new UserRegisterReqDTO("dev", "test");
-        Long userId = userService.register(reqDTO);
+    void authTest() {
+        UserRegisterReqDTO registerReqDTO = new UserRegisterReqDTO("dev", "test");
+        Long userId = userService.register(registerReqDTO);
         Assertions.assertNotNull(userId);
+        // 重复注册
         Assertions.assertThrows(
                 BizException.class,
-                () -> userService.register(reqDTO)
+                () -> userService.register(registerReqDTO)
+        );
+
+        // 用户名密码正确
+        UserLoginReqDTO rightLogin = new UserLoginReqDTO(registerReqDTO.username(), registerReqDTO.password());
+        String accessToken = userService.login(rightLogin);
+        Assertions.assertNotNull(accessToken);
+
+        // 密码不正确
+        UserLoginReqDTO passwordError = new UserLoginReqDTO(registerReqDTO.username(), registerReqDTO.password() + " ");
+        Assertions.assertThrows(
+                BizException.class,
+                () -> userService.login(passwordError)
+        );
+
+        // 用户名不正确
+        UserLoginReqDTO usernameError = new UserLoginReqDTO(registerReqDTO.username() + " ", registerReqDTO.password());
+        Assertions.assertThrows(
+                BizException.class,
+                () -> userService.login(usernameError)
         );
     }
 }

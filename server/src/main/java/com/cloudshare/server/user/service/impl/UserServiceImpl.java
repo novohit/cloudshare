@@ -2,7 +2,9 @@ package com.cloudshare.server.user.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.lock.lock.ILock;
+import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
@@ -10,6 +12,8 @@ import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.exception.BizException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * @author novo
@@ -55,5 +59,19 @@ public class UserServiceImpl implements UserService {
             throw new BizException("用户名已存在");
         });
         return true;
+    }
+
+    @Override
+    public String login(UserLoginReqDTO reqDTO) {
+        Optional<User> optional = userRepository.findByUsername(reqDTO.username());
+        if (optional.isPresent()) {
+            User user = optional.get();
+            String cryptPassword = SecureUtil.md5(user.getSalt() + reqDTO.password());
+            if (!cryptPassword.equals(user.getPassword())) {
+                throw new BizException("用户名或密码不正确");
+            }
+            return TokenUtil.generateAccessToken(user.getId());
+        }
+        throw new BizException("用户名或密码不正确");
     }
 }

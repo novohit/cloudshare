@@ -1,5 +1,6 @@
 package com.cloudshare.server.user.service;
 
+import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 
 /**
@@ -10,4 +11,6 @@ public interface UserService {
     Long register(UserRegisterReqDTO reqDTO);
 
     Boolean checkUsername(String username);
+
+    String login(UserLoginReqDTO reqDTO);
 }

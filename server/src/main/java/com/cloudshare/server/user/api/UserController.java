@@ -1,5 +1,6 @@
 package com.cloudshare.server.user.api;
 
+import com.cloudshare.server.user.api.request.UserLoginReqDTO;
 import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.response.Response;
@@ -38,5 +39,11 @@ public class UserController {
     public Response<Long> register(@Validated @RequestBody UserRegisterReqDTO reqDTO) {
         Long userId = userService.register(reqDTO);
         return Response.success(userId);
+    }
+
+    @PostMapping("/login")
+    public Response<String> login(@Validated @RequestBody UserLoginReqDTO reqDTO) {
+        String accessToken = userService.login(reqDTO);
+        return Response.success(accessToken);
     }
 }
