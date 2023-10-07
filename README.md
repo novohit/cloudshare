@@ -18,13 +18,15 @@ cloudshare
 - MySQL 8
 - SpringBoot 2.7
 - Redis
+- Kafka
 - JPA
 
 
 
-### frondend
+### frontend
 
-- Vue 3 + Ts
+- Vue 3
+- Element-Plus
 
 
 
