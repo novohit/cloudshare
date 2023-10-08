@@ -64,24 +64,27 @@ onMounted(() => {
 })
 
 const doLogin = () => {
-    if (checkLoginForm()) {
-        loading.value = true
-        userService.login(loginForm, res => {
-            setToken(res.data)
-            userService.info(res => {
-                setParentId(res.data.rootFileId)
-                setDefaultParentId(res.data.rootFileId)
-                setDefaultParentFilename(res.data.rootFilename)
-                setUsername(res.data.username)
-                router.push({name: 'Index'})
-            }, res => {
-                ElMessage.error(res.message)
-            })
-        }, res => {
-            ElMessage.error(res.message)
-            loading.value = false
-        })
-    }
+    window.location.href = "/api/oauth/render/google";
+    const currentURL = window.location.href;
+    const token = urlParams.get("token");
+    // if (checkLoginForm()) {
+    //     loading.value = true
+    //     userService.login(loginForm, res => {
+    //         setToken(res.data)
+    //         userService.info(res => {
+    //             setParentId(res.data.rootFileId)
+    //             setDefaultParentId(res.data.rootFileId)
+    //             setDefaultParentFilename(res.data.rootFilename)
+    //             setUsername(res.data.username)
+    //             router.push({name: 'Index'})
+    //         }, res => {
+    //             ElMessage.error(res.message)
+    //         })
+    //     }, res => {
+    //         ElMessage.error(res.message)
+    //         loading.value = false
+    //     })
+    // }
 }
 
 const goForget = () => {

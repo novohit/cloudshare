@@ -24,7 +24,7 @@
         <hutool.version>5.8.22</hutool.version>
         <commons.math3.version>3.6.1</commons.math3.version>
         <commons.codec.version>1.15</commons.codec.version>
-
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
 
         <sharding-jdbc.version>4.1.1</sharding-jdbc.version>
         <jwt.version>0.9.1</jwt.version>
@@ -124,6 +124,12 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons.codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
             </dependency>
 
             <!--sharding-jdbc-->
