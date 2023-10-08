@@ -175,7 +175,7 @@ public class GlobalExceptionHandler {
                 .map(objectError -> {
                     if (objectError instanceof FieldError) {
                         FieldError fieldError = (FieldError) objectError;
-                        return fieldError.getField() + fieldError.getDefaultMessage();
+                        return "%s %s".formatted(fieldError.getField(), fieldError.getDefaultMessage());
                     } else {
                         return objectError.getDefaultMessage();
                     }
