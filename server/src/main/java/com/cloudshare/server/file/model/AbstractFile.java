@@ -50,10 +50,6 @@ public abstract class AbstractFile extends BaseModel {
     @Comment("文件/目录 逻辑名称")
     private String name;
 
-    @Column(length = 64, nullable = false)
-    @Comment("真实文件名")
-    private String realName;
-
     @Column(nullable = false)
     @Comment("文件大小")
     private Long size;

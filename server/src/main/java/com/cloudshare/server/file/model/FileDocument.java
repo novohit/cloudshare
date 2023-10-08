@@ -27,4 +27,8 @@ public class FileDocument extends AbstractFile {
     @Column(length = 64)
     @Comment("文件后缀")
     private String suffix;
+
+    @Column(length = 64)
+    @Comment("真实文件名")
+    private String realName;
 }
