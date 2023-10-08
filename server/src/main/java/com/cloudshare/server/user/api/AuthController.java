@@ -2,7 +2,6 @@ package com.cloudshare.server.user.api;
 
 import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.service.UserService;
-import com.cloudshare.web.response.Response;
 import com.xkcoding.http.config.HttpConfig;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
@@ -11,6 +10,7 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthGoogleRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,12 +43,14 @@ public class AuthController {
 
     @GetMapping("/callback/{source}")
     @SuppressWarnings("unchecked")
-    public Response<String> login(@PathVariable("source") String source, AuthCallback callback) {
+    public void login(@PathVariable("source") String source, AuthCallback callback, HttpServletResponse response) {
         LoginType loginType = LoginType.fromString(source);
         AuthRequest authRequest = getAuthRequest(loginType);
         AuthResponse<AuthUser> authResponse = authRequest.login(callback);
         String accessToken = userService.login(loginType, authResponse.getData());
-        return Response.success(accessToken);
+        response.setHeader("Location", "http://localhost:5173?token=" + accessToken);
+//        return Response.success(accessToken);
+        response.setStatus(HttpStatus.FOUND.value());
     }
 
     private AuthRequest getAuthRequest(LoginType loginType) {
