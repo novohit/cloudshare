@@ -21,12 +21,12 @@ public abstract class BaseModel {
 
     @CreatedDate
     @Comment("创建时间")
-    private LocalDateTime createTime;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Comment("更改时间")
-    private LocalDateTime updateTime;
+    private LocalDateTime updatedAt;
 
     @Comment("删除时间")
-    private LocalDateTime deleteTime;
+    private LocalDateTime deletedAt;
 }
