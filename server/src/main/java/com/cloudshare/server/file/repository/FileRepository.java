@@ -12,4 +12,6 @@ import java.util.List;
 public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     List<FileDocument> findByUserIdAndCurDirectory(Long userId, String curDirectory);
+
+    List<FileDocument> findByUserIdAndCurDirectoryAndNameStartsWith(Long userId, String curDirectory, String key);
 }
