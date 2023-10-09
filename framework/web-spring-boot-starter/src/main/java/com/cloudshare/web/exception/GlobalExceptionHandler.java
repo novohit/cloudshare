@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
         Response<Void> response = Response.build(e.getCode(), null, e.getMessage());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpStatus httpStatus = HttpStatus.resolve(e.getHttpStatusCode());
+        HttpStatus httpStatus = e.getHttpStatus();
         if (httpStatus == null) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         }

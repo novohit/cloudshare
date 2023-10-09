@@ -15,11 +15,11 @@ public class BizException extends RuntimeException {
 
     protected String message;
 
-    protected Integer httpStatusCode = 200;
+    protected HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
     public BizException(String message) {
         super(message);
-        this.code = 500;
+        this.code = -1;
         this.message = message;
     }
 
@@ -33,6 +33,6 @@ public class BizException extends RuntimeException {
         super(bizCodeEnum.getMessage());
         this.code = bizCodeEnum.getCode();
         this.message = bizCodeEnum.getMessage();
-        this.httpStatusCode = httpStatus.value();
+        this.httpStatus = httpStatus;
     }
 }
