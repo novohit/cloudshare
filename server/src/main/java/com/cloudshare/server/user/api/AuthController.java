@@ -10,6 +10,7 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthGoogleRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,12 @@ public class AuthController {
 
     private final UserService userService;
 
+    @Value("${auth.frontend-url}")
+    private String frontEndUrl;
+
+    @Value("${auth.callback-url}")
+    private String callbackUrl;
+
     public AuthController(UserService userService) {
         this.userService = userService;
     }
@@ -48,8 +55,7 @@ public class AuthController {
         AuthRequest authRequest = getAuthRequest(loginType);
         AuthResponse<AuthUser> authResponse = authRequest.login(callback);
         String accessToken = userService.login(loginType, authResponse.getData());
-        response.setHeader("Location", "http://localhost:5173?token=" + accessToken);
-//        return Response.success(accessToken);
+        response.setHeader("Location", frontEndUrl + "?token=" + accessToken);
         response.setStatus(HttpStatus.FOUND.value());
     }
 
@@ -59,7 +65,7 @@ public class AuthController {
                 return new AuthGoogleRequest(AuthConfig.builder()
                         .clientId("342994534137-ras735k0pju62e0inefok56p8muvg50h.apps.googleusercontent.com")
                         .clientSecret("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")
-                        .redirectUri("http://localhost:8080/api/oauth/callback/google")
+                        .redirectUri(callbackUrl + "/api/oauth/callback/google")
                         // 针对国外平台配置代理
                         .httpConfig(HttpConfig.builder()
                                 .timeout(15000)
