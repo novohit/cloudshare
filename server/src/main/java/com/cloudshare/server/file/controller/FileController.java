@@ -2,7 +2,7 @@ package com.cloudshare.server.file.controller;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
-import com.cloudshare.server.file.controller.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;
@@ -34,8 +34,8 @@ public class FileController {
     }
 
     @PostMapping("/list")
-    public Response<List<FileListRepDTO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
-        List<FileListRepDTO> response = fileService.list(reqDTO);
+    public Response<List<FileListVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
+        List<FileListVO> response = fileService.list(reqDTO);
         return Response.success(response);
     }
 }

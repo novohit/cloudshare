@@ -3,7 +3,7 @@ package com.cloudshare.server.file.service.impl;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
-import com.cloudshare.server.file.controller.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
@@ -43,11 +43,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileListRepDTO> list(FileListReqDTO reqDTO) {
+    public List<FileListVO> list(FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
-        List<FileListRepDTO> voList = fileConverter.DOList2VOList(fileList);
+        List<FileListVO> voList = fileConverter.DOList2VOList(fileList);
         return voList;
     }
 }

@@ -2,7 +2,7 @@ package com.cloudshare.server.file.service;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
-import com.cloudshare.server.file.controller.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListVO;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ import java.util.List;
 public interface FileService {
     void addDir(DirAddReqDTO reqDTO);
 
-    List<FileListRepDTO> list(FileListReqDTO reqDTO);
+    List<FileListVO> list(FileListReqDTO reqDTO);
 }

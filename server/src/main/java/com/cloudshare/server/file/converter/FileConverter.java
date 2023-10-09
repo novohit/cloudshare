@@ -1,6 +1,6 @@
 package com.cloudshare.server.file.converter;
 
-import com.cloudshare.server.file.controller.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.model.FileDocument;
 import org.mapstruct.Mapper;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface FileConverter {
 
-    FileListRepDTO DO2VO(FileDocument fileDocument);
+    FileListVO DO2VO(FileDocument fileDocument);
 
-    List<FileListRepDTO> DOList2VOList(List<FileDocument> fileList);
+    List<FileListVO> DOList2VOList(List<FileDocument> fileList);
 }

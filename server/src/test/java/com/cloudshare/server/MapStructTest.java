@@ -1,6 +1,6 @@
 package com.cloudshare.server;
 
-import com.cloudshare.server.file.controller.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
@@ -28,7 +28,7 @@ public class MapStructTest {
         fileDocument.setPath("/");
         fileDocument.setUserId(0L);
         fileDocument.setId(1L);
-        FileListRepDTO repDTO = fileConverter.DO2VO(fileDocument);
+        FileListVO repDTO = fileConverter.DO2VO(fileDocument);
         log.info("{}", repDTO);
     }
 }
