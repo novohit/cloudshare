@@ -23,8 +23,11 @@ public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
 
-    public FileServiceImpl(FileRepository fileRepository) {
+    private final FileConverter fileConverter;
+
+    public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter) {
         this.fileRepository = fileRepository;
+        this.fileConverter = fileConverter;
     }
 
     @Override
@@ -44,8 +47,7 @@ public class FileServiceImpl implements FileService {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
-        FileListRepDTO fileListRepDTO = FileConverter.INSTANCE.DO2VO(fileList.get(0));
-        System.out.println(fileListRepDTO);
-        return null;
+        List<FileListRepDTO> voList = fileConverter.DOList2VOList(fileList);
+        return voList;
     }
 }
