@@ -6,7 +6,7 @@
                     <h3>网盘登录</h3>
                     <el-form class="loginForm" :model="loginForm">
                         <el-form-item label="账号">
-                            <el-input type="text" v-model="loginForm.username" autocomplete="off" placeholder="请输入"/>
+                            <el-input type="text" v-model="loginForm.username" autocomplete="off" placeholder="请输入" ref="usernameEl"/>
                         </el-form-item>
                         <el-form-item label="密码">
                             <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入"/>
@@ -60,10 +60,10 @@ const userStore = useUserStore()
 const {setParentId, setDefaultParentId, setDefaultParentFilename} = fileStore
 const {setUsername} = userStore
 
-// const usernameEl = ref(null)
-// onMounted(() => {
-//     usernameEl.value.focus()
-// })
+const usernameEl = ref(null)
+onMounted(() => {
+    usernameEl.value.focus()
+})
 
 const doLogin = () => {
     if (checkLoginForm()) {
@@ -107,6 +107,7 @@ const visitor = ()=>{
 
 const google = ()=>{
     window.location.href ="/api/oauth/render/google";
+    console.log(window.location.href);
 }
 
 const goForget = () => {
