@@ -1,8 +1,8 @@
-package com.cloudshare.server.user.api;
+package com.cloudshare.server.user.controller;
 
-import com.cloudshare.server.user.api.request.UserInfoRepDTO;
-import com.cloudshare.server.user.api.request.UserLoginReqDTO;
-import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
+import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
+import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;

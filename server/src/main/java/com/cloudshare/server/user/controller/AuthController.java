@@ -1,4 +1,4 @@
-package com.cloudshare.server.user.api;
+package com.cloudshare.server.user.controller;
 
 import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.service.UserService;

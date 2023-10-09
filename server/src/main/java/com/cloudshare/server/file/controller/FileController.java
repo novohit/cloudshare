@@ -1,8 +1,8 @@
-package com.cloudshare.server.file.api;
+package com.cloudshare.server.file.controller;
 
-import com.cloudshare.server.file.api.requset.DirAddReqDTO;
-import com.cloudshare.server.file.api.requset.FileListReqDTO;
-import com.cloudshare.server.file.api.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.response.FileListRepDTO;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;

@@ -1,6 +1,6 @@
 package com.cloudshare.server;
 
-import com.cloudshare.server.file.api.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListRepDTO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;

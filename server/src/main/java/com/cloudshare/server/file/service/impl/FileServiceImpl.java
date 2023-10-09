@@ -1,9 +1,9 @@
 package com.cloudshare.server.file.service.impl;
 
 import com.cloudshare.server.auth.UserContextThreadHolder;
-import com.cloudshare.server.file.api.requset.DirAddReqDTO;
-import com.cloudshare.server.file.api.requset.FileListReqDTO;
-import com.cloudshare.server.file.api.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.response.FileListRepDTO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;

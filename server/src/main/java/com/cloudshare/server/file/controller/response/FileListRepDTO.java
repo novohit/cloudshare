@@ -1,4 +1,4 @@
-package com.cloudshare.server.file.api.response;
+package com.cloudshare.server.file.controller.response;
 
 import com.cloudshare.server.file.enums.FileType;
 

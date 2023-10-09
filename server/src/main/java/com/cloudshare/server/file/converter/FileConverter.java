@@ -1,6 +1,6 @@
 package com.cloudshare.server.file.converter;
 
-import com.cloudshare.server.file.api.response.FileListRepDTO;
+import com.cloudshare.server.file.controller.response.FileListRepDTO;
 import com.cloudshare.server.file.model.FileDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

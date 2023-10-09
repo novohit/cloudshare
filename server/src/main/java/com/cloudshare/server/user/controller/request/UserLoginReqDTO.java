@@ -1,4 +1,4 @@
-package com.cloudshare.server.user.api.request;
+package com.cloudshare.server.user.controller.request;
 
 import javax.validation.constraints.NotBlank;
 

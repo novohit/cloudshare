@@ -1,10 +1,9 @@
-package com.cloudshare.server.api;
+package com.cloudshare.server.controller;
 
 import com.cloudshare.web.response.Response;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author novo
