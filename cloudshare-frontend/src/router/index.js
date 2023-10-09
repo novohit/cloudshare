@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import 'nprogress/nprogress.css'
 import NProgress from 'nprogress'
-import {getToken} from '@/utils/cookie'
+import {setToken,getToken} from '@/utils/cookie'
 import userService from '@/api/user'
 import {useUserStore} from '@/stores/user'
 import {useFileStore} from '@/stores/file'
@@ -116,6 +116,9 @@ const toIndexPageList = ['Login', 'Register', 'Forget'],
 
 router.beforeEach((to, from, next) => {
     NProgress.start()
+    if(to.query.token){
+        setToken(to.query.token)
+    }
     const hasToken = getToken()
     const userStore = useUserStore()
     const fileStore = useFileStore()
