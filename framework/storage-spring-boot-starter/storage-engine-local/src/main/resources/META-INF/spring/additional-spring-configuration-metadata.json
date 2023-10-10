@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "storage.local.base-path",
+      "defaultValue": "@see com.cloudshare.storage.local.config.LocalStorageEngineProperties",
+      "description": "local storage path."
+    }
+  ]
+}

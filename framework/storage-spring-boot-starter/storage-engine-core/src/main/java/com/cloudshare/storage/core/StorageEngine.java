@@ -1,8 +1,17 @@
 package com.cloudshare.storage.core;
 
+import com.cloudshare.storage.core.model.DeleteContext;
+import com.cloudshare.storage.core.model.StoreContext;
+
+import java.io.IOException;
+
 /**
  * @author novo
  * @since 2023/10/10
  */
 public interface StorageEngine {
+
+    void store(StoreContext context) throws IOException;
+
+    void delete(DeleteContext context) throws IOException;
 }
