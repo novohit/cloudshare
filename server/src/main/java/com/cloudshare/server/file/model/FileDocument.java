@@ -31,4 +31,8 @@ public class FileDocument extends AbstractFile {
     @Column(length = 64)
     @Comment("真实文件名")
     private String realName;
+
+    @Column(length = 256)
+    @Comment("MD5")
+    private String md5;
 }
