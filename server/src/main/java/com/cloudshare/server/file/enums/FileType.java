@@ -72,7 +72,7 @@ public enum FileType {
         return suffixes.contains(suffix);
     }),
 
-    UNKNOWN(Objects::isNull);
+    UNKNOWN(suffix -> true);
 
     private final Predicate<String> predicate;
 

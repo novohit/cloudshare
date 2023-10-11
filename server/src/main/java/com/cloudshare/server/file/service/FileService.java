@@ -4,6 +4,7 @@ import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface FileService {
     void updateDir(DirUpdateReqDTO reqDTO);
 
     void renameDir(DirRenameReqDTO reqDTO);
+
+    void singleUpload(FileSingleUploadReqDTO reqDTO);
 }

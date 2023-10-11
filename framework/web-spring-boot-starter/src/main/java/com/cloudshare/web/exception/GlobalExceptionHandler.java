@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -77,6 +78,17 @@ public class GlobalExceptionHandler {
         }
         log.error("[业务异常] url:[{}],msg:[{}]", requestUrl, e.getMessage());
         return new ResponseEntity<>(response, headers, httpStatus);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public Response<Void> methodArgumentNotValidExceptionHandler(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
+        // content type 不对
+        String requestUrl = request.getRequestURI();
+        String method = request.getMethod();
+        log.error("[参数异常] url:[{}],msg:[{}]", requestUrl, e.getMessage());
+        return Response.error(e.getMessage());
     }
 
 

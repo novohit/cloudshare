@@ -4,9 +4,11 @@ import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,5 +48,12 @@ public class FileController {
     public Response<List<FileListVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
         List<FileListVO> response = fileService.list(reqDTO);
         return Response.success(response);
+    }
+
+
+    @PostMapping(path = "/single-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<Void> singleUpload(@Validated FileSingleUploadReqDTO reqDTO) {
+        fileService.singleUpload(reqDTO);
+        return Response.success();
     }
 }

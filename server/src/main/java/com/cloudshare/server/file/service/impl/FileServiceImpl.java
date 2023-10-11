@@ -1,23 +1,30 @@
 package com.cloudshare.server.file.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
+import com.cloudshare.server.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
+import com.cloudshare.storage.core.StorageEngine;
+import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -34,9 +41,12 @@ public class FileServiceImpl implements FileService {
 
     private final FileConverter fileConverter;
 
-    public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter) {
+    private final StorageEngine storageEngine;
+
+    public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter, StorageEngine storageEngine) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
+        this.storageEngine = storageEngine;
     }
 
     @Override
@@ -124,11 +134,78 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
+    public void singleUpload(FileSingleUploadReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        // 保存实体
+        // 上传文件
+        try {
+            MultipartFile multipartFile = reqDTO.file();
+            StoreContext context = new StoreContext();
+            context.setTotalSize(multipartFile.getSize());
+            context.setInputStream(multipartFile.getInputStream());
+            context.setFileNameWithSuffix(multipartFile.getOriginalFilename());
+            storageEngine.store(context);
+            FileDocument fileDocument = assembleFileDocument(
+                    userId,
+                    reqDTO.parentId(),
+                    reqDTO.md5(),
+                    context.getFileNameWithSuffix(),
+                    null,
+                    reqDTO.curDirectory(),
+                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileNameWithSuffix(),
+                    context.getRealPath(),
+                    context.getTotalSize(),
+                    FileType.suffix2Type(FileUtil.getSuffix(context.getFileNameWithSuffix()))
+            );
+            saveFile2DB(fileDocument);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
     public List<FileListVO> list(FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
         List<FileListVO> voList = fileConverter.DOList2VOList(fileList);
         return voList;
+    }
+
+
+    private FileDocument assembleFileDocument(
+            Long userId,
+            Long parentId,
+            String md5,
+            String name,
+            String realName,
+            String curDirectory,
+            String path,
+            String realPath,
+            Long size,
+            FileType fileType
+    ) {
+        FileDocument fileDocument = new FileDocument();
+        fileDocument.setUserId(userId);
+        fileDocument.setParentId(parentId);
+        fileDocument.setMd5(md5);
+        fileDocument.setName(name);
+        fileDocument.setCurDirectory(curDirectory);
+        fileDocument.setPath(path);
+        fileDocument.setRealPath(realPath);
+        fileDocument.setSize(size);
+        fileDocument.setType(fileType);
+        return fileDocument;
+    }
+
+    private void saveFile2DB(FileDocument fileDocument) {
+        // 正常规则是 /A/B + / + name
+        // 当前目录是根目录时会多加一个 /
+        if (BizConstant.LINUX_SEPARATOR.equals(fileDocument.getCurDirectory())) {
+            fileDocument.setPath(fileDocument.getCurDirectory() + fileDocument.getName());
+        }
+        fileRepository.save(fileDocument);
     }
 }
