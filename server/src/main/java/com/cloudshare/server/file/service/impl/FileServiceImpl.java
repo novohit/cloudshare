@@ -135,6 +135,11 @@ public class FileServiceImpl implements FileService {
                 });
     }
 
+    /**
+     * TODO　多次上传同名字文件处理
+     *
+     * @param reqDTO
+     */
     @Override
     @Transactional
     public void singleUpload(FileSingleUploadReqDTO reqDTO) {
@@ -194,7 +199,7 @@ public class FileServiceImpl implements FileService {
                 reqDTO.fileName(),
                 null,
                 reqDTO.curDirectory(),
-                same.getPath(),
+                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
                 same.getRealPath(),
                 same.getSize(),
                 FileType.suffix2Type(suffix),

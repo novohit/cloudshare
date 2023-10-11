@@ -51,7 +51,7 @@ public class FileController {
     }
 
     @PostMapping("/sec-upload")
-    public Response<Boolean> secUpload(@Validated FileSecUploadReqDTO reqDTO) {
+    public Response<Boolean> secUpload(@Validated @RequestBody FileSecUploadReqDTO reqDTO) {
         return Response.success(fileService.secUpload(reqDTO));
     }
 

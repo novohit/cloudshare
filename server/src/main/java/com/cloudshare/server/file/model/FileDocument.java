@@ -11,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * @author novo
@@ -20,14 +19,10 @@ import javax.persistence.UniqueConstraint;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "file")
-@Table(
-        uniqueConstraints = {
-                @UniqueConstraint(name = "nk_md5", columnNames = {"md5"}),
-        },
-        indexes = {
-                @Index(name = "idx_cur_directory_user_id", columnList = "curDirectory,userId"),
-        }
-)
+@Table(indexes = {
+        @Index(name = "idx_md5", columnList = "md5"),
+        @Index(name = "idx_cur_directory_user_id", columnList = "curDirectory,userId"),
+})
 public class FileDocument extends AbstractFile {
 
     @Id
