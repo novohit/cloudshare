@@ -1,6 +1,7 @@
 package com.cloudshare.server.file.enums;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -82,6 +83,8 @@ public enum FileType {
 
     public static FileType suffix2Type(String suffix) {
         return Arrays.stream(FileType.values())
+                // 先按 ordinal 升序 然后找到第一个匹配的
+                .sorted(Comparator.comparingInt(FileType::ordinal))
                 .filter(fileType -> fileType.predicate.test(suffix))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("未知的文件类型: " + suffix));

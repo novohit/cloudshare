@@ -8,4 +8,6 @@ public final class BizConstant {
 
     public static final String LINUX_SEPARATOR = "/";
 
+    public static final String DOT = ".";
+
 }

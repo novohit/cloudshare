@@ -148,6 +148,9 @@ public class FileServiceImpl implements FileService {
             context.setInputStream(multipartFile.getInputStream());
             context.setFileNameWithSuffix(multipartFile.getOriginalFilename());
             storageEngine.store(context);
+            String suffix = FileUtil.getSuffix(context.getFileNameWithSuffix());
+            // hutool return suffix have no dot
+            suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(
                     userId,
                     reqDTO.parentId(),
@@ -158,7 +161,8 @@ public class FileServiceImpl implements FileService {
                     reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileNameWithSuffix(),
                     context.getRealPath(),
                     context.getTotalSize(),
-                    FileType.suffix2Type(FileUtil.getSuffix(context.getFileNameWithSuffix()))
+                    FileType.suffix2Type(suffix),
+                    suffix
             );
             saveFile2DB(fileDocument);
         } catch (IOException e) {
@@ -180,6 +184,9 @@ public class FileServiceImpl implements FileService {
             return false;
         }
         FileDocument same = optional.get();
+        String suffix = FileUtil.getSuffix(reqDTO.fileName());
+        suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
+        // fileType suffix 以用户新给的文件名为主
         FileDocument fileDocument = assembleFileDocument(
                 userId,
                 reqDTO.parentId(),
@@ -190,7 +197,8 @@ public class FileServiceImpl implements FileService {
                 same.getPath(),
                 same.getRealPath(),
                 same.getSize(),
-                same.getType()
+                FileType.suffix2Type(suffix),
+                suffix
         );
         saveFile2DB(fileDocument);
         return true;
@@ -217,7 +225,8 @@ public class FileServiceImpl implements FileService {
             String path,
             String realPath,
             Long size,
-            FileType fileType
+            FileType fileType,
+            String suffix
     ) {
         FileDocument fileDocument = new FileDocument();
         fileDocument.setUserId(userId);
@@ -229,6 +238,7 @@ public class FileServiceImpl implements FileService {
         fileDocument.setRealPath(realPath);
         fileDocument.setSize(size);
         fileDocument.setType(fileType);
+        fileDocument.setSuffix(suffix);
         return fileDocument;
     }
 
