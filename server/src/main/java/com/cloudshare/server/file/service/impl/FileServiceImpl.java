@@ -7,6 +7,7 @@ import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.converter.FileConverter;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -162,6 +164,36 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 即使多个用户也共享同一个 md5
+     *
+     * @param reqDTO
+     * @return
+     */
+    @Override
+    public Boolean secUpload(FileSecUploadReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        Optional<FileDocument> optional = fileRepository.findByMd5(reqDTO.md5());
+        if (optional.isEmpty()) {
+            return false;
+        }
+        FileDocument same = optional.get();
+        FileDocument fileDocument = assembleFileDocument(
+                userId,
+                reqDTO.parentId(),
+                reqDTO.md5(),
+                reqDTO.fileName(),
+                null,
+                reqDTO.curDirectory(),
+                same.getPath(),
+                same.getRealPath(),
+                same.getSize(),
+                same.getType()
+        );
+        saveFile2DB(fileDocument);
+        return true;
     }
 
 

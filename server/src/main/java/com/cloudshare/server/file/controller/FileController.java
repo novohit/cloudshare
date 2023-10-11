@@ -2,8 +2,8 @@ package com.cloudshare.server.file.controller;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
-import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.service.FileService;
@@ -48,6 +48,11 @@ public class FileController {
     public Response<List<FileListVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
         List<FileListVO> response = fileService.list(reqDTO);
         return Response.success(response);
+    }
+
+    @PostMapping("/sec-upload")
+    public Response<Boolean> secUpload(@Validated FileSecUploadReqDTO reqDTO) {
+        return Response.success(fileService.secUpload(reqDTO));
     }
 
 

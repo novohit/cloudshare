@@ -21,6 +21,8 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     Optional<FileDocument> findByUserIdAndCurDirectoryAndName(Long userId, String curDirectory, String name);
 
+    Optional<FileDocument> findByMd5(String md5);
+
     @Modifying
     @Query("UPDATE file AS f " +
             "SET f.name = :name, " +
