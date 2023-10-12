@@ -3,7 +3,7 @@
         <el-card class="content">
             <div class="box">
                 <div class="loginBox">
-                    <h3>网盘登录</h3>
+                    <h3>Cloudshare Login</h3>
                     <el-form class="loginForm" :model="loginForm">
                         <el-form-item label="账号">
                             <el-input type="text" v-model="loginForm.username" autocomplete="off" placeholder="请输入" ref="usernameEl"/>
@@ -12,7 +12,7 @@
                             <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入"/>
                         </el-form-item>
                         <el-form-item>
-                            <el-button style="width: 100%;" type="success" :loading="loading" @click="doLogin">登录</el-button>
+                            <el-button style="width: 100%;" type="primary" :loading="loading" @click="doLogin">登录</el-button>
                         </el-form-item>
                     </el-form>
                     
@@ -61,7 +61,7 @@ const loginForm = reactive({
 
 const visitorForm = reactive({
     username: 'root',
-    password: 'root'
+    password: '123456'
 })
 
 const fileStore = useFileStore()

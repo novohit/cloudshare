@@ -1,6 +1,6 @@
 <template>
     <div class="download-button-content">
-        <el-button v-if="roundFlag" type="info" :size="size" round @click="downloadFile" :loading="loading">
+        <el-button v-if="roundFlag" type="info" :size="size" @click="downloadFile" :loading="loading">
             下载
             <el-icon class="el-icon--right">
                 <Download/>

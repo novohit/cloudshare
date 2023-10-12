@@ -68,6 +68,6 @@ const goToThis = (id, index) => {
 
 .breadcrumb-item-a {
     cursor: pointer !important;
-    color: #409EFF !important;
+    color: #2faa69 !important;
 }
 </style>

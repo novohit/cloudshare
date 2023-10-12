@@ -5,7 +5,7 @@
                 <li class="pan-nav-file-all">
                     <a @click="change('Files')" :class="{'checked': active === 'Files'}" href="javascript:void(0);">
                         <span class="text">
-                            <el-icon class="icon" :size="16" :color="active === 'Files' ? '#09AAFF' : ''"><Files/></el-icon>
+                            <el-icon class="icon" :size="16" :color="active === 'Files' ? '#16904f' : ''"><Files/></el-icon>
                             <span>全部文件</span>
                         </span>
                     </a>
@@ -13,7 +13,7 @@
                 <li class="pan-nav-file-pic">
                     <a @click="change('Imgs')" :class="{'checked': active === 'Imgs'}" href="javascript:void(0);">
                         <span class="text">
-                            <span class="icon"/>
+                            <el-icon class="icon" :size="16" :color="active === 'Imgs' ? '#16904f' : ''"><Picture /></el-icon>
                             <span>图片</span>
                         </span>
                     </a>
@@ -21,7 +21,7 @@
                 <li class="pan-nav-file-doc">
                     <a @click="change('Docs')" :class="{'checked': active === 'Docs'}" href="javascript:void(0);">
                         <span class="text">
-                            <span class="icon"/>
+                            <el-icon class="icon" :size="16" :color="active === 'Docs' ? '#16904f' : ''"><Document /></el-icon>
                             <span>文档</span>
                         </span>
                     </a>
@@ -30,7 +30,7 @@
                     <a @click="change('Videos')" :class="{'checked': active === 'Videos'}"
                        href="javascript:void(0);">
                         <span class="text">
-                            <span class="icon"/>
+                            <el-icon class="icon" :size="16" :color="active === 'Videos' ? '#16904f' : ''"><VideoCamera /></el-icon>
                             <span>视频</span>
                         </span>
                     </a>
@@ -39,7 +39,7 @@
                     <a @click="change('Musics')" :class="{'checked': active === 'Musics'}"
                        href="javascript:void(0);">
                         <span class="text">
-                            <span class="icon"/>
+                            <el-icon class="icon" :size="16" :color="active === 'Musics' ? '#16904f' : ''"><Headset /></el-icon>
                             <span>音乐</span>
                         </span>
                     </a>
@@ -50,7 +50,7 @@
                     <a @click="change('Shares')" :class="{'checked': active === 'Shares'}"
                        href="javascript:void(0);">
                         <span class="text">
-                            <el-icon class="icon" :size="16" :color="active === 'Shares' ? '#09AAFF' : ''"><Share/></el-icon>
+                            <el-icon class="icon" :size="16" :color="active === 'Shares' ? '#16904f' : ''"><Share/></el-icon>
                             <span>我的分享</span>
                         </span>
                     </a>
@@ -61,7 +61,7 @@
                     <a @click="change('Recycles')" :class="{'checked': active === 'Recycles'}"
                        href="javascript:void(0);">
                         <span class="text">
-                            <el-icon class="icon" :size="16" :color="active === 'Recycles' ? '#09AAFF' : ''"><Delete/></el-icon>
+                            <el-icon class="icon" :size="16" :color="active === 'Recycles' ? '#16904f' : ''"><Delete/></el-icon>
                             <span>回收站</span>
                         </span>
                     </a>
@@ -100,7 +100,7 @@ onMounted(() => {
 }
 
 .checked span {
-    color: #09AAFF;
+    color: #16904f;
 }
 
 ul {

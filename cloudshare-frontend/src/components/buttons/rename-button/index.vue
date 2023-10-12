@@ -1,6 +1,6 @@
 <template>
     <div class="rename-button-content">
-        <el-button v-if="roundFlag" type="warning" :size="size" round @click="renameFile">
+        <el-button v-if="roundFlag" type="warning" :size="size" @click="renameFile">
             重命名
             <el-icon class="el-icon--right">
                 <EditPen/>

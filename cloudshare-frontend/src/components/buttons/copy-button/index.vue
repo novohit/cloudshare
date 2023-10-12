@@ -1,6 +1,6 @@
 <template>
     <div class="copy-button-content">
-        <el-button color="#626aef" v-if="roundFlag" :size="size" round @click="copyFile" plain>
+        <el-button color="#626aef" v-if="roundFlag" :size="size" @click="copyFile" plain>
             复制到
             <el-icon class="el-icon--right">
                 <CopyDocument/>

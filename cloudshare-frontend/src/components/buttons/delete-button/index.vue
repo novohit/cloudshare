@@ -1,6 +1,6 @@
 <template>
     <div class="download-button-content">
-        <el-button v-if="roundFlag" type="danger" :size="size" round @click="deleteFile">
+        <el-button v-if="roundFlag" type="danger" :size="size" @click="deleteFile">
             删除
             <el-icon class="el-icon--right">
                 <Delete/>

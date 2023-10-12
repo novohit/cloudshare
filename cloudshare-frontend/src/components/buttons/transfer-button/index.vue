@@ -1,6 +1,6 @@
 <template>
     <div class="transfer-button-content">
-        <el-button v-if="roundFlag" :size="size" round @click="transferFile">
+        <el-button v-if="roundFlag" :size="size" @click="transferFile">
             移动到
             <el-icon class="el-icon--right">
                 <Position/>

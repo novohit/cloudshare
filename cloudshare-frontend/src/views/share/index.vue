@@ -6,10 +6,10 @@
                     <span class="pan-share-header-title-font" @click="goHome">Cloudshare</span>
                 </div>
                 <div v-if="loginFlag" class="pan-share-header-user-info-content">
-                    <el-link :underline=false type="success" class="pan-share-username">
+                    <el-link :underline=false type="primary" class="pan-share-username">
                         欢迎您,{{ username }}
                     </el-link>
-                    <el-link :underline=false type="success" class="pan-share-exit-button" @click="exit">
+                    <el-link :underline=false type="primary" class="pan-share-exit-button" @click="exit">
                         退出
                     </el-link>
                 </div>
@@ -196,7 +196,7 @@
             </div>
         </el-dialog>
         <el-dialog
-            title="保存到我的R盘"
+            title="保存到我的空间"
             v-model="treeDialogVisible"
             @open="loadTreeData"
             @closed="resetTreeData"

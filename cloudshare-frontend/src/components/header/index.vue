@@ -54,10 +54,10 @@ const goHome = () => {
 }
 
 .pan-header-content-wrapper .pan-title-font-content .pan-title-font {
-    font-size: 40px;
+    font-size: 34px;
     font-weight: bolder;
     cursor: pointer;
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-header-content-wrapper .pan-user-info-content {

@@ -1,6 +1,6 @@
 <template>
     <div class="share-button-content">
-        <el-button class="share-button" v-if="roundFlag" :size="size" round @click="shareFile">
+        <el-button class="share-button" v-if="roundFlag" :size="size" @click="shareFile">
             分享
             <el-icon class="el-icon--right">
                 <Share/>

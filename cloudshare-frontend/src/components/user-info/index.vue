@@ -200,6 +200,6 @@ onMounted(() => {
 
 <style scoped>
 .pan-user-info {
-    color: #409EFF;
+    color: #16904f;
 }
 </style>

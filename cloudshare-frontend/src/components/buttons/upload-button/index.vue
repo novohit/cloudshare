@@ -1,6 +1,6 @@
 <template>
     <div class="upload-button-content">
-        <el-button v-if="roundFlag" type="primary" id="uploadButton" :size="size" round
+        <el-button v-if="roundFlag" type="default" id="uploadButton" :size="size"
                    @click="uploadDialogVisible = true">
             上传
             <el-icon class="el-icon--right">
@@ -355,7 +355,7 @@ onMounted(() => {
 }
 
 .upload-content .drag-content:hover {
-    border: 0.2em dashed #409EFF;
+    border: 0.2em dashed #2faa69;
 }
 
 .upload-content .drag-content .drag-icon-content {

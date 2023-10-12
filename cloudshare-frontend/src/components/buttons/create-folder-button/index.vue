@@ -1,6 +1,6 @@
 <template>
     <div class="create-folder-button-content">
-        <el-button v-if="roundFlag" type="success" :size="size" round @click="addDirDialogVisible = true">
+        <el-button v-if="roundFlag" type="primary" :size="size" @click="addDirDialogVisible = true">
             新建文件夹
             <el-icon class="el-icon--right">
                 <FolderAdd/>
