@@ -57,7 +57,7 @@ import {storeToRefs} from 'pinia'
 const fileStore = useFileStore()
 const taskStore = useTaskStore()
 
-const {parentId} = storeToRefs(fileStore)
+const {parentId, curDirectory} = storeToRefs(fileStore)
 
 const uploadDialogVisible = ref(false)
 
@@ -146,10 +146,11 @@ const filesAdded = (files, fileList, event) => {
                 f['uniqueIdentifier'] = md5
                 fileService.secUpload({
                     fileName: f.name,
-                    identifier: md5,
-                    parentId: parentId.value
+                    md5: md5,
+                    parentId: parentId.value,
+                    curDirectory: curDirectory.value,
                 }, res => {
-                    if (res.code === 0) {
+                    if (res.data === true) {
                         ElMessage.success('文件：' + f.name + ' 上传完成')
                         f.cancel()
                         taskStore.remove(f.name)
