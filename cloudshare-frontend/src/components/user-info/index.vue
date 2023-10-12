@@ -181,9 +181,10 @@ const doChangePassword = async () => {
 const initUserInfoIfNecessary = () => {
     if (!username.value) {
         userService.info(res => {
-            fileStore.setParentId(res.data.rootFileId)
-            fileStore.setDefaultParentId(res.data.rootFileId)
-            fileStore.setDefaultParentFilename(res.data.rootFilename)
+            fileStore.setParentId(res.data.rootId)
+            fileStore.setDefaultParentId(res.data.rootId)
+            fileStore.setCurDirectory(res.data.rootName)
+            fileStore.setDefaultCurDirectory(res.data.rootName)
             userStore.setUsername(res.data.username)
         }, res => {
             ElMessage.error(res.message)

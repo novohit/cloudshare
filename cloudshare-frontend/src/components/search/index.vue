@@ -33,7 +33,7 @@ const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 const navbarStore = useNavbarStore()
 
-const {defaultParentId, defaultParentFilename} = storeToRefs(fileStore)
+const {defaultParentId, defaultCurDirectory} = storeToRefs(fileStore)
 
 const searchKey = ref('')
 
@@ -61,7 +61,7 @@ const doSearch = () => {
         breadcrumbStore.clear()
         breadcrumbStore.addItem({
             id: defaultParentId.value,
-            name: defaultParentFilename.value
+            name: defaultCurDirectory.value
         })
         breadcrumbStore.addItem({
             id: '-1',

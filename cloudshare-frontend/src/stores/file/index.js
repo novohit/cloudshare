@@ -6,9 +6,9 @@ import {ElMessage} from 'element-plus'
 export const useFileStore = defineStore('file', () => {
 
     const parentId = ref('')
-    const curDirectory = ref('/')
+    const curDirectory = ref('')
     const defaultParentId = ref('')
-    const defaultParentFilename = ref('')
+    const defaultCurDirectory = ref('')
     const fileList = ref([])
     const multipleSelection = ref([])
     const fileTypes = ref('-1')
@@ -30,8 +30,16 @@ export const useFileStore = defineStore('file', () => {
         defaultParentId.value = newDefaultParentId
     }
 
-    function setDefaultParentFilename(newDefaultParentFilename) {
-        defaultParentFilename.value = newDefaultParentFilename
+    function setCurDirectory(newCurDirectory) {
+        curDirectory.value = newCurDirectory
+    }
+
+    function refreshCurDirectory() {
+        curDirectory.value = defaultCurDirectory.value
+    }
+
+    function setDefaultCurDirectory(newDefaultCurDirectory) {
+        defaultCurDirectory.value = newDefaultCurDirectory
     }
 
     function setFileList(newFileList) {
@@ -64,7 +72,8 @@ export const useFileStore = defineStore('file', () => {
     function clear(state) {
         parentId.value = ''
         defaultParentId.value = ''
-        defaultParentFilename.value = ''
+        curDirectory.value = ''
+        defaultCurDirectory.value = ''
         fileList.value = new Array()
         multipleSelection.value = new Array()
         fileTypes.value = '-1'
@@ -104,7 +113,8 @@ export const useFileStore = defineStore('file', () => {
     return {
         parentId,
         defaultParentId,
-        defaultParentFilename,
+        curDirectory,
+        defaultCurDirectory,
         fileList,
         multipleSelection,
         fileTypes,
@@ -115,7 +125,9 @@ export const useFileStore = defineStore('file', () => {
         setParentId,
         refreshParentId,
         setDefaultParentId,
-        setDefaultParentFilename,
+        setCurDirectory,
+        refreshCurDirectory,
+        setDefaultCurDirectory,
         setFileList,
         setMultipleSelection,
         setFileTypes,

@@ -57,7 +57,7 @@ const visitorForm = reactive({
 const fileStore = useFileStore()
 const userStore = useUserStore()
 
-const {setParentId, setDefaultParentId, setDefaultParentFilename} = fileStore
+const {setParentId, setDefaultParentId, setCurDirectory, setDefaultCurDirectory} = fileStore
 const {setUsername} = userStore
 
 const usernameEl = ref(null)
@@ -71,9 +71,10 @@ const doLogin = () => {
         userService.login(loginForm, res => {
             setToken(res.data)
             userService.info(res => {
-                setParentId(res.data.rootFileId)
-                setDefaultParentId(res.data.rootFileId)
-                setDefaultParentFilename(res.data.rootFilename)
+                setParentId(res.data.rootId)
+                setDefaultParentId(res.data.rootId)
+                setCurDirectory(res.data.rootName)
+                setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 router.push({name: 'Index'})
             }, res => {
@@ -91,9 +92,10 @@ const visitor = ()=>{
         userService.login(visitorForm, res => {
             setToken(res.data)
             userService.info(res => {
-                setParentId(res.data.rootFileId)
-                setDefaultParentId(res.data.rootFileId)
-                setDefaultParentFilename(res.data.rootFilename)
+                setParentId(res.data.rootId)
+                setDefaultParentId(res.data.rootId)
+                setCurDirectory(res.data.rootName)
+                setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 router.push({name: 'Index'})
             }, res => {

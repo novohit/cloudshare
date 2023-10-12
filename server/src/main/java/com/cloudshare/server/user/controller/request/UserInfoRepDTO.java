@@ -7,6 +7,8 @@ package com.cloudshare.server.user.controller.request;
 public record UserInfoRepDTO(
         Long id,
         String username,
-        String phone
+        String phone,
+        Long rootId,
+        String rootName
 ) {
 }

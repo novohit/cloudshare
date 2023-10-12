@@ -131,9 +131,10 @@ router.beforeEach((to, from, next) => {
                 // 防止有token直接跳转首页的情况下没有初始化用户信息的情况
                 if (!userStore.username.value) {
                     userService.info(res => {
-                        fileStore.setParentId(res.data.rootFileId)
-                        fileStore.setDefaultParentId(res.data.rootFileId)
-                        fileStore.setDefaultParentFilename(res.data.rootFilename)
+                        fileStore.setParentId(res.data.rootId)
+                        fileStore.setDefaultParentId(res.data.rootId)
+                        fileStore.setCurDirectory(res.data.rootName)
+                        fileStore.setDefaultCurDirectory(res.data.rootName)
                         userStore.setUsername(res.data.username)
                         next()
                     }, res => {
