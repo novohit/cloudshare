@@ -8,7 +8,7 @@
             <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
-                    <el-dropdown-item command="exit">退出登录</el-dropdown-item>
+                    <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -96,13 +96,13 @@ const goLogin = () => {
     window.location.reload()
 }
 
-const doExit = () => {
+const doLogout = () => {
     ElMessageBox.confirm('确定要退出登录吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        userService.exit(() => {
+        userService.logout(() => {
             goLogin()
         }, res => {
             ElMessage.error(res.message)
@@ -116,8 +116,8 @@ const passwordEl = ref(null)
 const handleCommand = (command) => {
     if (command === 'changePassword') {
         changePasswordDialogVisible.value = true
-    } else if (command === 'exit') {
-        doExit()
+    } else if (command === 'logout') {
+        doLogout()
     }
 }
 

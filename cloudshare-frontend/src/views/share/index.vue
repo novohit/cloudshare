@@ -390,13 +390,13 @@ const login = () => {
     loginDialogVisible.value = true
 }
 
-const exit = () => {
+const logout = () => {
     ElMessageBox.confirm('确定要退出登录吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        userService.exit(() => {
+        userService.logout(() => {
             clearToken()
             loginFlag.value = false
             username.value = ''

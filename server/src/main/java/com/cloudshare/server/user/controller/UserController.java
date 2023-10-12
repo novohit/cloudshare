@@ -53,4 +53,9 @@ public class UserController {
         String accessToken = userService.login(reqDTO);
         return Response.success(accessToken);
     }
+
+    @PostMapping("/logout")
+    public Response<Void> logout() {
+        return Response.success();
+    }
 }

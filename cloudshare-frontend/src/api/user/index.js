@@ -53,9 +53,9 @@ let userService = {
             method: 'post'
         }).then(res => resolve(res)).catch(res => reject(res))
     },
-    exit: function (resolve, reject) {
+    logout: function (resolve, reject) {
         http({
-            url: '/user/exit',
+            url: '/user/logout',
             method: 'post'
         }).then(res => resolve(res)).catch(res => reject(res))
     },
