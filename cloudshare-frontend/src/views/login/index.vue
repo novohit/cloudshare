@@ -17,9 +17,19 @@
                     </el-form>
                     
                     <div class="btns">
-                        <el-button link>&lt&lt首页</el-button>
-                        <el-button @click="visitor" link>游客登录</el-button>
-                        <el-button @click="google" link>第三方登录</el-button>
+                        <el-button link>
+                            &lt&lt
+                            <el-icon><HomeFilled /></el-icon>
+                            首页
+                        </el-button>
+                        <el-button @click="visitor" link>
+                            <el-icon><UserFilled /></el-icon>
+                            游客登录
+                        </el-button>
+                        <el-button @click="google" link>
+                            <el-icon><ChromeFilled /></el-icon>
+                            Google
+                        </el-button>
                     </div>
                 </div>
                 <div style="flex:1">
