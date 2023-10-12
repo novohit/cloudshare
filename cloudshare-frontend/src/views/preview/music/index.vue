@@ -21,7 +21,7 @@
                         <el-menu class="music-list"
                                  :default-active="activeIndex"
                                  @select="selectMusic">
-                            <el-menu-item v-for="(item, index) in musicList" :key="index" :index="item.fileId">
+                            <el-menu-item v-for="(item, index) in musicList" :key="index" :index="item.id">
                                 <i class="fa fa-music"></i>
                                 <span slot="title">{{ item.fileName }}</span>
                             </el-menu-item>
@@ -55,20 +55,20 @@ const renderMusicList = (dataList) => {
         if (item.fileName.length > 15) {
             item.fileName = item.fileName.substring(0, 16) + '...'
         }
-        if (item.fileId === route.params.fileId) {
+        if (item.id === route.params.id) {
             musicName.value = item.fileName
-            musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
+            musicShowPath.value = panUtil.getPreviewUrl(item.id)
         }
         musicList.value.push(item)
     })
-    activeIndex.value = route.params.fileId
+    activeIndex.value = route.params.id
 }
 
 const selectNext = () => {
     let i = '',
-        currentFileId = activeIndex.value
+        currentId = activeIndex.value
     musicList.value.some((item, index) => {
-        if (item.fileId === currentFileId) {
+        if (item.id === currentId) {
             i = index
             return true
         }
@@ -78,16 +78,16 @@ const selectNext = () => {
     }
     let item = musicList.value[++i]
     musicName.value = item.fileName
-    musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
-    activeIndex.value = item.fileId
+    musicShowPath.value = panUtil.getPreviewUrl(item.id)
+    activeIndex.value = item.id
 }
 
 const selectMusic = (index, indexPath) => {
     activeIndex.value = index
     musicList.value.some(item => {
-        if (item.fileId === index) {
+        if (item.id === index) {
             musicName.value = item.fileName
-            musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
+            musicShowPath.value = panUtil.getPreviewUrl(item.id)
             return true
         }
     })

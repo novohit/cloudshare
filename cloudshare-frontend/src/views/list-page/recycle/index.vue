@@ -110,14 +110,14 @@ onMounted(() => {
     loadTableData()
 })
 
-const doDeleteRecycle = (fileIds) => {
+const doDeleteRecycle = (ids) => {
     ElMessageBox.confirm('文件删除后将不可恢复，您确定这样做吗？', '删除文件', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
         recycleService.deleteRecycle({
-            fileIds: fileIds
+            ids: ids
         }, res => {
             ElMessage.success('删除成功')
             loadTableData()
@@ -129,11 +129,11 @@ const doDeleteRecycle = (fileIds) => {
 
 const cleanRecycle = () => {
     if (tableData.value && tableData.value.length > 0) {
-        let fileIdArr = new Array()
+        let idArr = new Array()
         tableData.value.forEach(item => {
-            fileIdArr.push(item.fileId)
+            idArr.push(item.id)
         })
-        doDeleteRecycle(fileIdArr.join('__,__'))
+        doDeleteRecycle(idArr.join('__,__'))
     }
 }
 
@@ -153,9 +153,9 @@ const getFileFontElement = (type) => {
     panUtil.getFileFontElement(type)
 }
 
-const doRestoreRecycle = (fileIds) => {
+const doRestoreRecycle = (ids) => {
     recycleService.restoreRecycle({
-        fileIds: fileIds
+        ids: ids
     }, res => {
         ElMessage.success('文件还原成功')
         tableData.value = res.data
@@ -166,22 +166,22 @@ const doRestoreRecycle = (fileIds) => {
 
 const restoreRecycle = () => {
     if (multipleSelection.value && multipleSelection.value.length > 0) {
-        let fileIdArr = new Array()
+        let idArr = new Array()
         multipleSelection.value.forEach(item => {
-            fileIdArr.push(item.fileId)
+            idArr.push(item.id)
         })
-        doRestoreRecycle(fileIdArr.join('__,__'))
+        doRestoreRecycle(idArr.join('__,__'))
         return
     }
     ElMessage.error('请选择要还原的文件')
 }
 
 const restoreOneRecycleFile = (row) => {
-    doRestoreRecycle(row.fileId)
+    doRestoreRecycle(row.id)
 }
 
 const deleteOneRecycleFile = (row) => {
-    doDeleteRecycle(row.fileId)
+    doDeleteRecycle(row.id)
 }
 
 </script>

@@ -26,14 +26,14 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
 
-const doDeleteFile = (fileIds) => {
+const doDeleteFile = (ids) => {
     ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
         fileService.delete({
-            fileIds: fileIds
+            ids: ids
         }, res => {
             ElMessage.success('删除成功')
             fileStore.loadFileList()
@@ -45,13 +45,13 @@ const doDeleteFile = (fileIds) => {
 
 const deleteFile = () => {
     if (props.item) {
-        doDeleteFile(props.item.fileId)
+        doDeleteFile(props.item.id)
         return
     }
     if (multipleSelection.value && multipleSelection.value.length > 0) {
-        let fileIdArr = new Array()
-        multipleSelection.value.forEach(item => fileIdArr.push(item.fileId))
-        doDeleteFile(fileIdArr.join('__,__'))
+        let idArr = new Array()
+        multipleSelection.value.forEach(item => idArr.push(item.id))
+        doDeleteFile(idArr.join('__,__'))
         return
     }
     ElMessage.error('请选择要删除的文件')

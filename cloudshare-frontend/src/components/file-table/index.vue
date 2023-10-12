@@ -118,14 +118,14 @@ const hiddenOperation = (row, column, cell, event) => {
     panUtil.hiddenOperation(cell)
 }
 
-const goInFolder = (fileId) => {
+const goInFolder = (id) => {
     fileService.getBreadcrumbs({
-        fileId: fileId
+        id: id
     }, res => {
         fileStore.setSearchFlag(false)
         breadcrumbStore.clear()
         breadcrumbStore.reset(res.data)
-        fileStore.setParentId(fileId)
+        fileStore.setParentId(id)
         fileStore.loadFileList()
     }, res => {
         ElMessage.error(res.message)
@@ -144,13 +144,13 @@ const openNewPage = (path, name, params, query) => {
 
 const showOffice = (row) => {
     openNewPage('/preview/office', 'PreviewOffice', {
-        fileId: panUtil.handleId(row.fileId)
+        id: panUtil.handleId(row.id)
     })
 }
 
 const showIframe = (row) => {
     openNewPage('/preview/iframe', 'PreviewIframe', {
-        fileId: panUtil.handleId(row.fileId)
+        id: panUtil.handleId(row.id)
     })
 }
 
@@ -159,8 +159,8 @@ const showImg = (row) => {
     let imgIndex = 0
     for (let i = 0, iLength = fileList.value.length; i < iLength; ++i) {
         if (fileList.value[i].fileType === 7) {
-            imgs.push(panUtil.getPreviewUrl(fileList.value[i].fileId))
-            if (fileList.value[i].fileId === row.fileId) {
+            imgs.push(panUtil.getPreviewUrl(fileList.value[i].id))
+            if (fileList.value[i].id === row.id) {
                 imgIndex = imgs.length - 1
             }
         }
@@ -182,21 +182,21 @@ const showImg = (row) => {
 
 const showMusic = (row) => {
     openNewPage('/preview/music', 'PreviewMusic', {
-        fileId: panUtil.handleId(row.fileId),
+        id: panUtil.handleId(row.id),
         parentId: panUtil.handleId(row.parentId)
     })
 }
 
 const showVideo = (row) => {
     openNewPage('/preview/video', 'PreviewVideo', {
-        fileId: panUtil.handleId(row.fileId),
+        id: panUtil.handleId(row.id),
         parentId: panUtil.handleId(row.parentId)
     })
 }
 
 const showCode = (row) => {
     openNewPage('/preview/code', 'PreviewCode', {
-        fileId: panUtil.handleId(row.fileId),
+        id: panUtil.handleId(row.id),
     }, {
         fileName: row.fileName
     })
@@ -209,7 +209,7 @@ const getFileFontElement = (type) => {
 const clickFilename = (row) => {
     switch (row.fileType) {
         case 0:
-            goInFolder(panUtil.handleId(row.fileId))
+            goInFolder(panUtil.handleId(row.id))
             break
         case 3:
         case 4:

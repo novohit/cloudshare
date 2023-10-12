@@ -89,16 +89,16 @@ const resetTreeData = () => {
 const treeData = ref([])
 
 const doCopyFile = (targetParentId) => {
-    let fileIds = ''
+    let ids = ''
     if (props.item) {
-        fileIds = props.item.fileId
+        ids = props.item.id
     } else {
-        let fileIdArr = new Array()
-        multipleSelection.value.forEach(item => fileIdArr.push(item.fileId))
-        fileIds = fileIdArr.join('__,__')
+        let idArr = new Array()
+        multipleSelection.value.forEach(item => idArr.push(item.id))
+        ids = idArr.join('__,__')
     }
     fileService.copy({
-        fileIds: fileIds,
+        ids: ids,
         targetParentId: targetParentId
     }, res => {
         loading.value = false

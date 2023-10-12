@@ -73,27 +73,27 @@ const router = createRouter({
             component: () => import('@/views/share/index.vue')
         },
         {
-            path: '/preview/code/:fileId',
+            path: '/preview/code/:id',
             name: 'PreviewCode',
             component: () => import('@/views/preview/code/index.vue')
         },
         {
-            path: '/preview/office/:fileId',
+            path: '/preview/office/:id',
             name: 'PreviewOffice',
             component: () => import('@/views/preview/office/index.vue')
         },
         {
-            path: '/preview/iframe/:fileId',
+            path: '/preview/iframe/:id',
             name: 'PreviewIframe',
             component: () => import('@/views/preview/iframe/index.vue')
         },
         {
-            path: '/preview/music/:parentId/:fileId',
+            path: '/preview/music/:parentId/:id',
             name: 'PreviewMusic',
             component: () => import('@/views/preview/music/index.vue')
         },
         {
-            path: '/preview/video/:parentId/:fileId',
+            path: '/preview/video/:parentId/:id',
             name: 'PreviewVideo',
             component: () => import('@/views/preview/video/index.vue')
         },

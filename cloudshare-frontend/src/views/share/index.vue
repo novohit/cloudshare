@@ -473,10 +473,10 @@ const clickFilename = (row) => {
 
 const goInFolder = (row) => {
     breadCrumbs.value.push({
-        id: row.fileId,
+        id: row.id,
         name: row.fileName
     })
-    reloadTableData(row.fileId)
+    reloadTableData(row.id)
 }
 
 const reloadTableData = (parentId) => {
@@ -550,7 +550,7 @@ const doDownload = (item) => {
                 shareId: getShareId()
             }, res => {
                 if (res.code === 0) {
-                    let url = panUtil.getUrlPrefix() + '/share/file/download?fileId=' + item.fileId.replace(/\+/g, '%2B') + '&shareToken=' + getShareToken() + '&authorization=' + getToken(),
+                    let url = panUtil.getUrlPrefix() + '/share/file/download?id=' + item.id.replace(/\+/g, '%2B') + '&shareToken=' + getShareToken() + '&authorization=' + getToken(),
                         fileName = item.fileName,
                         link = document.createElement('a')
                     link.style.display = 'none'
@@ -611,18 +611,18 @@ const saveFiles = (newItem) => {
 }
 
 const doSaveFiles = (targetParentId) => {
-    let fileIds = ''
+    let ids = ''
     if (item.value) {
-        fileIds = item.value.fileId
+        ids = item.value.id
     } else {
-        let fileIdArr = new Array()
+        let idArr = new Array()
         multipleSelection.value.forEach(item => {
-            fileIdArr.push(item.fileId)
+            idArr.push(item.id)
         })
-        fileIds = fileIdArr.join('__,__')
+        ids = idArr.join('__,__')
     }
     shareService.saveShareFiles({
-        fileIds: fileIds,
+        ids: ids,
         targetParentId: targetParentId
     }, res => {
         if (res.code === 0) {

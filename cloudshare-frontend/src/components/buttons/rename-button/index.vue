@@ -62,7 +62,7 @@ const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
 
 const renameForm = reactive({
-    fileId: '',
+    id: '',
     fileName: ''
 })
 
@@ -82,7 +82,7 @@ const renameRules = reactive({
 
 const renameFile = () => {
     if (props.item) {
-        renameForm.fileId = props.item.fileId
+        renameForm.id = props.item.id
         renameForm.fileName = props.item.fileName
         renameDialogVisible.value = true
         return
@@ -96,7 +96,7 @@ const renameFile = () => {
         return
     }
     let item = multipleSelection.value[0]
-    renameForm.fileId = item.fileId
+    renameForm.id = item.id
     renameForm.fileName = item.fileName
     renameDialogVisible.value = true
 }
@@ -106,7 +106,7 @@ const doRenameFile = async () => {
         if (valid) {
             loading.value = true
             fileService.update({
-                fileId: renameForm.fileId,
+                id: renameForm.id,
                 newFilename: renameForm.fileName
             }, res => {
                 loading.value = false

@@ -147,20 +147,20 @@ const doShareFile = async () => {
 
     await shareFormRef.value.validate((valid, fields) => {
         if (valid) {
-            let shareFileIdArr = new Array()
+            let shareIdArr = new Array()
             loading.value = true
             if (props.item) {
-                shareFileIdArr.push(props.item.fileId)
+                shareIdArr.push(props.item.id)
             } else {
                 multipleSelection.value.forEach(item => {
-                    shareFileIdArr.push(item.fileId)
+                    shareIdArr.push(item.id)
                 })
             }
             shareService.createShare({
                 shareName: shareFileForm.shareName,
                 shareType: parseInt(shareFileForm.shareType),
                 shareDayType: parseInt(shareFileForm.shareDayType),
-                shareFileIds: shareFileIdArr.join('__,__')
+                shareIds: shareIdArr.join('__,__')
             }, res => {
                 loading.value = false
                 shareTitle.value = '恭喜你！分享成功！'

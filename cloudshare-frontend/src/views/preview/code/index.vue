@@ -21,8 +21,8 @@ const codeContent = ref('')
 
 const route = useRoute()
 
-const renderCode = (fileId, fileName) => {
-    axios.get(panUtil.getPreviewUrl(fileId)).then(res => {
+const renderCode = (id, fileName) => {
+    axios.get(panUtil.getPreviewUrl(id)).then(res => {
         if (res.code === 200) {
             codeContent.value = res.data
             layui.use('code', function () {
@@ -42,9 +42,9 @@ const renderCode = (fileId, fileName) => {
 }
 
 const init = () => {
-    let fileId = route.params.fileId,
+    let id = route.params.id,
         fileName = route.query.fileName
-    renderCode(fileId, fileName)
+    renderCode(id, fileName)
 }
 
 onMounted(() => {

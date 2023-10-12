@@ -18,7 +18,7 @@
                         <el-menu class="video-list"
                                  :default-active="activeIndex"
                                  @select="selectVideo">
-                            <el-menu-item v-for="(item, index) in videoList" :key="index" :index="item.fileId">
+                            <el-menu-item v-for="(item, index) in videoList" :key="index" :index="item.id">
                                 <i class="fa fa-video-camera"></i>
                                 <span slot="title">{{ item.fileName }}</span>
                             </el-menu-item>
@@ -52,20 +52,20 @@ const renderVideoList = (dataList) => {
         if (item.fileName.length > 15) {
             item.fileName = item.fileName.substring(0, 16) + '...'
         }
-        if (item.fileId === route.params.fileId) {
+        if (item.id === route.params.id) {
             videoName.value = item.fileName
-            videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
+            videoShowPath.value = panUtil.getPreviewUrl(item.id)
         }
         videoList.value.push(item)
     })
-    activeIndex.value = route.params.fileId
+    activeIndex.value = route.params.id
 }
 
 const selectNext = () => {
     let i = '',
-        currentFileId = activeIndex.value
+        currentId = activeIndex.value
     videoList.value.some((item, index) => {
-        if (item.fileId === currentFileId) {
+        if (item.id === currentId) {
             i = index
             return true
         }
@@ -75,16 +75,16 @@ const selectNext = () => {
     }
     let item = videoList.value[++i]
     videoName.value = item.fileName
-    videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
-    activeIndex.value = item.fileId
+    videoShowPath.value = panUtil.getPreviewUrl(item.id)
+    activeIndex.value = item.id
 }
 
 const selectVideo = (index) => {
     activeIndex.value = index
     videoList.value.some(item => {
-        if (item.fileId === index) {
+        if (item.id === index) {
             videoName.value = item.fileName
-            videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
+            videoShowPath.value = panUtil.getPreviewUrl(item.id)
             return true
         }
     })
