@@ -130,7 +130,7 @@ const filesAdded = (files, fileList, event) => {
             }
             let taskItem = {
                 target: f,
-                filename: f.name,
+                fileName: f.name,
                 fileSize: panUtil.translateFileSize(f.size),
                 uploadedSize: panUtil.translateFileSize(0),
                 status: panUtil.fileStatus.PARSING.code,
@@ -145,7 +145,7 @@ const filesAdded = (files, fileList, event) => {
             MD5(f.file, (e, md5) => {
                 f['uniqueIdentifier'] = md5
                 fileService.secUpload({
-                    filename: f.name,
+                    fileName: f.name,
                     identifier: md5,
                     parentId: paramParentId.value
                 }, res => {
@@ -160,7 +160,7 @@ const filesAdded = (files, fileList, event) => {
                     } else {
                         f.resume()
                         taskStore.updateStatus({
-                            filename: f.name,
+                            fileName: f.name,
                             status: panUtil.fileStatus.WAITING.code,
                             statusText: panUtil.fileStatus.WAITING.text
                         })
@@ -168,7 +168,7 @@ const filesAdded = (files, fileList, event) => {
                 }, res => {
                     f.resume()
                     taskStore.updateStatus({
-                        filename: f.name,
+                        fileName: f.name,
                         status: panUtil.fileStatus.WAITING.code,
                         statusText: panUtil.fileStatus.WAITING.text
                     })
@@ -190,13 +190,13 @@ const uploadProgress = (rootFile, file, chunk) => {
     if (file.isUploading()) {
         if (uploadTaskItem.status !== panUtil.fileStatus.UPLOADING.code) {
             taskStore.updateStatus({
-                filename: file.name,
+                fileName: file.name,
                 status: panUtil.fileStatus.UPLOADING.code,
                 statusText: panUtil.fileStatus.UPLOADING.text
             })
         }
         taskStore.updateProcess({
-            filename: file.name,
+            fileName: file.name,
             speed: panUtil.translateSpeed(file.averageSpeed),
             percentage: Math.floor(file.progress() * 100),
             uploadedSize: panUtil.translateFileSize(file.sizeUploaded()),
@@ -208,19 +208,19 @@ const uploadProgress = (rootFile, file, chunk) => {
 const doMerge = (file) => {
     let uploadTaskItem = taskStore.getUploadTask(file.name)
     taskStore.updateStatus({
-        filename: file.name,
+        fileName: file.name,
         status: panUtil.fileStatus.MERGE.code,
         statusText: panUtil.fileStatus.MERGE.text
     })
     taskStore.updateProcess({
-        filename: file.name,
+        fileName: file.name,
         speed: panUtil.translateSpeed(file.averageSpeed),
         percentage: 99,
         uploadedSize: panUtil.translateFileSize(file.sizeUploaded()),
         timeRemaining: panUtil.translateTime(file.timeRemaining())
     })
     fileService.merge({
-        filename: uploadTaskItem.filename,
+        fileName: uploadTaskItem.fileName,
         identifier: uploadTaskItem.target.uniqueIdentifier,
         parentId: uploadTaskItem.parentId,
         totalSize: uploadTaskItem.target.size
@@ -229,7 +229,7 @@ const doMerge = (file) => {
         uploader.removeFile(file)
         fileStore.loadFileList()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.SUCCESS.code,
             statusText: panUtil.fileStatus.SUCCESS.text
         })
@@ -240,7 +240,7 @@ const doMerge = (file) => {
     }, res => {
         file.pause()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.FAIL.code,
             statusText: panUtil.fileStatus.FAIL.text
         })
@@ -265,7 +265,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
             uploader.removeFile(file)
             fileStore.loadFileList()
             taskStore.updateStatus({
-                filename: file.name,
+                fileName: file.name,
                 status: panUtil.fileStatus.SUCCESS.code,
                 statusText: panUtil.fileStatus.SUCCESS.text
             })
@@ -277,7 +277,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
     } else {
         file.pause()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.FAIL.code,
             statusText: panUtil.fileStatus.FAIL.text
         })
@@ -289,12 +289,12 @@ const uploadComplete = () => {
 
 const uploadError = (rootFile, file, message, chunk) => {
     taskStore.updateStatus({
-        filename: file.name,
+        fileName: file.name,
         status: panUtil.fileStatus.FAIL.code,
         statusText: panUtil.fileStatus.FAIL.text
     })
     taskStore.updateProcess({
-        filename: file.name,
+        fileName: file.name,
         speed: panUtil.translateSpeed(0),
         percentage: 0,
         uploadedSize: panUtil.translateFileSize(0),

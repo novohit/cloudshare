@@ -21,14 +21,14 @@ const codeContent = ref('')
 
 const route = useRoute()
 
-const renderCode = (fileId, filename) => {
+const renderCode = (fileId, fileName) => {
     axios.get(panUtil.getPreviewUrl(fileId)).then(res => {
         if (res.code === 200) {
             codeContent.value = res.data
             layui.use('code', function () {
                 layui.code({
                     elem: '.layui-code.code-text',
-                    title: filename,
+                    title: fileName,
                     encode: false,
                     about: false
                 })
@@ -43,8 +43,8 @@ const renderCode = (fileId, filename) => {
 
 const init = () => {
     let fileId = route.params.fileId,
-        filename = route.query.filename
-    renderCode(fileId, filename)
+        fileName = route.query.fileName
+    renderCode(fileId, fileName)
 }
 
 onMounted(() => {

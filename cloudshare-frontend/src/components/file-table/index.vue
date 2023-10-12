@@ -17,7 +17,7 @@
             </el-table-column>
             <el-table-column
                 label="文件名"
-                prop="filename"
+                prop="fileName"
                 sortable
                 show-overflow-tooltip
                 min-width="750">
@@ -25,7 +25,7 @@
                     <div @click="clickFilename(scope.row)" class="file-name-content">
                         <i :class="getFileFontElement(scope.row.fileType)"
                            style="margin-right: 15px; font-size: 20px; cursor: pointer;"/>
-                        <span style="cursor:pointer;">{{ scope.row.filename }}</span>
+                        <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                     </div>
                     <div class="file-operation-content">
                         <el-tooltip class="item" effect="light" content="下载" placement="top">
@@ -61,7 +61,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                prop="fileSizeDesc"
+                prop="size"
                 sortable
                 label="大小"
                 min-width="120"
@@ -198,7 +198,7 @@ const showCode = (row) => {
     openNewPage('/preview/code', 'PreviewCode', {
         fileId: panUtil.handleId(row.fileId),
     }, {
-        filename: row.filename
+        fileName: row.fileName
     })
 }
 

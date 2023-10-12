@@ -83,7 +83,7 @@
                             </el-table-column>
                             <el-table-column
                                 label="文件名"
-                                prop="filename"
+                                prop="fileName"
                                 sortable
                                 show-overflow-tooltip
                                 min-width="750">
@@ -91,7 +91,7 @@
                                     <div @click="clickFilename(scope.row)" class="file-name-content">
                                         <i :class="getFileFontElement(scope.row.fileType)"
                                            style="margin-right: 15px; font-size: 20px; cursor: pointer;"/>
-                                        <span style="cursor:pointer;">{{ scope.row.filename }}</span>
+                                        <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                                     </div>
                                     <div class="file-operation-content">
                                         <el-tooltip class="item" effect="light" content="保存到我的R盘" placement="top">
@@ -106,7 +106,7 @@
                                 </template>
                             </el-table-column>
                             <el-table-column
-                                prop="fileSizeDesc"
+                                prop="size"
                                 sortable
                                 label="大小"
                                 min-width="120"
@@ -466,7 +466,7 @@ const hiddenOperation = (row, column, cell, event) => {
 }
 
 const clickFilename = (row) => {
-    if (row.folderFlag === 1) {
+    if (row.fileType === 'DIR') {
         goInFolder(row)
     }
 }
@@ -474,7 +474,7 @@ const clickFilename = (row) => {
 const goInFolder = (row) => {
     breadCrumbs.value.push({
         id: row.fileId,
-        name: row.filename
+        name: row.fileName
     })
     reloadTableData(row.fileId)
 }
@@ -517,7 +517,7 @@ const downloadFile = () => {
         return
     }
     for (let i = 0, iLength = multipleSelection.value.length; i < iLength; i++) {
-        if (multipleSelection.value[i].folderFlag === 1) {
+        if (multipleSelection.value[i].fileType === 'DIR') {
             ElMessage.error('文件夹暂不支持下载')
             return
         }
@@ -540,7 +540,7 @@ const doDownLoads = (items, i) => {
 }
 
 const doDownload = (item) => {
-    if (item.folderFlag === 1) {
+    if (item.fileType === 'DIR') {
         ElMessage.error('文件夹暂不支持下载')
         return
     }
@@ -551,11 +551,11 @@ const doDownload = (item) => {
             }, res => {
                 if (res.code === 0) {
                     let url = panUtil.getUrlPrefix() + '/share/file/download?fileId=' + item.fileId.replace(/\+/g, '%2B') + '&shareToken=' + getShareToken() + '&authorization=' + getToken(),
-                        filename = item.filename,
+                        fileName = item.fileName,
                         link = document.createElement('a')
                     link.style.display = 'none'
                     link.href = url
-                    link.setAttribute('download', filename)
+                    link.setAttribute('download', fileName)
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)

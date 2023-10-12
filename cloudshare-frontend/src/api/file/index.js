@@ -3,11 +3,11 @@
 import http from '@/utils/http'
 
 let fileService = {
-    list: function (params, resolve, reject) {
+    list: function (data, resolve, reject) {
         http({
-            url: '/files',
-            params: params,
-            method: 'get'
+            url: '/file/list',
+            data: data,
+            method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
     createFolder: function (data, resolve, reject) {

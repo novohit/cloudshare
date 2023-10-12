@@ -119,11 +119,11 @@ const shareFileRules = reactive({
     ]
 })
 
-const handleFilename = (filename) => {
-    if (filename.length > 10) {
-        filename = filename.substring(0, 11) + '...'
+const handleFilename = (fileName) => {
+    if (fileName.length > 10) {
+        fileName = fileName.substring(0, 11) + '...'
     }
-    return filename
+    return fileName
 }
 
 const shareFile = () => {
@@ -132,12 +132,12 @@ const shareFile = () => {
         return
     }
     if (props.item) {
-        shareTitle.value = '分享文件（' + handleFilename(props.item.filename) + ')'
+        shareTitle.value = '分享文件（' + handleFilename(props.item.fileName) + ')'
     } else {
         if (multipleSelection.value.length === 1) {
-            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].filename) + ')'
+            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].fileName) + ')'
         } else {
-            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].filename) + '等)'
+            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].fileName) + '等)'
         }
     }
     shareDialogVisible.value = true

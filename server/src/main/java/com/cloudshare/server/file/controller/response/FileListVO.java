@@ -10,8 +10,8 @@ public record FileListVO(
         Long id,
         String path,
         String curDirectory,
-        FileType type,
-        String name,
+        FileType fileType,
+        String fileName,
         Long size,
         String suffix
 ) {

@@ -21,11 +21,11 @@
                          :model="renameForm"
                          status-icon
                          @submit.native.prevent>
-                    <el-form-item label="文件名称" prop="filename">
+                    <el-form-item label="文件名称" prop="fileName">
                         <el-input type="text"
                                   ref="filenameEl"
                                   @keyup.enter.native="doRenameFile"
-                                  v-model="renameForm.filename" autocomplete="off"/>
+                                  v-model="renameForm.fileName" autocomplete="off"/>
                     </el-form-item>
                 </el-form>
             </div>
@@ -63,7 +63,7 @@ const {multipleSelection} = storeToRefs(fileStore)
 
 const renameForm = reactive({
     fileId: '',
-    filename: ''
+    fileName: ''
 })
 
 const resetForm = () => {
@@ -75,7 +75,7 @@ const focusInput = () => {
 }
 
 const renameRules = reactive({
-    filename: [
+    fileName: [
         {required: true, message: '请输入新文件名称', trigger: 'blur'}
     ]
 })
@@ -83,7 +83,7 @@ const renameRules = reactive({
 const renameFile = () => {
     if (props.item) {
         renameForm.fileId = props.item.fileId
-        renameForm.filename = props.item.filename
+        renameForm.fileName = props.item.fileName
         renameDialogVisible.value = true
         return
     }
@@ -97,7 +97,7 @@ const renameFile = () => {
     }
     let item = multipleSelection.value[0]
     renameForm.fileId = item.fileId
-    renameForm.filename = item.filename
+    renameForm.fileName = item.fileName
     renameDialogVisible.value = true
 }
 
@@ -107,7 +107,7 @@ const doRenameFile = async () => {
             loading.value = true
             fileService.update({
                 fileId: renameForm.fileId,
-                newFilename: renameForm.filename
+                newFilename: renameForm.fileName
             }, res => {
                 loading.value = false
                 renameDialogVisible.value = false

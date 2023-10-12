@@ -18,7 +18,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
 
     @Override
     public void store(StoreContext context) throws IOException {
-        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "fileName must be not null or empty");
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
         doStore(context);
@@ -35,7 +35,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     protected abstract void doDelete(DeleteContext context) throws IOException;
 
     protected String getSuffix(String fileName) {
-        Assert.isTrue(StringUtils.hasText(fileName), "filename must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(fileName), "fileName must be not null or empty");
         int index = fileName.lastIndexOf(".");
         if (index == fileName.length() - 1) {
             return "";

@@ -6,6 +6,7 @@ import {ElMessage} from 'element-plus'
 export const useFileStore = defineStore('file', () => {
 
     const parentId = ref('')
+    const curDirectory = ref('/')
     const defaultParentId = ref('')
     const defaultParentFilename = ref('')
     const fileList = ref([])
@@ -88,6 +89,7 @@ export const useFileStore = defineStore('file', () => {
         } else {
             fileService.list({
                 parentId: parentId.value,
+                curDirectory: curDirectory.value,
                 fileTypes: fileTypes.value
             }, res => {
                 setTableLoading(false)

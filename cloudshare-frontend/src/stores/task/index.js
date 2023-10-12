@@ -20,9 +20,9 @@ export const useTaskStore = defineStore('task', () => {
         taskList.value.push(taskItem)
     }
 
-    function remove(filename) {
+    function remove(fileName) {
         for (let i = 0; i < taskList.value.length; i++) {
-            if (filename === taskList.value[i].filename) {
+            if (fileName === taskList.value[i].fileName) {
                 taskList.value.splice(i, 1)
                 break
             }
@@ -30,47 +30,47 @@ export const useTaskStore = defineStore('task', () => {
     }
 
     function updateStatus(param) {
-        let taskItem = taskList.value.find(taskItem => param.filename === taskItem.filename)
+        let taskItem = taskList.value.find(taskItem => param.fileName === taskItem.fileName)
         taskItem.status = param.status
         taskItem.statusText = param.statusText
     }
 
     function updateProcess(param) {
-        let taskItem = taskList.value.find(taskItem => param.filename === taskItem.filename)
+        let taskItem = taskList.value.find(taskItem => param.fileName === taskItem.fileName)
         taskItem.speed = param.speed
         taskItem.percentage = param.percentage
         taskItem.uploadedSize = param.uploadedSize
         taskItem.timeRemaining = param.timeRemaining
     }
 
-    function pause(filename) {
-        let taskItem = taskList.value.find(taskItem => filename === taskItem.filename)
+    function pause(fileName) {
+        let taskItem = taskList.value.find(taskItem => fileName === taskItem.fileName)
         taskItem.target.pause()
         taskItem.status = panUtil.fileStatus.PAUSE.code
         taskItem.statusText = panUtil.fileStatus.PAUSE.text
     }
 
-    function resume(filename) {
-        let taskItem = taskList.value.find(taskItem => filename === taskItem.filename)
+    function resume(fileName) {
+        let taskItem = taskList.value.find(taskItem => fileName === taskItem.fileName)
         taskItem.target.resume()
     }
 
-    function cancel(filename) {
+    function cancel(fileName) {
         for (let i = 0; i < taskList.value.length; i++) {
-            if (filename === taskList.value[i].filename) {
+            if (fileName === taskList.value[i].fileName) {
                 taskList.value[i].target.cancel()
                 taskList.value.splice(i, 1)
                 if (taskList.value.length === 0) {
                     viewFlag.value = false
                 }
-                ElMessage.info('文件：' + filename + ' 取消上传')
+                ElMessage.info('文件：' + fileName + ' 取消上传')
                 break
             }
         }
     }
 
-    function retry(filename) {
-        let taskItem = taskList.value.find(taskItem => filename === taskItem.filename)
+    function retry(fileName) {
+        let taskItem = taskList.value.find(taskItem => fileName === taskItem.fileName)
         taskItem.target.bootstrap()
         taskItem.target.resume()
     }
@@ -79,8 +79,8 @@ export const useTaskStore = defineStore('task', () => {
         viewFlag.value = newViewFlag
     }
 
-    function getUploadTask(filename) {
-        return taskList.value.find(taskItem => filename === taskItem.filename)
+    function getUploadTask(fileName) {
+        return taskList.value.find(taskItem => fileName === taskItem.fileName)
     }
 
     return {
