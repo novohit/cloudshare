@@ -10,9 +10,9 @@ let fileService = {
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    createFolder: function (data, resolve, reject) {
+    addDir: function (data, resolve, reject) {
         http({
-            url: '/file/folder',
+            url: '/file/dir',
             data: data,
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))

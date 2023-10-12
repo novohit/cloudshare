@@ -89,7 +89,7 @@ let panUtil = {
     getFileFontElement(type) {
         let tagStr = 'fa fa-file'
         switch (type) {
-            case 0:
+            case 'DIR':
                 tagStr = 'fa fa-folder-o'
                 break
             case 2:
@@ -107,7 +107,7 @@ let panUtil = {
             case 6:
                 tagStr = 'fa fa-file-text-o'
                 break
-            case 7:
+            case 'IMAGE':
                 tagStr = 'fa fa-file-image-o'
                 break
             case 8:

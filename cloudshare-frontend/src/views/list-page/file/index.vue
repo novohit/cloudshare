@@ -25,7 +25,7 @@ const breadcrumbStore = useBreadcrumbStore()
 
 const {searchFlag, defaultParentId, defaultParentFilename} = storeToRefs(fileStore)
 
-const buttonArray = ref(['upload', 'createFolder', 'download', 'delete', 'rename', 'share', 'copy', 'transfer'])
+const buttonArray = ref(['upload', 'addDir', 'download', 'delete', 'rename', 'share', 'copy', 'transfer'])
 
 onMounted(() => {
     if (!searchFlag.value) {

@@ -23,7 +23,7 @@
                          @submit.native.prevent>
                     <el-form-item label="文件名称" prop="fileName">
                         <el-input type="text"
-                                  ref="filenameEl"
+                                  ref="fileNameEl"
                                   @keyup.enter.native="doRenameFile"
                                   v-model="renameForm.fileName" autocomplete="off"/>
                     </el-form-item>
@@ -56,7 +56,7 @@ import {ElMessage} from 'element-plus'
 const renameDialogVisible = ref(false)
 const loading = ref(false)
 const renameFormRef = ref(null)
-const filenameEl = ref(null)
+const fileNameEl = ref(null)
 
 const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
@@ -71,7 +71,7 @@ const resetForm = () => {
 }
 
 const focusInput = () => {
-    filenameEl.value.focus()
+    fileNameEl.value.focus()
 }
 
 const renameRules = reactive({

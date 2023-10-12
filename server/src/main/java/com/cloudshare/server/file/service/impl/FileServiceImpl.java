@@ -54,7 +54,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void addDir(DirAddReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        String name = reqDTO.name();
+        String name = reqDTO.dirName();
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWith(userId, reqDTO.curDirectory(), name);
         // 第一个括号 (\\d+) 是一个分组 用于匹配一个或多个数字
         // 第二个括号是字面量

@@ -2,7 +2,7 @@
     <div class="pan-main-operating-content">
         <div class="pan-main-button-content">
             <upload-button v-if="uploadButtonFlag" size="default" round-flag/>
-            <create-folder-button v-if="createFolderButtonFlag" size="default" round-flag/>
+            <create-folder-button v-if="addDirButtonFlag" size="default" round-flag/>
             <download-button v-if="downloadButtonFlag" size="default" round-flag/>
             <delete-button v-if="deleteButtonFlag" size="default" round-flag/>
             <rename-button v-if="renameButtonFlag" size="default" round-flag/>
@@ -21,7 +21,7 @@ const props = defineProps({
 })
 
 import UploadButton from '@/components/buttons/upload-button/index.vue'
-import CreateFolderButton from '@/components/buttons/create-folder-button/index.vue'
+import AddDirButton from '@/components/buttons/create-folder-button/index.vue'
 import DownloadButton from '@/components/buttons/download-button/index.vue'
 import DeleteButton from '@/components/buttons/delete-button/index.vue'
 import RenameButton from '@/components/buttons/rename-button/index.vue'
@@ -32,7 +32,7 @@ import TransferButton from '@/components/buttons/transfer-button/index.vue'
 import {onMounted, ref} from 'vue'
 
 const uploadButtonFlag = ref(false)
-const createFolderButtonFlag = ref(false)
+const addDirButtonFlag = ref(false)
 const downloadButtonFlag = ref(false)
 const deleteButtonFlag = ref(false)
 const renameButtonFlag = ref(false)
@@ -47,8 +47,8 @@ const initButton = () => {
                 case 'upload':
                     uploadButtonFlag.value = true
                     break
-                case 'createFolder':
-                    createFolderButtonFlag.value = true
+                case 'addDir':
+                    addDirButtonFlag.value = true
                     break
                 case 'download':
                     downloadButtonFlag.value = true
