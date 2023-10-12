@@ -54,7 +54,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {paramParentId} = storeToRefs(fileStore)
+const {parentId} = storeToRefs(fileStore)
 
 const addDirDialogVisible = ref(false)
 const loading = ref(false)

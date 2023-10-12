@@ -57,7 +57,7 @@ import {storeToRefs} from 'pinia'
 const fileStore = useFileStore()
 const taskStore = useTaskStore()
 
-const {paramParentId} = storeToRefs(fileStore)
+const {parentId} = storeToRefs(fileStore)
 
 const uploadDialogVisible = ref(false)
 
@@ -77,7 +77,7 @@ const fileOptions = {
     fileParameterName: 'file',
     query: function (file, chunk) {
         return {
-            parentId: paramParentId.value
+            parentId: parentId.value
         }
     },
     headers: {
@@ -138,7 +138,7 @@ const filesAdded = (files, fileList, event) => {
                 timeRemaining: panUtil.translateTime(Number.POSITIVE_INFINITY),
                 speed: panUtil.translateSpeed(f.averageSpeed),
                 percentage: 0,
-                parentId: new String(paramParentId.value)
+                parentId: parentId.value
             }
             // 添加
             taskStore.add(taskItem)
@@ -147,7 +147,7 @@ const filesAdded = (files, fileList, event) => {
                 fileService.secUpload({
                     fileName: f.name,
                     identifier: md5,
-                    parentId: paramParentId.value
+                    parentId: parentId.value
                 }, res => {
                     if (res.code === 0) {
                         ElMessage.success('文件：' + f.name + ' 上传完成')

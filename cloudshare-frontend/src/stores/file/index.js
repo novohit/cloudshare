@@ -16,8 +16,6 @@ export const useFileStore = defineStore('file', () => {
     const searchKey = ref('')
     const tableLoading = ref(true)
 
-    const paramParentId = computed(() => parentId.value === '-1' ? defaultParentId.value : parentId.value)
-
     function setParentId(newParentId) {
         parentId.value = newParentId
     }
@@ -121,7 +119,6 @@ export const useFileStore = defineStore('file', () => {
         searchFlag,
         searchKey,
         tableLoading,
-        paramParentId,
         setParentId,
         refreshParentId,
         setDefaultParentId,
