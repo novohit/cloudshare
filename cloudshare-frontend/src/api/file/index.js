@@ -59,13 +59,6 @@ let fileService = {
             method: 'get'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    getBreadcrumbs: function (params, resolve, reject) {
-        http({
-            url: '/file/breadcrumbs',
-            params: params,
-            method: 'get'
-        }).then(res => resolve(res)).catch(err => reject(err))
-    },
     secUpload: function (data, resolve, reject) {
         http({
             url: '/file/sec-upload',

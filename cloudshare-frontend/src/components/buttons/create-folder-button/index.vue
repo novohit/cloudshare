@@ -54,7 +54,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {parentId} = storeToRefs(fileStore)
+const {parentId, curDirectory} = storeToRefs(fileStore)
 
 const addDirDialogVisible = ref(false)
 const loading = ref(false)
@@ -79,8 +79,8 @@ const doAddDir = async () => {
         if (valid) {
             loading.value = true
             fileService.addDir({
-                parentId: 1,
-                curDirectory: '/',
+                parentId: parentId.value,
+                curDirectory: curDirectory.value,
                 dirName: addDirForm.dirName
             }, res => {
                 loading.value = false

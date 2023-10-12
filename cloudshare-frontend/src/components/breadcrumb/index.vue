@@ -8,7 +8,7 @@
         <el-divider direction="vertical" style="vertical-align: top !important;"/>
         <el-breadcrumb separator-icon="ArrowRight" style="display: inline-block;">
             <el-breadcrumb-item v-for="(item, index) in breadCrumbs" :key="index">
-                <a class="breadcrumb-item-a" @click="goToThis(item.id)" href="#">{{ item.name }}</a>
+                <a class="breadcrumb-item-a" @click="goToThis(item.id, index)" href="#">{{ item.name }}</a>
             </el-breadcrumb-item>
         </el-breadcrumb>
     </div>
@@ -30,11 +30,18 @@ const goBack = () => {
         let resolveBreadCrumbs = [...breadCrumbs.value]
         resolveBreadCrumbs.pop()
         let newId = resolveBreadCrumbs.pop().id
-        goToThis(newId)
+        goToThis(newId, breadCrumbs.value.length - 2)
     }
 }
 
-const goToThis = (id) => {
+const goToThis = (id, index) => {
+    let curDirectory = breadCrumbs.value
+        .slice(0, index + 1)
+        .map(item => item.name)
+        .join('/');
+    // 去除多余的 /
+    curDirectory = curDirectory.length > 1 ? curDirectory.replace(/^\//, '') : curDirectory;
+    console.log("curDirectory", curDirectory)
     if (id !== '-1') {
         let newBreadCrumbs = new Array()
         breadCrumbs.value.some(item => {
@@ -45,6 +52,7 @@ const goToThis = (id) => {
         })
         breadcrumbStore.reset(newBreadCrumbs)
         fileStore.setParentId(id)
+        fileStore.setCurDirectory(curDirectory)
         fileStore.setSearchFlag(false)
         fileStore.loadFileList()
     }

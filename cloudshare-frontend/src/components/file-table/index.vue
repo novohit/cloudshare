@@ -118,18 +118,16 @@ const hiddenOperation = (row, column, cell, event) => {
     panUtil.hiddenOperation(cell)
 }
 
-const goInFolder = (id) => {
-    fileService.getBreadcrumbs({
-        id: id
-    }, res => {
-        fileStore.setSearchFlag(false)
-        breadcrumbStore.clear()
-        breadcrumbStore.reset(res.data)
-        fileStore.setParentId(id)
-        fileStore.loadFileList()
-    }, res => {
-        ElMessage.error(res.message)
-    })
+const goInFolder = (id, curDirectory, fileName) => {
+    fileStore.setSearchFlag(false)
+    breadcrumbStore.addItem({
+            id: id,
+            name: fileName
+        })
+    fileStore.setParentId(id)
+    const newCurDirectory = curDirectory === '/' ? curDirectory + fileName : curDirectory + '/' + fileName
+    fileStore.setCurDirectory(newCurDirectory)
+    fileStore.loadFileList()
 }
 
 const openNewPage = (path, name, params, query) => {
@@ -208,8 +206,9 @@ const getFileFontElement = (type) => {
 
 const clickFilename = (row) => {
     switch (row.fileType) {
-        case 0:
-            goInFolder(panUtil.handleId(row.id))
+        case 'DIR':
+            // goInFolder(panUtil.handleId(row.id))
+            goInFolder(row.id, row.curDirectory, row.fileName)
             break
         case 3:
         case 4:
