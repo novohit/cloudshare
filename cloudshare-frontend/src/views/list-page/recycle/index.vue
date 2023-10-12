@@ -68,7 +68,7 @@
                     align="center">
                 </el-table-column>
                 <el-table-column
-                    prop="updateTime"
+                    prop="updatedAt"
                     sortable
                     align="center"
                     label="删除日期"

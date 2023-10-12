@@ -113,7 +113,7 @@
                                 align="center">
                             </el-table-column>
                             <el-table-column
-                                prop="updateTime"
+                                prop="updatedAt"
                                 sortable
                                 align="center"
                                 label="修改日期"
