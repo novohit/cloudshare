@@ -3,6 +3,7 @@ package com.cloudshare.server.file.service;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
+import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -26,4 +27,6 @@ public interface FileService {
     void singleUpload(FileSingleUploadReqDTO reqDTO);
 
     Boolean secUpload(FileSecUploadReqDTO reqDTO);
+
+    void chunkUpload(FileChunkUploadReqDTO reqDTO);
 }

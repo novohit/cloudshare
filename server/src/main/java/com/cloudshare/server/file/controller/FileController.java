@@ -2,6 +2,7 @@ package com.cloudshare.server.file.controller;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
+import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -59,6 +60,12 @@ public class FileController {
     @PostMapping(path = "/single-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Void> singleUpload(@Validated FileSingleUploadReqDTO reqDTO) {
         fileService.singleUpload(reqDTO);
+        return Response.success();
+    }
+
+    @PostMapping(path = "/chunk-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<Void> chunkUpload(@Validated FileChunkUploadReqDTO reqDTO) {
+        fileService.chunkUpload(reqDTO);
         return Response.success();
     }
 }

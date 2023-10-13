@@ -1,6 +1,7 @@
 package com.cloudshare.storage.core;
 
 import com.cloudshare.storage.core.model.DeleteContext;
+import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.core.util.UUIDUtil;
 import org.springframework.util.Assert;
@@ -18,7 +19,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
 
     @Override
     public void store(StoreContext context) throws IOException {
-        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "fileName must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
         doStore(context);
@@ -30,9 +31,19 @@ public abstract class AbstractStorageEngine implements StorageEngine {
         doDelete(context);
     }
 
+    @Override
+    public void storeChunk(StoreChunkContext context) throws IOException {
+        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.notNull(context.getInputStream(), "inputStream must be not null");
+        Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
+        doStoreChunk(context);
+    }
+
     protected abstract void doStore(StoreContext context) throws IOException;
 
     protected abstract void doDelete(DeleteContext context) throws IOException;
+
+    protected abstract void doStoreChunk(StoreChunkContext context) throws IOException;
 
     protected String getSuffix(String fileName) {
         Assert.isTrue(StringUtils.hasText(fileName), "fileName must be not null or empty");

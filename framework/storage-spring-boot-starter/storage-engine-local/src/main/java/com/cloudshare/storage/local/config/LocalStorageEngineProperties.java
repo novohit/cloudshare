@@ -16,4 +16,6 @@ public class LocalStorageEngineProperties {
     public static final String PREFIX = "storage.local";
 
     private String basePath = System.getProperty("user.dir") + File.separator + "temp";
+
+    private String chunkPath = System.getProperty("user.dir") + File.separator + "temp" + File.separator + "chunk";
 }

@@ -6,16 +6,20 @@ import com.cloudshare.server.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
+import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
+import com.cloudshare.server.file.model.FileChunk;
 import com.cloudshare.server.file.model.FileDocument;
+import com.cloudshare.server.file.repository.FileChunkRepository;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.storage.core.StorageEngine;
+import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
 import org.springframework.beans.BeanUtils;
@@ -45,10 +49,14 @@ public class FileServiceImpl implements FileService {
 
     private final StorageEngine storageEngine;
 
-    public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter, StorageEngine storageEngine) {
+    private final FileChunkRepository fileChunkRepository;
+
+    public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
+                           StorageEngine storageEngine, FileChunkRepository fileChunkRepository) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
+        this.fileChunkRepository = fileChunkRepository;
     }
 
     @Override
@@ -207,6 +215,33 @@ public class FileServiceImpl implements FileService {
         );
         saveFile2DB(fileDocument);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void chunkUpload(FileChunkUploadReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        try {
+            // 上传分片
+            MultipartFile multipartFile = reqDTO.file();
+            StoreChunkContext context = new StoreChunkContext();
+            context.setChunk(reqDTO.chunk());
+            context.setMd5(reqDTO.md5());
+            context.setTotalSize(multipartFile.getSize());
+            context.setInputStream(multipartFile.getInputStream());
+            context.setFileNameWithSuffix(reqDTO.fileName());
+            storageEngine.storeChunk(context);
+            // 保存分片记录
+            FileChunk fileChunk = new FileChunk();
+            fileChunk.setName(reqDTO.fileName());
+            fileChunk.setUserId(userId);
+            fileChunk.setChunk(reqDTO.chunk());
+            fileChunk.setMd5(reqDTO.md5());
+            fileChunk.setRealPath(context.getRealPath());
+            fileChunkRepository.save(fileChunk);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
