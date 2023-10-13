@@ -29,4 +29,6 @@ public interface FileService {
     Boolean secUpload(FileSecUploadReqDTO reqDTO);
 
     void chunkUpload(FileChunkUploadReqDTO reqDTO);
+
+    List<Long> chunkUpload(String md5);
 }

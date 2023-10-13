@@ -11,12 +11,15 @@ import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -25,6 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/file")
+@Validated
 public class FileController {
 
     private final FileService fileService;
@@ -61,6 +65,17 @@ public class FileController {
     public Response<Void> singleUpload(@Validated FileSingleUploadReqDTO reqDTO) {
         fileService.singleUpload(reqDTO);
         return Response.success();
+    }
+
+    /**
+     * 查询已上传的分片数
+     * @param md5
+     * @return
+     */
+    @GetMapping("/chunk-upload")
+    public Response<List<Long>> chunkUpload(@NotBlank @RequestParam String md5) {
+        List<Long> received = fileService.chunkUpload(md5);
+        return Response.success(received);
     }
 
     @PostMapping(path = "/chunk-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -36,6 +36,8 @@ public abstract class AbstractStorageEngine implements StorageEngine {
         Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
+        Assert.isTrue(StringUtils.hasText(context.getMd5()), "md5 must be not null or empty");
+        Assert.notNull(context.getChunk(), "md5 must be not null or empty");
         doStoreChunk(context);
     }
 

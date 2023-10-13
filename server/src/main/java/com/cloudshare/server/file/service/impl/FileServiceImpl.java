@@ -244,6 +244,14 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public List<Long> chunkUpload(String md5) {
+        // TODO 是否允许不同用户公用分片
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserId(md5, userId);
+        return chunks.stream().map(FileChunk::getChunk).toList();
+    }
+
 
     @Override
     public List<FileListVO> list(FileListReqDTO reqDTO) {
