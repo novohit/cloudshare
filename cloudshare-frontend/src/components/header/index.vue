@@ -2,7 +2,7 @@
     <div class="pan-header-content">
         <div class="pan-header-content-wrapper">
             <div class="pan-title-font-content">
-                <span class="pan-title-font" @click="goHome">Cloudshare</span>
+                <span class="pan-title-font" @click="goHome"><img src="../../assets/imgs/logo.png" height="40" width="40"> Cloudshare</span>
             </div>
             <div class="pan-upload-task-list-content">
                 <pan-task-list/>
