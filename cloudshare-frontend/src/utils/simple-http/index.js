@@ -20,7 +20,7 @@ httpSimple.interceptors.request.use(config => {
     let token = getToken(),
         shareToken = getShareToken()
     if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token
+        config.headers['Authorization'] = token
     }
     if (shareToken) {
         config.headers['Share-Token'] = shareToken

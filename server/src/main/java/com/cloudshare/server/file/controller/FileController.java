@@ -80,9 +80,9 @@ public class FileController {
     }
 
     @PostMapping(path = "/chunk-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Response<Void> chunkUpload(@Validated FileChunkUploadReqDTO reqDTO) {
-        fileService.chunkUpload(reqDTO);
-        return Response.success();
+    public Response<Boolean> chunkUpload(@Validated FileChunkUploadReqDTO reqDTO) {
+        boolean merge = fileService.chunkUpload(reqDTO);
+        return Response.success(merge);
     }
 
     @PostMapping( "/chunk-merge")

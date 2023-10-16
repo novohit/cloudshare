@@ -66,9 +66,9 @@ let fileService = {
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    merge: function (data, resolve, reject) {
+    mergeChunk: function (data, resolve, reject) {
         http({
-            url: '/file/merge',
+            url: '/file/chunk-merge',
             data: data,
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))

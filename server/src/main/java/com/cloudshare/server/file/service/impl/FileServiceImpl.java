@@ -24,6 +24,7 @@ import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,6 +47,7 @@ import java.util.regex.Pattern;
  * @since 2023/10/8
  */
 @Service
+@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
@@ -221,9 +224,15 @@ public class FileServiceImpl implements FileService {
         return true;
     }
 
+    /**
+     * TODO 并发读取分片数量优化
+     *
+     * @param reqDTO
+     * @return
+     */
     @Override
     @Transactional
-    public void chunkUpload(FileChunkUploadReqDTO reqDTO) {
+    public synchronized boolean chunkUpload(FileChunkUploadReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         try {
             // 上传分片
@@ -236,14 +245,22 @@ public class FileServiceImpl implements FileService {
             context.setFileNameWithSuffix(reqDTO.fileName());
             storageEngine.storeChunk(context);
             // 保存分片记录
-            FileChunk fileChunk = new FileChunk();
-            fileChunk.setName(reqDTO.fileName());
-            fileChunk.setUserId(userId);
-            fileChunk.setChunk(reqDTO.chunk());
-            fileChunk.setChunkSize(multipartFile.getSize());
-            fileChunk.setMd5(reqDTO.md5());
-            fileChunk.setRealPath(context.getRealPath());
-            fileChunkRepository.save(fileChunk);
+            // 前端分片上传组件会出现取消上传但请求已经发出的情况
+
+            Optional<FileChunk> optional = fileChunkRepository.findByRealPathAndUserIdAndDeletedAtIsNull(context.getRealPath(), userId);
+            if (optional.isEmpty()) {
+                FileChunk fileChunk = new FileChunk();
+                fileChunk.setName(reqDTO.fileName());
+                fileChunk.setUserId(userId);
+                fileChunk.setChunk(reqDTO.chunk());
+                fileChunk.setChunkSize(multipartFile.getSize());
+                fileChunk.setMd5(reqDTO.md5());
+                fileChunk.setRealPath(context.getRealPath());
+                fileChunkRepository.save(fileChunk);
+            }
+            // 判断所有分片是否上传完毕
+            List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(reqDTO.md5(), userId);
+            return chunks.size() == reqDTO.totalChunkSize();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -267,7 +284,9 @@ public class FileServiceImpl implements FileService {
             return;
         }
         AtomicLong totalSize = new AtomicLong(0L);
-        List<String> chunkRealPathList = chunks.stream()
+        List<String> chunkRealPathList = chunks
+                .stream()
+                .sorted(Comparator.comparing(FileChunk::getChunk)) // 先根据分片排序
                 .map(chunk -> {
                     totalSize.addAndGet(chunk.getChunkSize());
                     return chunk.getRealPath();

@@ -67,7 +67,7 @@ const fileOptions = {
         if (panUtil.getChunkUploadSwitch()) {
             return panUtil.getUrlPrefix() + '/file/chunk-upload'
         }
-        return panUtil.getUrlPrefix() + '/file/upload'
+        return panUtil.getUrlPrefix() + '/file/single-upload'
     },
     singleFile: false,
     chunkSize: panUtil.getChunkSize(),
@@ -75,9 +75,21 @@ const fileOptions = {
     forceChunkSize: false,
     simultaneousUploads: 3,
     fileParameterName: 'file',
+    processParams: function (params) {
+        return {
+            chunk: params.chunkNumber,
+            totalChunkSize: params.totalChunks,
+            chunkSize: params.chunkSize,
+            totalSize: params.totalSize,
+            md5: params.identifier,
+            fileName: params.filename,
+            relativePath: params.relativePath,
+        }
+    },
     query: function (file, chunk) {
         return {
-            parentId: parentId.value
+            parentId: parentId.value,
+            curDirectory: curDirectory.value
         }
     },
     headers: {
@@ -138,7 +150,8 @@ const filesAdded = (files, fileList, event) => {
                 timeRemaining: panUtil.translateTime(Number.POSITIVE_INFINITY),
                 speed: panUtil.translateSpeed(f.averageSpeed),
                 percentage: 0,
-                parentId: parentId.value
+                parentId: parentId.value,
+                curDirectory: curDirectory.value
             }
             // 添加
             taskStore.add(taskItem)
@@ -220,10 +233,11 @@ const doMerge = (file) => {
         uploadedSize: panUtil.translateFileSize(file.sizeUploaded()),
         timeRemaining: panUtil.translateTime(file.timeRemaining())
     })
-    fileService.merge({
+    fileService.mergeChunk({
         fileName: uploadTaskItem.fileName,
-        identifier: uploadTaskItem.target.uniqueIdentifier,
+        md5: uploadTaskItem.target.uniqueIdentifier,
         parentId: uploadTaskItem.parentId,
+        curDirectory: uploadTaskItem.curDirectory,
         totalSize: uploadTaskItem.target.size
     }, res => {
         ElMessage.success('文件：' + file.name + ' 上传完成')
@@ -256,7 +270,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
     }
     if (res.code === 0) {
         if (res.data) {
-            if (res.data.mergeFlag) {
+            if (res.data) {
                 doMerge(file)
             } else if (res.data.uploadedChunks && res.data.uploadedChunks.length === file.chunks.length) {
                 doMerge(file)
