@@ -86,7 +86,7 @@ public class FileController {
     }
 
     @PostMapping( "/chunk-merge")
-    public Response<Void> chunkMerge(@Validated FileChunkMergeReqDTO reqDTO) {
+    public Response<Void> chunkMerge(@Validated @RequestBody FileChunkMergeReqDTO reqDTO) {
         fileService.chunkMerge(reqDTO);
         return Response.success();
     }
