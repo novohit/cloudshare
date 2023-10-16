@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import com.cloudshare.storage.core.AbstractStorageEngine;
 import com.cloudshare.storage.core.model.DeleteContext;
+import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.local.util.LocalStorageUtil;
@@ -12,6 +13,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,6 +64,19 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         }
         File file = new File(prefixPath + ".bak." + context.getChunk());
         LocalStorageUtil.writeStream2File(context.getInputStream(), file, context.getTotalSize());
+        context.setRealPath(file.getAbsolutePath());
+    }
+
+    protected void doMergeChunk(MergeChunkContext context) throws IOException {
+        String basePath = localStorageEngineProperties.getBasePath();
+        String fileNameWithSuffix = context.getFileNameWithSuffix();
+        String path = generateFilePath(basePath, fileNameWithSuffix);
+        File file = new File(path);
+
+        List<String> chunkRealPathList = context.getChunkRealPathList();
+        // 合并
+        LocalStorageUtil.mergeFile(file, chunkRealPathList);
+        // TODO 合并后删除分片交给上游定时删除
         context.setRealPath(file.getAbsolutePath());
     }
 }

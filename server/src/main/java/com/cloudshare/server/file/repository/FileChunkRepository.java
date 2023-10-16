@@ -10,5 +10,5 @@ import java.util.List;
  * @since 2023/10/13
  */
 public interface FileChunkRepository extends JpaRepository<FileChunk, Long> {
-    List<FileChunk> findByMd5AndUserId(String md5, Long userId);
+    List<FileChunk> findByMd5AndUserIdAndDeletedAtIsNull(String md5, Long userId);
 }

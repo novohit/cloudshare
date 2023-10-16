@@ -35,6 +35,10 @@ public class FileChunk extends BaseModel {
     @Comment("分片序号")
     private Long chunk;
 
+    @Column(nullable = false)
+    @Comment("分片大小")
+    private Long chunkSize;
+
     @Column(length = 256)
     @Comment("MD5")
     private String md5;

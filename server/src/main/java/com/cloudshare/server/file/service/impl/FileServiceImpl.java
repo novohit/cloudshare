@@ -6,6 +6,7 @@ import com.cloudshare.server.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
+import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
@@ -19,6 +20,7 @@ import com.cloudshare.server.file.repository.FileChunkRepository;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.storage.core.StorageEngine;
+import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
@@ -30,9 +32,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -236,6 +240,7 @@ public class FileServiceImpl implements FileService {
             fileChunk.setName(reqDTO.fileName());
             fileChunk.setUserId(userId);
             fileChunk.setChunk(reqDTO.chunk());
+            fileChunk.setChunkSize(multipartFile.getSize());
             fileChunk.setMd5(reqDTO.md5());
             fileChunk.setRealPath(context.getRealPath());
             fileChunkRepository.save(fileChunk);
@@ -248,8 +253,61 @@ public class FileServiceImpl implements FileService {
     public List<Long> chunkUpload(String md5) {
         // TODO 是否允许不同用户公用分片
         Long userId = UserContextThreadHolder.getUserId();
-        List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserId(md5, userId);
+        List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(md5, userId);
         return chunks.stream().map(FileChunk::getChunk).toList();
+    }
+
+    @Override
+    @Transactional
+    public void chunkMerge(FileChunkMergeReqDTO reqDTO) {
+        // 1. 查询分片文件路径
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(reqDTO.md5(), userId);
+        if (CollectionUtils.isEmpty(chunks)) {
+            return;
+        }
+        AtomicLong totalSize = new AtomicLong(0L);
+        List<String> chunkRealPathList = chunks.stream()
+                .map(chunk -> {
+                    totalSize.addAndGet(chunk.getChunkSize());
+                    return chunk.getRealPath();
+                })
+                .toList();
+
+        try {
+            // 1. 分片文件合并
+            MergeChunkContext context = new MergeChunkContext();
+            context.setFileNameWithSuffix(reqDTO.fileName());
+            context.setChunkRealPathList(chunkRealPathList);
+            storageEngine.mergeChunk(context);
+
+            // 2. 删除分片记录和分片文件 交给定时任务 TODO
+            List<FileChunk> deletedChunks = chunks
+                    .stream()
+                    .peek(chunk -> chunk.setDeletedAt(LocalDateTime.now()))
+                    .toList();
+            fileChunkRepository.saveAll(deletedChunks);
+            // 3. 保存合并记录
+            String suffix = FileUtil.getSuffix(context.getFileNameWithSuffix());
+            // hutool return suffix have no dot
+            suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
+            FileDocument fileDocument = assembleFileDocument(
+                    userId,
+                    reqDTO.parentId(),
+                    reqDTO.md5(),
+                    reqDTO.fileName(),
+                    null,
+                    reqDTO.curDirectory(),
+                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
+                    context.getRealPath(),
+                    totalSize.get(),
+                    FileType.suffix2Type(suffix),
+                    suffix
+            );
+            saveFile2DB(fileDocument);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

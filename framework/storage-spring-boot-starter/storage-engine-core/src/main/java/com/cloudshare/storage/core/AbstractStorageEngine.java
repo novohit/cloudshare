@@ -1,10 +1,12 @@
 package com.cloudshare.storage.core;
 
 import com.cloudshare.storage.core.model.DeleteContext;
+import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.core.util.UUIDUtil;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -41,11 +43,21 @@ public abstract class AbstractStorageEngine implements StorageEngine {
         doStoreChunk(context);
     }
 
+
+    @Override
+    public void mergeChunk(MergeChunkContext context) throws IOException {
+        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkRealPathList()), "chunks path must be not null");
+        doMergeChunk(context);
+    }
+
     protected abstract void doStore(StoreContext context) throws IOException;
 
     protected abstract void doDelete(DeleteContext context) throws IOException;
 
     protected abstract void doStoreChunk(StoreChunkContext context) throws IOException;
+
+    protected abstract void doMergeChunk(MergeChunkContext context) throws IOException;
 
     protected String getSuffix(String fileName) {
         Assert.isTrue(StringUtils.hasText(fileName), "fileName must be not null or empty");
