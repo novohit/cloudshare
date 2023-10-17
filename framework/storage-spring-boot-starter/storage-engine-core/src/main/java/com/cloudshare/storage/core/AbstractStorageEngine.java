@@ -2,6 +2,7 @@ package com.cloudshare.storage.core;
 
 import com.cloudshare.storage.core.model.DeleteContext;
 import com.cloudshare.storage.core.model.MergeChunkContext;
+import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.core.util.UUIDUtil;
@@ -51,6 +52,12 @@ public abstract class AbstractStorageEngine implements StorageEngine {
         doMergeChunk(context);
     }
 
+    @Override
+    public void read(ReadContext context) throws IOException {
+        Assert.isTrue(StringUtils.hasText(context.getRealPath()), "file path must be not null");
+        doRead(context);
+    }
+
     protected abstract void doStore(StoreContext context) throws IOException;
 
     protected abstract void doDelete(DeleteContext context) throws IOException;
@@ -58,6 +65,8 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     protected abstract void doStoreChunk(StoreChunkContext context) throws IOException;
 
     protected abstract void doMergeChunk(MergeChunkContext context) throws IOException;
+
+    protected abstract void doRead(ReadContext context) throws IOException;
 
     protected String getSuffix(String fileName) {
         Assert.isTrue(StringUtils.hasText(fileName), "fileName must be not null or empty");

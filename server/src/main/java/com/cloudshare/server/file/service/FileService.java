@@ -10,6 +10,7 @@ import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.FileListVO;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -34,4 +35,6 @@ public interface FileService {
     List<Long> chunkUpload(String md5);
 
     void chunkMerge(FileChunkMergeReqDTO reqDTO);
+
+    void download(Long fileId, HttpServletResponse response);
 }

@@ -2,6 +2,7 @@ package com.cloudshare.storage.core;
 
 import com.cloudshare.storage.core.model.DeleteContext;
 import com.cloudshare.storage.core.model.MergeChunkContext;
+import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 
@@ -20,4 +21,6 @@ public interface StorageEngine {
     void storeChunk(StoreChunkContext context) throws IOException;
 
     void mergeChunk(MergeChunkContext context) throws IOException;
+
+    void read(ReadContext context) throws IOException;
 }

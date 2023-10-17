@@ -13,6 +13,7 @@ import com.cloudshare.web.response.Response;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -88,6 +90,12 @@ public class FileController {
     @PostMapping( "/chunk-merge")
     public Response<Void> chunkMerge(@Validated @RequestBody FileChunkMergeReqDTO reqDTO) {
         fileService.chunkMerge(reqDTO);
+        return Response.success();
+    }
+
+    @GetMapping( "/download/{id}")
+    public Response<Void> download(@PathVariable("id") Long fileId, HttpServletResponse response) {
+        fileService.download(fileId, response);
         return Response.success();
     }
 }

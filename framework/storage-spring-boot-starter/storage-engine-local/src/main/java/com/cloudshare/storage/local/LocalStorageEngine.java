@@ -5,6 +5,7 @@ import cn.hutool.core.io.IORuntimeException;
 import com.cloudshare.storage.core.AbstractStorageEngine;
 import com.cloudshare.storage.core.model.DeleteContext;
 import com.cloudshare.storage.core.model.MergeChunkContext;
+import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.local.util.LocalStorageUtil;
@@ -78,5 +79,10 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         LocalStorageUtil.mergeFile(file, chunkRealPathList);
         // TODO 合并后删除分片交给上游定时删除
         context.setRealPath(file.getAbsolutePath());
+    }
+
+    protected void doRead(ReadContext context) throws IOException {
+        File file = new File(context.getRealPath());
+        LocalStorageUtil.readStreamFromFile(context.getOutputStream(), file, file.length());
     }
 }

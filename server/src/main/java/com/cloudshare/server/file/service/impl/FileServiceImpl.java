@@ -21,9 +21,11 @@ import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.storage.core.StorageEngine;
 import com.cloudshare.storage.core.model.MergeChunkContext;
+import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
+import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -324,6 +329,38 @@ public class FileServiceImpl implements FileService {
                     suffix
             );
             saveFile2DB(fileDocument);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void download(Long fileId, HttpServletResponse response) {
+        Long userId = UserContextThreadHolder.getUserId();
+        // 1. 校验下载权限
+        Optional<FileDocument> optional = fileRepository.findByIdAndUserId(fileId, userId);
+        if (optional.isEmpty()) {
+            throw new BizException("文件不存在");
+        }
+        FileDocument fileDocument = optional.get();
+        if (FileType.DIR.equals(fileDocument.getType())) {
+            // TODO support dir download
+            throw new BizException("暂不支持文件夹下载");
+        }
+        // 2. 返回文件流
+        try {
+            // 兼容所有 client https://xie.infoq.cn/article/7907c0965b06ae114fa1079c5
+            String fileName = URLEncoder.encode(fileDocument.getName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-disposition",
+                    "attachment;filename=" + fileName +
+                            ";filename*=utf-8''" + fileName);
+
+            ReadContext context = new ReadContext();
+            context.setRealPath(fileDocument.getRealPath());
+            context.setOutputStream(response.getOutputStream());
+            storageEngine.read(context);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

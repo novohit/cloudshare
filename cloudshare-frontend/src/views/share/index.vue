@@ -550,7 +550,7 @@ const doDownload = (item) => {
                 shareId: getShareId()
             }, res => {
                 if (res.code === 0) {
-                    let url = panUtil.getUrlPrefix() + '/share/file/download?id=' + item.id.replace(/\+/g, '%2B') + '&shareToken=' + getShareToken() + '&authorization=' + getToken(),
+                    let url = panUtil.getUrlPrefix() + '/share/file/download/' + item.id + '?shareToken=' + getShareToken() + '&authorization=' + getToken(),
                         fileName = item.fileName,
                         link = document.createElement('a')
                     link.style.display = 'none'
