@@ -119,7 +119,7 @@ let panUtil = {
             case 10:
                 tagStr = 'fa fa-file-powerpoint-o'
                 break
-            case 11:
+            case 'SOURCE_CODE':
                 tagStr = 'fa fa-file-code-o'
                 break
             default:

@@ -23,13 +23,13 @@ const route = useRoute()
 
 const renderCode = (id, fileName) => {
     axios.get(panUtil.getPreviewUrl(id)).then(res => {
-        if (res.code === 200) {
+        if (res.status === 200) {
             codeContent.value = res.data
             layui.use('code', function () {
                 layui.code({
                     elem: '.layui-code.code-text',
                     title: fileName,
-                    encode: false,
+                    encode: true,
                     about: false
                 })
             })

@@ -194,7 +194,7 @@ const showVideo = (row) => {
 
 const showCode = (row) => {
     openNewPage('/preview/code', 'PreviewCode', {
-        id: panUtil.handleId(row.id),
+        id: row.id,
     }, {
         fileName: row.fileName
     })
@@ -228,7 +228,7 @@ const clickFilename = (row) => {
         case 9:
             showVideo(row)
             break
-        case 11:
+        case 'SOURCE_CODE':
             showCode(row)
         default:
             break
