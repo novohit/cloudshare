@@ -366,6 +366,31 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public void preview(Long fileId, HttpServletResponse response) {
+        Long userId = UserContextThreadHolder.getUserId();
+        // 1. 校验下载权限
+        Optional<FileDocument> optional = fileRepository.findByIdAndUserId(fileId, userId);
+        if (optional.isEmpty()) {
+            throw new BizException("文件不存在");
+        }
+        FileDocument fileDocument = optional.get();
+        if (FileType.DIR.equals(fileDocument.getType())) {
+            // TODO support dir download
+            throw new BizException("暂不支持文件夹预览");
+        }
+        // 2. 返回文件流
+        try {
+            // TODO set content-type
+            ReadContext context = new ReadContext();
+            context.setRealPath(fileDocument.getRealPath());
+            context.setOutputStream(response.getOutputStream());
+            storageEngine.read(context);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public List<FileListVO> list(FileListReqDTO reqDTO) {

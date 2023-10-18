@@ -98,4 +98,10 @@ public class FileController {
         fileService.download(fileId, response);
         return Response.success();
     }
+
+    @GetMapping( "/preview/{id}")
+    public Response<Void> preview(@PathVariable("id") Long fileId, HttpServletResponse response) {
+        fileService.preview(fileId, response);
+        return Response.success();
+    }
 }

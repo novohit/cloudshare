@@ -37,4 +37,6 @@ public interface FileService {
     void chunkMerge(FileChunkMergeReqDTO reqDTO);
 
     void download(Long fileId, HttpServletResponse response);
+
+    void preview(Long fileId, HttpServletResponse response);
 }
