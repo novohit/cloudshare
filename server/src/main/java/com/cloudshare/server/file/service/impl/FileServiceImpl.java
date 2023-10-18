@@ -191,7 +191,8 @@ public class FileServiceImpl implements FileService {
             );
             saveFile2DB(fileDocument);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("文件上传异常", e);
+            throw new BizException("文件上传异常");
         }
     }
 
@@ -267,7 +268,8 @@ public class FileServiceImpl implements FileService {
             List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(reqDTO.md5(), userId);
             return chunks.size() == reqDTO.totalChunkSize();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("文件上传异常", e);
+            throw new BizException("文件上传异常");
         }
     }
 
@@ -330,7 +332,8 @@ public class FileServiceImpl implements FileService {
             );
             saveFile2DB(fileDocument);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("文件上传异常", e);
+            throw new BizException("文件上传异常");
         }
     }
 
@@ -362,7 +365,8 @@ public class FileServiceImpl implements FileService {
             context.setOutputStream(response.getOutputStream());
             storageEngine.read(context);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("文件读取异常", e);
+            throw new BizException("文件不存在");
         }
     }
 
@@ -387,7 +391,8 @@ public class FileServiceImpl implements FileService {
             context.setOutputStream(response.getOutputStream());
             storageEngine.read(context);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("文件读取异常", e);
+            throw new BizException("文件不存在");
         }
     }
 
