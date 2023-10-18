@@ -3,6 +3,7 @@ package com.cloudshare.server.file.controller.requset;
 import com.cloudshare.server.file.enums.FileType;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @author novo
@@ -11,6 +12,6 @@ import javax.validation.constraints.NotBlank;
 public record FileListReqDTO(
         Long parentId,
         @NotBlank String curDirectory,
-        FileType fileType
+        List<FileType> fileTypeList
 ) {
 }

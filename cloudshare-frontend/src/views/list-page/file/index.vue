@@ -37,7 +37,7 @@ onMounted(() => {
         breadcrumbStore.addItem(firstItem)
         fileStore.refreshParentId()
         fileStore.refreshCurDirectory()
-        fileStore.setFileTypes('-1')
+        fileStore.setFileTypeList([])
         fileStore.loadFileList()
     }
 })

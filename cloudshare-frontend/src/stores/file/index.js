@@ -11,7 +11,7 @@ export const useFileStore = defineStore('file', () => {
     const defaultCurDirectory = ref('')
     const fileList = ref([])
     const multipleSelection = ref([])
-    const fileTypes = ref('-1')
+    const fileTypeList = ref([])
     const searchFlag = ref(false)
     const searchKey = ref('')
     const tableLoading = ref(true)
@@ -48,8 +48,8 @@ export const useFileStore = defineStore('file', () => {
         multipleSelection.value = newMultipleSelection
     }
 
-    function setFileTypes(newFileTypes) {
-        fileTypes.value = newFileTypes
+    function setFileTypeList(newFileTypeList) {
+        fileTypeList.value = newFileTypeList
     }
 
     function setSearchFlag(newSearchFlag) {
@@ -74,7 +74,7 @@ export const useFileStore = defineStore('file', () => {
         defaultCurDirectory.value = ''
         fileList.value = new Array()
         multipleSelection.value = new Array()
-        fileTypes.value = '-1'
+        fileTypeList.value = []
         searchFlag.value = false
         searchKey.value = ''
         tableLoading.value = true
@@ -85,7 +85,7 @@ export const useFileStore = defineStore('file', () => {
         if (searchFlag.value) {
             fileService.search({
                 keyword: searchKey.value,
-                fileTypes: '-1'
+                fileTypeList: []
             }, res => {
                 setFileList(res.data)
                 setTableLoading(false)
@@ -97,7 +97,7 @@ export const useFileStore = defineStore('file', () => {
             fileService.list({
                 parentId: parentId.value,
                 curDirectory: curDirectory.value,
-                fileTypes: fileTypes.value
+                fileTypeList: fileTypeList.value
             }, res => {
                 setTableLoading(false)
                 setFileList(res.data)
@@ -115,7 +115,7 @@ export const useFileStore = defineStore('file', () => {
         defaultCurDirectory,
         fileList,
         multipleSelection,
-        fileTypes,
+        fileTypeList,
         searchFlag,
         searchKey,
         tableLoading,
@@ -127,7 +127,7 @@ export const useFileStore = defineStore('file', () => {
         setDefaultCurDirectory,
         setFileList,
         setMultipleSelection,
-        setFileTypes,
+        setFileTypeList,
         setSearchFlag,
         setSearchKey,
         setTableLoading,

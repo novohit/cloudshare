@@ -46,8 +46,8 @@ const querySearchHistory = (queryString, cb) => {
 }
 
 const doSearch = () => {
-    // 设置FileTypes
-    fileStore.setFileTypes('-1')
+    // 设置FileTypeList
+    fileStore.setFileTypeList([])
     // 设置搜索模式
     fileStore.setSearchFlag(true)
     // 跳转到Files页面
@@ -56,7 +56,7 @@ const doSearch = () => {
     fileStore.setSearchKey(searchKey.value)
     fileService.search({
         keyword: searchKey.value,
-        fileTypes: '-1'
+        fileTypeList: []
     }, res => {
         breadcrumbStore.clear()
         breadcrumbStore.addItem({

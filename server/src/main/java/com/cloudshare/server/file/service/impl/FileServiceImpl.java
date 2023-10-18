@@ -403,9 +403,9 @@ public class FileServiceImpl implements FileService {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
-        if (reqDTO.fileType() != null) {
+        if (!CollectionUtils.isEmpty(reqDTO.fileTypeList())) {
             fileList = fileList.stream()
-                    .filter(fileDocument -> reqDTO.fileType().equals(fileDocument.getType()))
+                    .filter(fileDocument -> reqDTO.fileTypeList().contains(fileDocument.getType()))
                     .toList();
         }
         List<FileListVO> voList = fileConverter.DOList2VOList(fileList);

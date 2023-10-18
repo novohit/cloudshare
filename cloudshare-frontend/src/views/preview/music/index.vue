@@ -102,7 +102,7 @@ const listenMusicPlayer = () => {
 const init = () => {
     fileService.list({
         curDirectory: route.params.curDirectory,
-        fileType: 'AUDIO'
+        fileTypeList: ['AUDIO']
     }, res => {
         if (res.code === 0) {
             const list = res.data.map(video => {

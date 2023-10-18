@@ -69,7 +69,7 @@ public enum FileType {
 
 
     SOURCE_CODE(suffix -> {
-        List<String> suffixes = Arrays.asList(".java", ".obj", ".h", ".c", ".html", ".net", ".php", ".css", ".js", ".ftl", ".jsp", ".asp");
+        List<String> suffixes = Arrays.asList(".java", ".go", ".cpp", ".py", ".obj", ".h", ".c", ".html", ".net", ".php", ".css", ".js", ".jsp", ".asp", ".sql");
         return suffixes.contains(suffix);
     }),
 

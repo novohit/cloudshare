@@ -101,7 +101,7 @@ const listenVideoPlayer = () => {
 const init = () => {
     fileService.list({
         curDirectory: route.params.curDirectory,
-        fileType: 'VIDEO'
+        fileTypeList: ['VIDEO']
     }, function (res) {
         if (res.code === 0) {
             const list = res.data.map(video => {
