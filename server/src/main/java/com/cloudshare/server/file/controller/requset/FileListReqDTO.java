@@ -1,5 +1,7 @@
 package com.cloudshare.server.file.controller.requset;
 
+import com.cloudshare.server.file.enums.FileType;
+
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -8,6 +10,7 @@ import javax.validation.constraints.NotBlank;
  */
 public record FileListReqDTO(
         Long parentId,
-        @NotBlank String curDirectory
+        @NotBlank String curDirectory,
+        FileType fileType
 ) {
 }

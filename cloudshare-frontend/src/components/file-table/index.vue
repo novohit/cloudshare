@@ -180,15 +180,16 @@ const showImg = (row) => {
 
 const showMusic = (row) => {
     openNewPage('/preview/music', 'PreviewMusic', {
-        id: panUtil.handleId(row.id),
-        parentId: panUtil.handleId(row.parentId)
+        id: row.id,
+        curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
 
 const showVideo = (row) => {
+    console.log(row)
     openNewPage('/preview/video', 'PreviewVideo', {
-        id: panUtil.handleId(row.id),
-        parentId: panUtil.handleId(row.parentId)
+        id: row.id,
+        curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
 
@@ -222,10 +223,10 @@ const clickFilename = (row) => {
         case 'IMAGE':
             showImg(row)
             break
-        case 8:
+        case 'AUDIO':
             showMusic(row)
             break
-        case 9:
+        case 'VIDEO':
             showVideo(row)
             break
         case 'SOURCE_CODE':

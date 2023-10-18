@@ -88,12 +88,12 @@ const router = createRouter({
             component: () => import('@/views/preview/iframe/index.vue')
         },
         {
-            path: '/preview/music/:parentId/:id',
+            path: '/preview/music/:curDirectory/:id',
             name: 'PreviewMusic',
             component: () => import('@/views/preview/music/index.vue')
         },
         {
-            path: '/preview/video/:parentId/:id',
+            path: '/preview/video/:curDirectory/:id',
             name: 'PreviewVideo',
             component: () => import('@/views/preview/video/index.vue')
         },

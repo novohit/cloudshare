@@ -101,11 +101,15 @@ const listenMusicPlayer = () => {
 
 const init = () => {
     fileService.list({
-        parentId: route.params.parentId,
-        fileTypes: '8'
+        curDirectory: route.params.curDirectory,
+        fileType: 'AUDIO'
     }, res => {
         if (res.code === 0) {
-            renderMusicList(res.data)
+            const list = res.data.map(video => {
+            // 将视频对象的 id 属性转换为字符串
+            return { ...video, id: String(video.id) };
+            });
+            renderMusicList(list)
             listenMusicPlayer()
         } else {
             ElMessage.error(res.message)

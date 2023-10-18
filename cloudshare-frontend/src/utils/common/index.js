@@ -110,10 +110,10 @@ let panUtil = {
             case 'IMAGE':
                 tagStr = 'fa fa-file-image-o'
                 break
-            case 8:
+            case 'AUDIO':
                 tagStr = 'fa fa-file-audio-o'
                 break
-            case 9:
+            case 'VIDEO':
                 tagStr = 'fa fa-file-video-o'
                 break
             case 10:

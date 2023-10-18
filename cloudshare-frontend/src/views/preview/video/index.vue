@@ -58,7 +58,9 @@ const renderVideoList = (dataList) => {
         }
         videoList.value.push(item)
     })
+    console.log(route.params.id)
     activeIndex.value = route.params.id
+    console.log("active", activeIndex.value)
 }
 
 const selectNext = () => {
@@ -98,11 +100,15 @@ const listenVideoPlayer = () => {
 
 const init = () => {
     fileService.list({
-        parentId: route.params.parentId,
-        fileTypes: '9'
+        curDirectory: route.params.curDirectory,
+        fileType: 'VIDEO'
     }, function (res) {
         if (res.code === 0) {
-            renderVideoList(res.data)
+            const list = res.data.map(video => {
+            // 将视频对象的 id 属性转换为字符串
+            return { ...video, id: String(video.id) };
+            });
+            renderVideoList(list)
             listenVideoPlayer()
         } else {
             ElMessage.error(res.message)

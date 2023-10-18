@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author novo
@@ -402,6 +403,11 @@ public class FileServiceImpl implements FileService {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
+        if (reqDTO.fileType() != null) {
+            fileList = fileList.stream()
+                    .filter(fileDocument -> reqDTO.fileType().equals(fileDocument.getType()))
+                    .toList();
+        }
         List<FileListVO> voList = fileConverter.DOList2VOList(fileList);
         return voList;
     }
