@@ -32,7 +32,7 @@ const {multipleSelection} = storeToRefs(fileStore)
 const loading = ref(false)
 
 const doDownload = (item) => {
-    let url = panUtil.getUrlPrefix() + '/file/download/' + item.id + '?authorization=' + getToken(),
+    let url = panUtil.getUrlPrefix() + '/file/download/' + item.id + '?Authorization=' + getToken(),
         fileName = item.fileName,
         link = document.createElement('a')
     link.style.display = 'none'

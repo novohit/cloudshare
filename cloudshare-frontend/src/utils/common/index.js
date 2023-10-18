@@ -128,7 +128,7 @@ let panUtil = {
         return tagStr
     },
     getPreviewUrl(id) {
-        return 'http://127.0.0.1:8080/file/preview?id=' + this.handleId(id) + '&authorization=' + getToken()
+        return panUtil.getUrlPrefix() + '/file/preview/' + id + '?Authorization=' + getToken()
     },
     getUrlPrefix() {
         return '/api'

@@ -156,7 +156,7 @@ const showImg = (row) => {
     let imgs = new Array()
     let imgIndex = 0
     for (let i = 0, iLength = fileList.value.length; i < iLength; ++i) {
-        if (fileList.value[i].fileType === 7) {
+        if (fileList.value[i].fileType === 'IMAGE') {
             imgs.push(panUtil.getPreviewUrl(fileList.value[i].id))
             if (fileList.value[i].id === row.id) {
                 imgIndex = imgs.length - 1
@@ -219,7 +219,7 @@ const clickFilename = (row) => {
         case 6:
             showIframe(row)
             break
-        case 7:
+        case 'IMAGE':
             showImg(row)
             break
         case 8:
