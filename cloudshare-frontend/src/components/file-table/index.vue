@@ -148,7 +148,7 @@ const showOffice = (row) => {
 
 const showIframe = (row) => {
     openNewPage('/preview/iframe', 'PreviewIframe', {
-        id: panUtil.handleId(row.id)
+        id: row.id
     })
 }
 
@@ -216,7 +216,7 @@ const clickFilename = (row) => {
             showOffice(row)
             break
         case 5:
-        case 6:
+        case 'TXT':
             showIframe(row)
             break
         case 'IMAGE':

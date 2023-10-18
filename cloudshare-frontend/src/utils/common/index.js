@@ -104,7 +104,7 @@ let panUtil = {
             case 5:
                 tagStr = 'fa fa-file-pdf-o'
                 break
-            case 6:
+            case 'TXT':
                 tagStr = 'fa fa-file-text-o'
                 break
             case 'IMAGE':

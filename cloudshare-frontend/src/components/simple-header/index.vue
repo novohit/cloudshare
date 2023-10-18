@@ -53,7 +53,7 @@ const goHome = () => {
     font-size: 40px;
     font-weight: bolder;
     cursor: pointer;
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-header-content-wrapper .pan-user-info-content {
