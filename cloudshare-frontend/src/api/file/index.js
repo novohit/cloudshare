@@ -17,9 +17,9 @@ let fileService = {
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    update: function (data, resolve, reject) {
+    rename: function (data, resolve, reject) {
         http({
-            url: '/file',
+            url: '/file/name',
             data: data,
             method: 'put'
         }).then(res => resolve(res)).catch(err => reject(err))

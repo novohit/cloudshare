@@ -1,7 +1,7 @@
 package com.cloudshare.server.file.service;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
-import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
+import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -24,7 +24,7 @@ public interface FileService {
 
     void updateDir(DirUpdateReqDTO reqDTO);
 
-    void renameDir(DirRenameReqDTO reqDTO);
+    void rename(FileRenameReqDTO reqDTO);
 
     void singleUpload(FileSingleUploadReqDTO reqDTO);
 

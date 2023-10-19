@@ -21,11 +21,11 @@
                          :model="renameForm"
                          status-icon
                          @submit.native.prevent>
-                    <el-form-item label="文件名称" prop="fileName">
+                    <el-form-item label="文件名称" prop="newName">
                         <el-input type="text"
                                   ref="fileNameEl"
                                   @keyup.enter.native="doRenameFile"
-                                  v-model="renameForm.fileName" autocomplete="off"/>
+                                  v-model="renameForm.newName" autocomplete="off"/>
                     </el-form-item>
                 </el-form>
             </div>
@@ -63,7 +63,9 @@ const {multipleSelection} = storeToRefs(fileStore)
 
 const renameForm = reactive({
     id: '',
-    fileName: ''
+    oldName: '',
+    newName: '',
+    curDirectory: '',
 })
 
 const resetForm = () => {
@@ -75,7 +77,7 @@ const focusInput = () => {
 }
 
 const renameRules = reactive({
-    fileName: [
+    newName: [
         {required: true, message: '请输入新文件名称', trigger: 'blur'}
     ]
 })
@@ -83,8 +85,11 @@ const renameRules = reactive({
 const renameFile = () => {
     if (props.item) {
         renameForm.id = props.item.id
-        renameForm.fileName = props.item.fileName
+        renameForm.oldName = props.item.fileName
+        renameForm.newName = props.item.fileName
+        renameForm.curDirectory = props.item.curDirectory
         renameDialogVisible.value = true
+        
         return
     }
     if (!multipleSelection.value || multipleSelection.value.length == 0) {
@@ -97,7 +102,9 @@ const renameFile = () => {
     }
     let item = multipleSelection.value[0]
     renameForm.id = item.id
-    renameForm.fileName = item.fileName
+    renameForm.oldName = item.fileName
+    renameForm.newName = item.fileName
+    renameForm.curDirectory = item.curDirectory
     renameDialogVisible.value = true
 }
 
@@ -105,9 +112,11 @@ const doRenameFile = async () => {
     await renameFormRef.value.validate((valid, fields) => {
         if (valid) {
             loading.value = true
-            fileService.update({
+            fileService.rename({
                 id: renameForm.id,
-                newFilename: renameForm.fileName
+                oldName: renameForm.oldName,
+                newName: renameForm.newName,
+                curDirectory: renameForm.curDirectory,
             }, res => {
                 loading.value = false
                 renameDialogVisible.value = false

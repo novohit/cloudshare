@@ -1,7 +1,7 @@
 package com.cloudshare.server.file.controller;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
-import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
+import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
@@ -46,9 +46,9 @@ public class FileController {
         return Response.success();
     }
 
-    @PutMapping("/dir/name")
-    public Response<Void> renameDir(@Validated @RequestBody DirRenameReqDTO reqDTO) {
-        fileService.renameDir(reqDTO);
+    @PutMapping("/name")
+    public Response<Void> rename(@Validated @RequestBody FileRenameReqDTO reqDTO) {
+        fileService.rename(reqDTO);
         return Response.success();
     }
 

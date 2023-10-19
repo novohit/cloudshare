@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
-import com.cloudshare.server.file.controller.requset.DirRenameReqDTO;
+import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author novo
@@ -139,8 +138,11 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public void renameDir(DirRenameReqDTO reqDTO) {
+    public void rename(FileRenameReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
+        if (reqDTO.oldName().equals(reqDTO.newName())) {
+            return;
+        }
         fileRepository.findByUserIdAndCurDirectoryAndName(userId, reqDTO.curDirectory(), reqDTO.newName())
                 .ifPresentOrElse((fileDocument) -> {
                     if (!fileDocument.getId().equals(reqDTO.id())) {
