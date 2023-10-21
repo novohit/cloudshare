@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * @author novo
  * @since 2023/10/8
  */
-public record FileListVO(
+public record FileVO(
         Long id,
         String path,
         String curDirectory,
@@ -17,7 +17,7 @@ public record FileListVO(
         String fileName,
         String size,
         String suffix,
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime createdAt,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createdAt,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime updatedAt
 ) {
 }

@@ -31,9 +31,9 @@ let fileService = {
             method: 'delete'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    getFolderTree: function (resolve, reject) {
+    getDirTree: function (resolve, reject) {
         http({
-            url: '/file/folder/tree',
+            url: '/file/dir/tree',
             params: {},
             method: 'get'
         }).then(res => resolve(res)).catch(err => reject(err))

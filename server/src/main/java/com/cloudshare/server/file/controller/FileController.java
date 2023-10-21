@@ -7,11 +7,14 @@ import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
-import com.cloudshare.server.file.controller.response.FileListVO;
+import com.cloudshare.server.file.controller.response.DirTreeNode;
+import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,15 +49,27 @@ public class FileController {
         return Response.success();
     }
 
+    @GetMapping("/dir/tree")
+    public Response<List<DirTreeNode>> dirTree() {
+        List<DirTreeNode> tree = fileService.dirTree();
+        return Response.success(tree);
+    }
+
     @PutMapping("/name")
     public Response<Void> rename(@Validated @RequestBody FileRenameReqDTO reqDTO) {
         fileService.rename(reqDTO);
         return Response.success();
     }
 
+    @DeleteMapping("/{id}")
+    public Response<Void> delete(@PathVariable Long id) {
+        fileService.delete(id);
+        return Response.success();
+    }
+
     @PostMapping("/list")
-    public Response<List<FileListVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
-        List<FileListVO> response = fileService.list(reqDTO);
+    public Response<List<FileVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
+        List<FileVO> response = fileService.list(reqDTO);
         return Response.success(response);
     }
 

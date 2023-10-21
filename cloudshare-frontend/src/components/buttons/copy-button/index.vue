@@ -30,7 +30,7 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <el-icon :size="20" style="margin-right: 15px; cursor: pointer;"><Folder/></el-icon>
-                            <span>{{ node.label }}</span>
+                            <span>{{ data.name }}</span>
                         </span>
                     </template>
                 </el-tree>
@@ -75,7 +75,7 @@ const copyFile = () => {
 const treeDialogVisible = ref(false)
 
 const loadTreeData = () => {
-    fileService.getFolderTree(res => {
+    fileService.getDirTree(res => {
         treeData.value = res.data
     }, res => {
         ElMessage.error(res.message)

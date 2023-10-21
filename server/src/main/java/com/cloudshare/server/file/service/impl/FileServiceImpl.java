@@ -4,14 +4,15 @@ import cn.hutool.core.io.FileUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
-import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
-import com.cloudshare.server.file.controller.response.FileListVO;
+import com.cloudshare.server.file.controller.response.DirTreeNode;
+import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileChunk;
@@ -39,13 +40,18 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author novo
@@ -399,9 +405,40 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public void delete(Long id) {
+        // TODO
+    }
 
     @Override
-    public List<FileListVO> list(FileListReqDTO reqDTO) {
+    public List<DirTreeNode> dirTree() {
+        // TODO set cache
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileDocument> list = fileRepository.findByUserIdAndType(userId, FileType.DIR);
+        List<DirTreeNode> nodes = fileConverter.DOList2TreeNodeList(list);
+
+        Map<Long, DirTreeNode> map = nodes.stream()
+                .collect(Collectors.toMap(DirTreeNode::getId, Function.identity()));
+
+        // 构建目录树
+        List<DirTreeNode> tree = new ArrayList<>();
+        for (DirTreeNode node : nodes) {
+            Long parentId = node.getParentId();
+            // 根目录
+            if (parentId == 0 || !map.containsKey(parentId)) {
+                tree.add(node);
+            } else {
+                DirTreeNode parentNode = map.get(parentId);
+                parentNode.getChildren().add(node);
+            }
+        }
+        DirTreeNode root = new DirTreeNode(0L, null, "/", "/", "/", tree);
+        return Collections.singletonList(root);
+    }
+
+
+    @Override
+    public List<FileVO> list(FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
@@ -410,7 +447,7 @@ public class FileServiceImpl implements FileService {
                     .filter(fileDocument -> reqDTO.fileTypeList().contains(fileDocument.getType()))
                     .toList();
         }
-        List<FileListVO> voList = fileConverter.DOList2VOList(fileList);
+        List<FileVO> voList = fileConverter.DOList2VOList(fileList);
         return voList;
     }
 

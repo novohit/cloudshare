@@ -1,5 +1,6 @@
 package com.cloudshare.server.file.repository;
 
+import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,4 +46,6 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
                   @Param("newPath") String newPath);
 
     Optional<FileDocument> findByIdAndUserId(Long fileId, Long userId);
+
+    List<FileDocument> findByUserIdAndType(Long userId, FileType type);
 }

@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
                 userContext.id(),
                 userContext.username(),
                 userContext.phone(),
-                100L,
+                0L,
                 "/");
         return repDTO;
     }
