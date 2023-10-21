@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
  */
 public record UserRegisterReqDTO(
         @NotBlank String username,
-        @NotBlank String password
+        @NotBlank String password,
+        String avatar
 ) {
 }

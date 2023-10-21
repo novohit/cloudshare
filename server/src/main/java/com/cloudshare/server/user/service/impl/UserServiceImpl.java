@@ -9,6 +9,7 @@ import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
 import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
 import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.controller.request.UserUpdateReqDTO;
 import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.model.UserAuth;
@@ -22,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -116,11 +118,24 @@ public class UserServiceImpl implements UserService {
         if (optional.isPresent()) {
             return TokenUtil.generateAccessToken(optional.get().getUserId());
         } else {
-            UserRegisterReqDTO reqDTO = new UserRegisterReqDTO(authUser.getUsername(), "123456");
+            UserRegisterReqDTO reqDTO = new UserRegisterReqDTO(authUser.getUsername(), "123456", authUser.getAvatar());
             Long userId = register(reqDTO);
             UserAuth userAuth = new UserAuth(null, userId, LoginType.GOOGLE, authUser.getUuid());
             userAuthRepository.save(userAuth);
             return TokenUtil.generateAccessToken(userId);
+        }
+    }
+
+    @Override
+    public void update(Long userId, UserUpdateReqDTO reqDTO) {
+        if (!UserContextThreadHolder.getUserId().equals(userId)) {
+            return;
+        }
+        Optional<User> optional = userRepository.findById(userId);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setAvatar(reqDTO.avatar());
+            userRepository.save(user);
         }
     }
 }
