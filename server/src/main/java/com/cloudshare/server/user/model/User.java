@@ -44,4 +44,8 @@ public class User extends BaseModel {
     @Column(length = 64)
     @Comment("密保答案")
     private String answer;
+
+    @Column(length = 255)
+    @Comment("头像")
+    private String avatar;
 }

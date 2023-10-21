@@ -8,6 +8,7 @@ public record UserInfoRepDTO(
         Long id,
         String username,
         String phone,
+        String avatar,
         Long rootId,
         String rootName
 ) {

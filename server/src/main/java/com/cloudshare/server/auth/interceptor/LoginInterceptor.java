@@ -73,6 +73,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 user.getId(),
                 user.getUsername(),
                 user.getPhone(),
+                user.getAvatar(),
                 1
         );
         BeanUtils.copyProperties(user, userContext);

@@ -60,8 +60,8 @@ const loginForm = reactive({
 })
 
 const visitorForm = reactive({
-    username: 'root',
-    password: '123456'
+    username: 'guest',
+    password: 'guest'
 })
 
 const fileStore = useFileStore()

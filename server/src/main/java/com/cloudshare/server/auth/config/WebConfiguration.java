@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +58,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .map(uri -> "/api" + uri)
                 .collect(Collectors.toList());
         exclude.add("/*");
+        exclude.add("/img/**");
         return exclude;
     }
 
@@ -63,5 +66,11 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void configurePathMatch(PathMatchConfigurer configurer) {
         // 配置只应用于RestController注解的类
         configurer.addPathPrefix("/api", aClass -> aClass.isAnnotationPresent(RestController.class));
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 静态资源---图片url地址
+        registry.addResourceHandler("/img/**").addResourceLocations("file:"+ System.getProperty("user.dir") + File.separator + "temp" + File.separator);
     }
 }
