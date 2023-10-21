@@ -7,6 +7,7 @@ import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
+import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
@@ -81,7 +82,7 @@ public class FileServiceImpl implements FileService {
     public void addDir(DirAddReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String name = reqDTO.dirName();
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWith(userId, reqDTO.curDirectory(), name);
+        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(userId, reqDTO.curDirectory(), name);
         // 第一个括号 (\\d+) 是一个分组 用于匹配一个或多个数字
         // 第二个括号是字面量
         // Pattern.quote(name) 方法来确保将 name 视为普通的字符串，而不是正则表达式的一部分。
@@ -123,7 +124,7 @@ public class FileServiceImpl implements FileService {
         Long userId = UserContextThreadHolder.getUserId();
         // 非移动目录
         if (!StringUtils.hasText(reqDTO.newDirectory())) {
-            fileRepository.findByUserIdAndCurDirectoryAndName(userId, reqDTO.curDirectory(), reqDTO.name())
+            fileRepository.findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(userId, reqDTO.curDirectory(), reqDTO.name())
                     .ifPresentOrElse((fileDocument) -> {
                         if (!fileDocument.getId().equals(reqDTO.id())) {
                             throw new BadRequestException("已存在该目录");
@@ -149,7 +150,7 @@ public class FileServiceImpl implements FileService {
         if (reqDTO.oldName().equals(reqDTO.newName())) {
             return;
         }
-        fileRepository.findByUserIdAndCurDirectoryAndName(userId, reqDTO.curDirectory(), reqDTO.newName())
+        fileRepository.findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(userId, reqDTO.curDirectory(), reqDTO.newName())
                 .ifPresentOrElse((fileDocument) -> {
                     if (!fileDocument.getId().equals(reqDTO.id())) {
                         throw new BadRequestException("已存在该目录");
@@ -350,7 +351,7 @@ public class FileServiceImpl implements FileService {
     public void download(Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
         // 1. 校验下载权限
-        Optional<FileDocument> optional = fileRepository.findByIdAndUserId(fileId, userId);
+        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }
@@ -383,7 +384,7 @@ public class FileServiceImpl implements FileService {
     public void preview(Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
         // 1. 校验下载权限
-        Optional<FileDocument> optional = fileRepository.findByIdAndUserId(fileId, userId);
+        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }
@@ -406,15 +407,34 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void delete(Long id) {
-        // TODO
+    public void delete(FileDeleteReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        if (CollectionUtils.isEmpty(reqDTO.ids())) {
+            return;
+        }
+        List<FileDocument> list = fileRepository.findByIdInAndUserId(reqDTO.ids(), userId);
+        List<FileDocument> delete = new ArrayList<>(list);
+        for (FileDocument file : list) {
+            // 文件直接设置删除时间
+            file.setDeletedAt(LocalDateTime.now());
+            if (FileType.DIR.equals(file.getType())) {
+                // 查询文件夹下的所有文件
+                List<FileDocument> subList = fileRepository.findByUserIdAndCurDirectoryStartsWithAndDeletedAtIsNull(userId, file.getPath());
+                for (FileDocument subFile : subList) {
+                    subFile.setDeletedAt(LocalDateTime.now());
+                }
+                delete.addAll(subList);
+            }
+            // TODO 定时任务执行物理删除
+        }
+        fileRepository.saveAll(delete);
     }
 
     @Override
     public List<DirTreeNode> dirTree() {
         // TODO set cache
         Long userId = UserContextThreadHolder.getUserId();
-        List<FileDocument> list = fileRepository.findByUserIdAndType(userId, FileType.DIR);
+        List<FileDocument> list = fileRepository.findByUserIdAndTypeAndDeletedAtIsNull(userId, FileType.DIR);
         List<DirTreeNode> nodes = fileConverter.DOList2TreeNodeList(list);
 
         Map<Long, DirTreeNode> map = nodes.stream()
@@ -441,7 +461,7 @@ public class FileServiceImpl implements FileService {
     public List<FileVO> list(FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         // 一级文件列表
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectory(userId, reqDTO.curDirectory());
+        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, reqDTO.curDirectory());
         if (!CollectionUtils.isEmpty(reqDTO.fileTypeList())) {
             fileList = fileList.stream()
                     .filter(fileDocument -> reqDTO.fileTypeList().contains(fileDocument.getType()))

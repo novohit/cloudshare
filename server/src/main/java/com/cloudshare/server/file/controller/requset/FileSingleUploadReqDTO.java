@@ -4,7 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 /**
  * @author novo
@@ -12,7 +11,7 @@ import javax.validation.constraints.Positive;
  */
 public record FileSingleUploadReqDTO(
         String md5,
-        @Positive Long parentId,
+        @NotNull Long parentId,
         @NotBlank String curDirectory,
         @NotNull MultipartFile file
 ) {

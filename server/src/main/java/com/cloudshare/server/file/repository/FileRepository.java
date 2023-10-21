@@ -16,11 +16,13 @@ import java.util.Optional;
  */
 public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
-    List<FileDocument> findByUserIdAndCurDirectory(Long userId, String curDirectory);
+    List<FileDocument> findByUserIdAndCurDirectoryAndDeletedAtIsNull(Long userId, String curDirectory);
 
-    List<FileDocument> findByUserIdAndCurDirectoryAndNameStartsWith(Long userId, String curDirectory, String key);
+    List<FileDocument> findByUserIdAndCurDirectoryStartsWithAndDeletedAtIsNull(Long userId, String curDirectory);
 
-    Optional<FileDocument> findByUserIdAndCurDirectoryAndName(Long userId, String curDirectory, String name);
+    List<FileDocument> findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(Long userId, String curDirectory, String key);
+
+    Optional<FileDocument> findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(Long userId, String curDirectory, String name);
 
     Optional<FileDocument> findByMd5(String md5);
 
@@ -45,7 +47,9 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
                   @Param("newName") String newName,
                   @Param("newPath") String newPath);
 
-    Optional<FileDocument> findByIdAndUserId(Long fileId, Long userId);
+    Optional<FileDocument> findByIdAndUserIdAndDeletedAtIsNull(Long fileId, Long userId);
 
-    List<FileDocument> findByUserIdAndType(Long userId, FileType type);
+    List<FileDocument> findByIdInAndUserId(List<Long> ids, Long userId);
+
+    List<FileDocument> findByUserIdAndTypeAndDeletedAtIsNull(Long userId, FileType type);
 }

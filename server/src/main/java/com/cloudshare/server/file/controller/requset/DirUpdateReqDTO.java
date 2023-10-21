@@ -1,14 +1,13 @@
 package com.cloudshare.server.file.controller.requset;
 
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author novo
  * @since 2023/10/9
  */
 public record DirUpdateReqDTO(
-        @Positive
-        Long id,
+        @NotNull Long id,
         Long parentId,
         String name,
         String description,

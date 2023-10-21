@@ -4,6 +4,7 @@ import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
+import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
@@ -41,7 +42,7 @@ public interface FileService {
 
     void preview(Long fileId, HttpServletResponse response);
 
-    void delete(Long id);
+    void delete(FileDeleteReqDTO reqDTO);
 
     List<DirTreeNode> dirTree();
 }

@@ -1,6 +1,7 @@
 package com.cloudshare.server.file.controller;
 
 import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -61,9 +62,9 @@ public class FileController {
         return Response.success();
     }
 
-    @DeleteMapping("/{id}")
-    public Response<Void> delete(@PathVariable Long id) {
-        fileService.delete(id);
+    @DeleteMapping
+    public Response<Void> delete(@RequestBody FileDeleteReqDTO reqDTO) {
+        fileService.delete(reqDTO);
         return Response.success();
     }
 

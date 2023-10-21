@@ -1,7 +1,7 @@
 package com.cloudshare.server.file.controller.requset;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author novo
@@ -9,7 +9,7 @@ import javax.validation.constraints.Positive;
  */
 public record FileChunkMergeReqDTO(
         @NotBlank String md5,
-        @Positive Long parentId,
+        @NotNull Long parentId,
         @NotBlank String curDirectory,
         @NotBlank String fileName
 ) {
