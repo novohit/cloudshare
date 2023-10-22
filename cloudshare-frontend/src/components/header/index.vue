@@ -64,7 +64,6 @@ const goHome = () => {
     display: inline-block;
     position: absolute;
     right: 60px;
-    top: 20px;
 }
 
 .pan-header-content-wrapper .pan-upload-task-list-content {

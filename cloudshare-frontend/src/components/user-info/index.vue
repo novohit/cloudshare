@@ -1,12 +1,14 @@
 <template>
     <div>
+        <span style="">欢迎您&nbsp</span>
         <el-dropdown @command="handleCommand">
-                          <span class="pan-user-info">
-                            欢迎您,{{ username }}
-                              <el-icon class="el-icon--right"><arrow-down/></el-icon>
-                          </span>
+            <div class="pan-user-info">
+                <img class="avatar" :src="photo === ''?'/src/assets/imgs/avatar.png':photo">
+            </div>
             <template #dropdown>
                 <el-dropdown-menu>
+                    <el-dropdown-item command="#">用户名：{{ username }}</el-dropdown-item>
+                    <el-dropdown-item command="payment">套餐购买</el-dropdown-item>
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item command="exit">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
@@ -59,6 +61,7 @@
 
 <script setup>
 import {onMounted, reactive, ref} from 'vue'
+import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {ElMessage, ElMessageBox, ElNotification} from 'element-plus'
 import userService from '@/api/user'
@@ -71,6 +74,8 @@ import {useTaskStore} from '@/stores/task'
 
 const userStore = useUserStore()
 const {username} = storeToRefs(userStore)
+
+const router = useRouter()
 
 const breadcrumbStore = useBreadcrumbStore()
 const fileStore = useFileStore()
@@ -85,6 +90,9 @@ const changePasswordForm = reactive({
     newPassword: '',
     reNewPassword: ''
 })
+
+//后端头像
+let photo = ref('')
 
 const goLogin = () => {
     clearToken()
@@ -111,6 +119,11 @@ const doExit = () => {
     })
 }
 
+const doPayment = () =>{
+    console.log('???');
+    router.push({name: 'Pay'})
+}
+
 const passwordEl = ref(null)
 
 const handleCommand = (command) => {
@@ -118,6 +131,8 @@ const handleCommand = (command) => {
         changePasswordDialogVisible.value = true
     } else if (command === 'exit') {
         doExit()
+    } else if (command === 'payment') {
+        doPayment()
     }
 }
 
@@ -200,5 +215,13 @@ onMounted(() => {
 <style scoped>
 .pan-user-info {
     color: #409EFF;
+    margin-top:10px;
+}
+.avatar{
+    width: 36px;
+    height: auto;
+    margin-right: 5px;
+    border-radius: 100%;
+    vertical-align: middle;
 }
 </style>
