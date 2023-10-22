@@ -33,15 +33,13 @@ const alipay = ()=>{
         "bill_content": "test_951a4562e602",
         "bill_receiver_phone": "test_71398c1e670e",
         "bill_receiver_email": "test_17b07498eadd"
-    }, err => {
-        ElMessage.error(err.message)
-        
     }, res => {
         // 处理掉script标签的内容
-        const div=document.createElement('divform');
-        div.innerHTML=document.write(res);
-        document.body.appendChild(div);
+        const fragment = document.createElement('divform');
+        fragment.innerHTML=document.write(res.data);
         document.forms[0].submit();
+    }, err => {
+        ElMessage.error(err.message)
     })
     
 }
