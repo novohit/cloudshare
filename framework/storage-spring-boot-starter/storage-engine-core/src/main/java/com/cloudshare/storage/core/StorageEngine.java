@@ -23,4 +23,6 @@ public interface StorageEngine {
     void mergeChunk(MergeChunkContext context) throws IOException;
 
     void read(ReadContext context) throws IOException;
+
+    void shutdown();
 }

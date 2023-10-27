@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "storage.aliyun.oss.endpoint",
+      "defaultValue": "not null",
+      "description": "endpoint."
+    },
+    {
+      "name": "storage.aliyun.oss.access-key-id",
+      "defaultValue": "not null",
+      "description": "access-key-id."
+    },
+    {
+      "name": "storage.aliyun.oss.access-key-secret",
+      "defaultValue": "not null",
+      "description": "access-key-secret."
+    },
+    {
+      "name": "storage.aliyun.oss.bucket-name",
+      "defaultValue": "not null",
+      "description": "bucket-name."
+    }
+  ]
+}

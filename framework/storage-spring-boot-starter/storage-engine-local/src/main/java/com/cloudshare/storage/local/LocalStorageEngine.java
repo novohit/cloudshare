@@ -85,4 +85,9 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         File file = new File(context.getRealPath());
         LocalStorageUtil.readStreamFromFile(context.getOutputStream(), file, file.length());
     }
+
+    @Override
+    public void shutdown() {
+
+    }
 }

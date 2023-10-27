@@ -40,6 +40,12 @@
 
         <dependency>
             <groupId>com.cloudshare</groupId>
+            <artifactId>storage-engine-oss-aliyun</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudshare</groupId>
             <artifactId>common-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>

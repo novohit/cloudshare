@@ -23,7 +23,7 @@ public class UserServiceTest {
 
     @Test
     void authTest() {
-        UserRegisterReqDTO registerReqDTO = new UserRegisterReqDTO("dev", "test");
+        UserRegisterReqDTO registerReqDTO = new UserRegisterReqDTO("dev", "test", "");
         Long userId = userService.register(registerReqDTO);
         Assertions.assertNotNull(userId);
         // 重复注册
