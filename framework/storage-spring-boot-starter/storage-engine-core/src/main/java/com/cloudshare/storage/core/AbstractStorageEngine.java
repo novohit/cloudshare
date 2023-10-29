@@ -40,7 +40,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
         Assert.isTrue(StringUtils.hasText(context.getMd5()), "md5 must be not null or empty");
-        Assert.notNull(context.getChunk(), "md5 must be not null or empty");
+        Assert.notNull(context.getChunk(), "chunkNum must be not null or empty");
         doStoreChunk(context);
     }
 
@@ -48,7 +48,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     @Override
     public void mergeChunk(MergeChunkContext context) throws IOException {
         Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
-        Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkRealPathList()), "chunks path must be not null");
+        Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkInfo()), "chunks path must be not null");
         doMergeChunk(context);
     }
 

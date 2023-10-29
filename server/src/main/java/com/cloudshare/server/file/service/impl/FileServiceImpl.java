@@ -254,7 +254,7 @@ public class FileServiceImpl implements FileService {
             // 上传分片
             MultipartFile multipartFile = reqDTO.file();
             StoreChunkContext context = new StoreChunkContext();
-            context.setChunk(reqDTO.chunk());
+            context.setChunk(reqDTO.chunkNum());
             context.setMd5(reqDTO.md5());
             context.setTotalSize(multipartFile.getSize());
             context.setInputStream(multipartFile.getInputStream());
@@ -263,15 +263,15 @@ public class FileServiceImpl implements FileService {
             // 保存分片记录
             // 前端分片上传组件会出现取消上传但请求已经发出的情况
 
-            Optional<FileChunk> optional = fileChunkRepository.findByRealPathAndUserIdAndDeletedAtIsNull(context.getRealPath(), userId);
+            Optional<FileChunk> optional = fileChunkRepository.findByChunkInfoAndUserIdAndDeletedAtIsNull(context.getChunkInfo(), userId);
             if (optional.isEmpty()) {
                 FileChunk fileChunk = new FileChunk();
                 fileChunk.setName(reqDTO.fileName());
                 fileChunk.setUserId(userId);
-                fileChunk.setChunk(reqDTO.chunk());
+                fileChunk.setChunkNum(reqDTO.chunkNum());
                 fileChunk.setChunkSize(multipartFile.getSize());
                 fileChunk.setMd5(reqDTO.md5());
-                fileChunk.setRealPath(context.getRealPath());
+                fileChunk.setChunkInfo(context.getChunkInfo());
                 fileChunkRepository.save(fileChunk);
             }
             // 判断所有分片是否上传完毕
@@ -284,11 +284,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<Long> chunkUpload(String md5) {
+    public List<Integer> chunkUpload(String md5) {
         // TODO 是否允许不同用户公用分片
         Long userId = UserContextThreadHolder.getUserId();
         List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(md5, userId);
-        return chunks.stream().map(FileChunk::getChunk).toList();
+        return chunks.stream().map(FileChunk::getChunkNum).toList();
     }
 
     @Override
@@ -303,10 +303,10 @@ public class FileServiceImpl implements FileService {
         AtomicLong totalSize = new AtomicLong(0L);
         List<String> chunkRealPathList = chunks
                 .stream()
-                .sorted(Comparator.comparing(FileChunk::getChunk)) // 先根据分片排序
+                .sorted(Comparator.comparing(FileChunk::getChunkNum)) // 先根据分片排序
                 .map(chunk -> {
                     totalSize.addAndGet(chunk.getChunkSize());
-                    return chunk.getRealPath();
+                    return chunk.getChunkInfo();
                 })
                 .toList();
 
@@ -314,7 +314,7 @@ public class FileServiceImpl implements FileService {
             // 1. 分片文件合并
             MergeChunkContext context = new MergeChunkContext();
             context.setFileNameWithSuffix(reqDTO.fileName());
-            context.setChunkRealPathList(chunkRealPathList);
+            context.setChunkInfo(chunkRealPathList);
             storageEngine.mergeChunk(context);
 
             // 2. 删除分片记录和分片文件 交给定时任务 TODO

@@ -13,8 +13,8 @@ import javax.validation.constraints.Positive;
 public record FileChunkUploadReqDTO(
         @NotBlank String fileName,
         @NotBlank String md5,
-        @Positive Long chunk, // 分片序号
-        @Positive Long totalChunkSize, // 分片数
+        @Positive Integer chunkNum, // 分片序号
+        @Positive Integer totalChunkSize, // 分片数
         Long totalSize, // 文件总大小 分上传边合并才会用到
         @NotNull MultipartFile file
 ) {

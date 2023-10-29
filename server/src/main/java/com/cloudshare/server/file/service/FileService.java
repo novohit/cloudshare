@@ -34,7 +34,7 @@ public interface FileService {
 
     boolean chunkUpload(FileChunkUploadReqDTO reqDTO);
 
-    List<Long> chunkUpload(String md5);
+    List<Integer> chunkUpload(String md5);
 
     void chunkMerge(FileChunkMergeReqDTO reqDTO);
 

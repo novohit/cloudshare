@@ -77,7 +77,7 @@ const fileOptions = {
     fileParameterName: 'file',
     processParams: function (params) {
         return {
-            chunk: params.chunkNumber,
+            chunkNum: params.chunkNumber,
             totalChunkSize: params.totalChunks,
             chunkSize: params.chunkSize,
             totalSize: params.totalSize,

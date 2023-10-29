@@ -91,8 +91,8 @@ public class FileController {
      * @return
      */
     @GetMapping("/chunk-upload")
-    public Response<List<Long>> chunkUpload(@NotBlank @RequestParam String md5) {
-        List<Long> received = fileService.chunkUpload(md5);
+    public Response<List<Integer>> chunkUpload(@NotBlank @RequestParam String md5) {
+        List<Integer> received = fileService.chunkUpload(md5);
         return Response.success(received);
     }
 

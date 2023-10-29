@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +64,7 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         }
         File file = new File(prefixPath + ".bak." + context.getChunk());
         LocalStorageUtil.writeStream2File(context.getInputStream(), file, context.getTotalSize());
-        context.setRealPath(file.getAbsolutePath());
+        context.setChunkInfo(file.getAbsolutePath());
     }
 
     protected void doMergeChunk(MergeChunkContext context) throws IOException {
@@ -74,7 +73,7 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         String path = generateFilePath(basePath, fileNameWithSuffix);
         File file = new File(path);
 
-        List<String> chunkRealPathList = context.getChunkRealPathList();
+        List<String> chunkRealPathList = context.getChunkInfo();
         // 合并
         LocalStorageUtil.mergeFile(file, chunkRealPathList);
         // TODO 合并后删除分片交给上游定时删除

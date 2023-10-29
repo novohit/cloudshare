@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface FileChunkRepository extends JpaRepository<FileChunk, Long> {
     List<FileChunk> findByMd5AndUserIdAndDeletedAtIsNull(String md5, Long userId);
 
-    Optional<FileChunk> findByRealPathAndUserIdAndDeletedAtIsNull(String md5, Long userId);
+    Optional<FileChunk> findByChunkInfoAndUserIdAndDeletedAtIsNull(String md5, Long userId);
 }

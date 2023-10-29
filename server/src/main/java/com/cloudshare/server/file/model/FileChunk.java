@@ -33,7 +33,7 @@ public class FileChunk extends BaseModel {
 
     @Column(nullable = false)
     @Comment("分片序号")
-    private Long chunk;
+    private Integer chunkNum;
 
     @Column(nullable = false)
     @Comment("分片大小")
@@ -44,6 +44,6 @@ public class FileChunk extends BaseModel {
     private String md5;
 
     @Column(length = 256)
-    @Comment("真实路径")
-    private String realPath;
+    @Comment("分片合并所需的信息")
+    private String chunkInfo;
 }
