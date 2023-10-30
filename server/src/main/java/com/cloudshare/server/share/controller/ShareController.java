@@ -1,5 +1,6 @@
 package com.cloudshare.server.share.controller;
 
+import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
 import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
@@ -41,9 +42,9 @@ public class ShareController {
         return Response.success(resp);
     }
 
-    @DeleteMapping("/{shareId}")
-    public Response<Void> delete(@PathVariable("shareId") Long shareId) {
-        shareService.delete(shareId);
+    @DeleteMapping
+    public Response<Void> delete(@Validated @RequestBody ShareCancelReqDTO reqDTO) {
+        shareService.delete(reqDTO);
         return Response.success();
     }
 }

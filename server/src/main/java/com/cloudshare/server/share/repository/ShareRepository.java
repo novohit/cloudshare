@@ -15,4 +15,6 @@ public interface ShareRepository extends JpaRepository<Share, Long> {
     List<Share> findByUserId(Long userId);
 
     Optional<Share> findByIdAndUserId(Long shareId, Long userId);
+
+    List<Share> findByIdInAndUserId(List<Long> ids, Long userId);
 }

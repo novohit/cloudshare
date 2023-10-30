@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileRepository;
+import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
 import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
@@ -79,11 +80,12 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public void delete(Long shareId) {
+    public void delete(ShareCancelReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        Optional<Share> optional = shareRepository.findByIdAndUserId(shareId, userId);
-        if (optional.isPresent()) {
-            shareRepository.deleteById(shareId);
-        }
+        List<Share> shareList = shareRepository.findByIdInAndUserId(reqDTO.ids(), userId);
+        List<Long> ids = shareList.stream()
+                .map(Share::getId)
+                .toList();
+        shareRepository.deleteAllByIdInBatch(ids);
     }
 }
