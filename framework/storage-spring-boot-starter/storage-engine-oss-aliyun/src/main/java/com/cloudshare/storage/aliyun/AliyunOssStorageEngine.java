@@ -1,5 +1,7 @@
 package com.cloudshare.storage.aliyun;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONException;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
@@ -22,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -83,7 +86,6 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
      */
     @Override
     protected synchronized void doStoreChunk(StoreChunkContext context) throws IOException {
-        String realPath;
         ChunkUploadEntity entity = uploadEntityMap.get(context.getMd5());
         if (entity == null) {
             // 分片上传初始化
@@ -100,15 +102,16 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
         try {
             UploadPartResult result = ossClient.uploadPart(uploadPartRequest);
             PartETag partETag = result.getPartETag();
-            log.info("{} {} {} {}", partETag.getETag(), partETag.getPartCRC(), partETag.getPartNumber(), partETag.getPartSize());
-            realPath = result.getResponse().getUri();
-            // TODO 存储ETag
-            context.setChunkInfo(realPath);
-        } catch (OSSException | ClientException e) {
+            ChunkInfo chunkInfo = new ChunkInfo();
+            BeanUtils.copyProperties(partETag, chunkInfo);
+            chunkInfo.setUploadId(entity.getUploadId());
+            chunkInfo.setUploadId(entity.getObjectKey());
+            String info = JSON.toJSONString(chunkInfo);
+            context.setChunkInfo(info);
+        } catch (OSSException | ClientException | JSONException e) {
             log.error("阿里云OSS上传异常", e);
             throw new IOException(e);
         }
-
     }
 
     @Override
@@ -168,5 +171,29 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
          * 上传名称
          */
         private String objectKey;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static final class ChunkInfo {
+
+        /**
+         * 分片上传全局唯一id
+         */
+        private String uploadId;
+
+        /**
+         * 上传名称
+         */
+        private String objectKey;
+
+        private int partNumber;
+
+        private String eTag;
+
+        private long partSize;
+
+        private Long partCRC;
     }
 }

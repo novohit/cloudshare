@@ -1,7 +1,6 @@
 package com.cloudshare.storage.core.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.InputStream;
 
