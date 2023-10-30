@@ -4,6 +4,7 @@ import com.cloudshare.server.share.model.Share;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author novo
@@ -12,4 +13,6 @@ import java.util.List;
 public interface ShareRepository extends JpaRepository<Share, Long> {
 
     List<Share> findByUserId(Long userId);
+
+    Optional<Share> findByIdAndUserId(Long shareId, Long userId);
 }

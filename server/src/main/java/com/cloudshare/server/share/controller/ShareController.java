@@ -7,7 +7,9 @@ import com.cloudshare.server.share.controller.response.ShareListRespVO;
 import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +35,15 @@ public class ShareController {
         return Response.success(resp);
     }
 
-    @GetMapping
-    public Response<ShareListRespVO> createShare(@Validated @RequestBody ShareListReqDTO reqDTO) {
+    @GetMapping("/list")
+    public Response<ShareListRespVO> list(@Validated @RequestBody ShareListReqDTO reqDTO) {
         ShareListRespVO resp = shareService.list(reqDTO);
         return Response.success(resp);
+    }
+
+    @DeleteMapping("/{shareId}")
+    public Response<Void> delete(@PathVariable("shareId") Long shareId) {
+        shareService.delete(shareId);
+        return Response.success();
     }
 }

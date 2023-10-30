@@ -13,4 +13,6 @@ public interface ShareService {
     ShareCreateRespVO createShare(ShareCreateReqDTO reqDTO);
 
     ShareListRespVO list(ShareListReqDTO reqDTO);
+
+    void delete(Long shareId);
 }

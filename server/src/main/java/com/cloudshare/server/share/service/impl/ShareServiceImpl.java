@@ -77,4 +77,13 @@ public class ShareServiceImpl implements ShareService {
         List<ShareVO> shareVOList = shareConverter.DOList2VOList(shareList);
         return new ShareListRespVO(shareVOList);
     }
+
+    @Override
+    public void delete(Long shareId) {
+        Long userId = UserContextThreadHolder.getUserId();
+        Optional<Share> optional = shareRepository.findByIdAndUserId(shareId, userId);
+        if (optional.isPresent()) {
+            shareRepository.deleteById(shareId);
+        }
+    }
 }
