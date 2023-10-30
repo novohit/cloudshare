@@ -5,15 +5,21 @@ import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
+import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
+import com.cloudshare.server.share.controller.response.ShareListRespVO;
+import com.cloudshare.server.share.controller.response.ShareVO;
+import com.cloudshare.server.share.convert.ShareConverter;
 import com.cloudshare.server.share.enums.ShareStatus;
 import com.cloudshare.server.share.enums.VisibleType;
 import com.cloudshare.server.share.model.Share;
 import com.cloudshare.server.share.repository.ShareRepository;
 import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.web.exception.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,15 +27,21 @@ import java.util.Optional;
  * @since 2023/10/30
  */
 @Service
+@Slf4j
 public class ShareServiceImpl implements ShareService {
 
     private final ShareRepository shareRepository;
 
     private final FileRepository fileRepository;
 
-    public ShareServiceImpl(ShareRepository shareRepository, FileRepository fileRepository) {
+    private final ShareConverter shareConverter;
+
+
+    public ShareServiceImpl(ShareRepository shareRepository, FileRepository fileRepository,
+                            ShareConverter shareConverter) {
         this.shareRepository = shareRepository;
         this.fileRepository = fileRepository;
+        this.shareConverter = shareConverter;
     }
 
 
@@ -56,5 +68,13 @@ public class ShareServiceImpl implements ShareService {
         }
         shareRepository.save(share);
         return new ShareCreateRespVO(share.getId(), share.getUrl(), share.getCode());
+    }
+
+    @Override
+    public ShareListRespVO list(ShareListReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        List<Share> shareList = shareRepository.findByUserId(userId);
+        List<ShareVO> shareVOList = shareConverter.DOList2VOList(shareList);
+        return new ShareListRespVO(shareVOList);
     }
 }

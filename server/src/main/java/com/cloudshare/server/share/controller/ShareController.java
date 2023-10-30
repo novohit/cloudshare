@@ -1,10 +1,13 @@
 package com.cloudshare.server.share.controller;
 
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
+import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
+import com.cloudshare.server.share.controller.response.ShareListRespVO;
 import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,12 @@ public class ShareController {
     @PostMapping
     public Response<ShareCreateRespVO> createShare(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
         ShareCreateRespVO resp = shareService.createShare(reqDTO);
+        return Response.success(resp);
+    }
+
+    @GetMapping
+    public Response<ShareListRespVO> createShare(@Validated @RequestBody ShareListReqDTO reqDTO) {
+        ShareListRespVO resp = shareService.list(reqDTO);
         return Response.success(resp);
     }
 }

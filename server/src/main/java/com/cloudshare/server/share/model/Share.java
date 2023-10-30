@@ -1,6 +1,7 @@
 package com.cloudshare.server.share.model;
 
 import com.cloudshare.server.common.BaseModel;
+import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.share.enums.ShareStatus;
 import com.cloudshare.server.share.enums.VisibleType;
 import lombok.AllArgsConstructor;
@@ -9,12 +10,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 /**
@@ -53,4 +59,8 @@ public class Share extends BaseModel {
 
     @Comment("过期时间，为null永久有效")
     private LocalDateTime expiredAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(insertable = false, updatable = false, name = "fileId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private FileDocument fileDocument;
 }
