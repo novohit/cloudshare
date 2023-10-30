@@ -3,7 +3,7 @@ package com.cloudshare.server.file.service.impl;
 import cn.hutool.core.io.FileUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
-import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -79,7 +79,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void addDir(DirAddReqDTO reqDTO) {
+    public void createDir(DirCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String name = reqDTO.dirName();
         List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(userId, reqDTO.curDirectory(), name);

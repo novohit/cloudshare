@@ -1,6 +1,6 @@
 package com.cloudshare.server.file.service;
 
-import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2023/10/8
  */
 public interface FileService {
-    void addDir(DirAddReqDTO reqDTO);
+    void createDir(DirCreateReqDTO reqDTO);
 
     List<FileVO> list(FileListReqDTO reqDTO);
 

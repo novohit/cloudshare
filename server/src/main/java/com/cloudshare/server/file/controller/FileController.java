@@ -1,6 +1,6 @@
 package com.cloudshare.server.file.controller;
 
-import com.cloudshare.server.file.controller.requset.DirAddReqDTO;
+import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
@@ -44,8 +44,8 @@ public class FileController {
     }
 
     @PostMapping("/dir")
-    public Response<Void> addDir(@Validated @RequestBody DirAddReqDTO reqDTO) {
-        fileService.addDir(reqDTO);
+    public Response<Void> createDir(@Validated @RequestBody DirCreateReqDTO reqDTO) {
+        fileService.createDir(reqDTO);
         return Response.success();
     }
 
