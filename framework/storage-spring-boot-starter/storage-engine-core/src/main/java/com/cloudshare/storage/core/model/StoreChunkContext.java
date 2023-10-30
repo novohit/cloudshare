@@ -11,9 +11,15 @@ import java.io.InputStream;
 @Data
 public class StoreChunkContext {
 
-    private String fileNameWithSuffix;
+    /**
+     * 文件名带后缀
+     */
+    private String fileName;
 
 
+    /**
+     * 分片大小
+     */
     private Long totalSize;
 
 
@@ -27,7 +33,7 @@ public class StoreChunkContext {
     /**
      * 分片序号
      */
-    private Integer chunk;
+    private Integer chunkNum;
 
     private String md5;
 }

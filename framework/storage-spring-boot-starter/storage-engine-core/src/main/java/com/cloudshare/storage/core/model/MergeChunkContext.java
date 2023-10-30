@@ -11,9 +11,15 @@ import java.util.List;
 @Data
 public class MergeChunkContext {
 
+    /**
+     * 分片合并所需要的信息
+     */
     private List<String> chunkInfoList;
 
-    private String fileNameWithSuffix;
+    /**
+     * 文件名带后缀
+     */
+    private String fileName;
 
     /**
      * 上传后回传真实路径

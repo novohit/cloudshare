@@ -22,7 +22,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
 
     @Override
     public void store(StoreContext context) throws IOException {
-        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(context.getFileName()), "fileName must be not null or empty");
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
         doStore(context);
@@ -36,18 +36,18 @@ public abstract class AbstractStorageEngine implements StorageEngine {
 
     @Override
     public void storeChunk(StoreChunkContext context) throws IOException {
-        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(context.getFileName()), "fileName must be not null or empty");
         Assert.notNull(context.getInputStream(), "inputStream must be not null");
         Assert.isTrue(context.getTotalSize() > 0, "totalSize must be > 0");
         Assert.isTrue(StringUtils.hasText(context.getMd5()), "md5 must be not null or empty");
-        Assert.notNull(context.getChunk(), "chunkNum must be not null or empty");
+        Assert.notNull(context.getChunkNum(), "chunkNum must be not null or empty");
         doStoreChunk(context);
     }
 
 
     @Override
     public void mergeChunk(MergeChunkContext context) throws IOException {
-        Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
+        Assert.isTrue(StringUtils.hasText(context.getFileName()), "fileName must be not null or empty");
         Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkInfoList()), "chunkInfoList must be not null");
         doMergeChunk(context);
     }
@@ -81,10 +81,10 @@ public abstract class AbstractStorageEngine implements StorageEngine {
      * 路径生成逻辑 basePath/2023/10/10/97fe16vu.txt
      *
      * @param basePath
-     * @param fileNameWithSuffix
+     * @param fileName
      * @return
      */
-    protected String generateFilePath(String basePath, String fileNameWithSuffix) {
+    protected String generateFilePath(String basePath, String fileName) {
         LocalDate now = LocalDate.now();
         return basePath +
                 File.separator +
@@ -95,6 +95,6 @@ public abstract class AbstractStorageEngine implements StorageEngine {
                 now.getDayOfMonth() +
                 File.separator +
                 UUIDUtil.shortUUID() +
-                getSuffix(fileNameWithSuffix);
+                getSuffix(fileName);
     }
 }

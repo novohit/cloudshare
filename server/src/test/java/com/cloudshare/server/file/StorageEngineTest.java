@@ -34,7 +34,7 @@ public class StorageEngineTest {
         FileUtil.appendString("hello world!\r\n", file, "UTF-8");
 
         StoreContext context = new StoreContext();
-        context.setFileNameWithSuffix("测试文本.txt");
+        context.setFileName("测试文本.txt");
         context.setTotalSize(file.length());
         try {
             InputStream inputStream = new FileInputStream(file);

@@ -36,8 +36,8 @@ public class LocalStorageEngine extends AbstractStorageEngine {
     @Override
     protected void doStore(StoreContext context) throws IOException {
         String basePath = localStorageEngineProperties.getBasePath();
-        String fileNameWithSuffix = context.getFileNameWithSuffix();
-        String path = generateFilePath(basePath, fileNameWithSuffix);
+        String fileName = context.getFileName();
+        String path = generateFilePath(basePath, fileName);
         File file = new File(path);
         LocalStorageUtil.writeStream2File(context.getInputStream(), file, context.getTotalSize());
         context.setRealPath(file.getAbsolutePath());
@@ -58,19 +58,19 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         String chunkPath = localStorageEngineProperties.getChunkPath();
         String prefixPath = chunkNameMap.get(context.getMd5());
         if (!StringUtils.hasText(prefixPath)) {
-            String fileNameWithSuffix = context.getFileNameWithSuffix();
-            prefixPath = generateFilePath(chunkPath, fileNameWithSuffix);
+            String fileName = context.getFileName();
+            prefixPath = generateFilePath(chunkPath, fileName);
             chunkNameMap.put(context.getMd5(), prefixPath);
         }
-        File file = new File(prefixPath + ".bak." + context.getChunk());
+        File file = new File(prefixPath + ".bak." + context.getChunkNum());
         LocalStorageUtil.writeStream2File(context.getInputStream(), file, context.getTotalSize());
         context.setChunkInfo(file.getAbsolutePath());
     }
 
     protected void doMergeChunk(MergeChunkContext context) throws IOException {
         String basePath = localStorageEngineProperties.getBasePath();
-        String fileNameWithSuffix = context.getFileNameWithSuffix();
-        String path = generateFilePath(basePath, fileNameWithSuffix);
+        String fileName = context.getFileName();
+        String path = generateFilePath(basePath, fileName);
         File file = new File(path);
 
         List<String> chunkRealPathList = context.getChunkInfoList();

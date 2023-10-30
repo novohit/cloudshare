@@ -11,8 +11,10 @@ import java.io.InputStream;
 @Data
 public class StoreContext {
 
-
-    private String fileNameWithSuffix;
+    /**
+     * 文件名带后缀
+     */
+    private String fileName;
 
 
     private Long totalSize;

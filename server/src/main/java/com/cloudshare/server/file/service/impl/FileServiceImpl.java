@@ -181,19 +181,19 @@ public class FileServiceImpl implements FileService {
             StoreContext context = new StoreContext();
             context.setTotalSize(multipartFile.getSize());
             context.setInputStream(multipartFile.getInputStream());
-            context.setFileNameWithSuffix(multipartFile.getOriginalFilename());
+            context.setFileName(multipartFile.getOriginalFilename());
             storageEngine.store(context);
-            String suffix = FileUtil.getSuffix(context.getFileNameWithSuffix());
+            String suffix = FileUtil.getSuffix(context.getFileName());
             // hutool return suffix have no dot
             suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(
                     userId,
                     reqDTO.parentId(),
                     reqDTO.md5(),
-                    context.getFileNameWithSuffix(),
+                    context.getFileName(),
                     null,
                     reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileNameWithSuffix(),
+                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileName(),
                     context.getRealPath(),
                     context.getTotalSize(),
                     FileType.suffix2Type(suffix),
@@ -254,11 +254,11 @@ public class FileServiceImpl implements FileService {
             // 上传分片
             MultipartFile multipartFile = reqDTO.file();
             StoreChunkContext context = new StoreChunkContext();
-            context.setChunk(reqDTO.chunkNum());
+            context.setChunkNum(reqDTO.chunkNum());
             context.setMd5(reqDTO.md5());
             context.setTotalSize(multipartFile.getSize());
             context.setInputStream(multipartFile.getInputStream());
-            context.setFileNameWithSuffix(reqDTO.fileName());
+            context.setFileName(reqDTO.fileName());
             storageEngine.storeChunk(context);
             // 保存分片记录
             // 前端分片上传组件会出现取消上传但请求已经发出的情况
@@ -313,7 +313,7 @@ public class FileServiceImpl implements FileService {
         try {
             // 1. 分片文件合并
             MergeChunkContext context = new MergeChunkContext();
-            context.setFileNameWithSuffix(reqDTO.fileName());
+            context.setFileName(reqDTO.fileName());
             context.setChunkInfoList(chunkRealPathList);
             storageEngine.mergeChunk(context);
 
@@ -324,7 +324,7 @@ public class FileServiceImpl implements FileService {
                     .toList();
             fileChunkRepository.saveAll(deletedChunks);
             // 3. 保存合并记录
-            String suffix = FileUtil.getSuffix(context.getFileNameWithSuffix());
+            String suffix = FileUtil.getSuffix(context.getFileName());
             // hutool return suffix have no dot
             suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(

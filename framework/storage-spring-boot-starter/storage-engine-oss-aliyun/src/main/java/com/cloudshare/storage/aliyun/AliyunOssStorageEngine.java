@@ -59,14 +59,14 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
 
     @Override
     protected void doStore(StoreContext context) throws IOException {
-        String fileNameWithSuffix = context.getFileNameWithSuffix();
-        String path = generateFilePath("cloudshare", fileNameWithSuffix);
+        String fileName = context.getFileName();
+        String path = generateFilePath("cloudshare", fileName);
         String bucketName = properties.getBucketName();
         try {
             PutObjectRequest request = new PutObjectRequest(bucketName, path, context.getInputStream());
             request.setProcess("true");
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(Mimetypes.getInstance().getMimetype(fileNameWithSuffix));
+            metadata.setContentType(Mimetypes.getInstance().getMimetype(fileName));
             request.setMetadata(metadata);
 
             PutObjectResult result = ossClient.putObject(request);
@@ -107,7 +107,7 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
         uploadPartRequest.setKey(entity.getObjectKey());
         uploadPartRequest.setUploadId(entity.getUploadId());
         uploadPartRequest.setPartSize(context.getTotalSize());
-        uploadPartRequest.setPartNumber(context.getChunk());
+        uploadPartRequest.setPartNumber(context.getChunkNum());
         uploadPartRequest.setInputStream(context.getInputStream());
         try {
             UploadPartResult result = ossClient.uploadPart(uploadPartRequest);
@@ -171,7 +171,7 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
     }
 
     @Override
-    protected String generateFilePath(String basePath, String fileNameWithSuffix) {
+    protected String generateFilePath(String basePath, String fileName) {
         LocalDate now = LocalDate.now();
         return basePath +
                 "/" +
@@ -182,18 +182,18 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
                 now.getDayOfMonth() +
                 "/" +
                 UUIDUtil.shortUUID() +
-                getSuffix(fileNameWithSuffix);
+                getSuffix(fileName);
     }
 
     /**
      * 分片上传初始化
      */
     private ChunkUploadEntity initChunkUpload(StoreChunkContext context) {
-        String fileNameWithSuffix = context.getFileNameWithSuffix();
-        String path = generateFilePath("cloudshare", fileNameWithSuffix);
+        String fileName = context.getFileName();
+        String path = generateFilePath("cloudshare", fileName);
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(properties.getBucketName(), path);
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(Mimetypes.getInstance().getMimetype(fileNameWithSuffix));
+        metadata.setContentType(Mimetypes.getInstance().getMimetype(fileName));
         request.setObjectMetadata(metadata);
 
         InitiateMultipartUploadResult result = ossClient.initiateMultipartUpload(request);
