@@ -1,6 +1,6 @@
 package com.cloudshare.server.user.model;
 
-import com.cloudshare.server.BaseModel;
+import com.cloudshare.server.common.BaseModel;
 import com.cloudshare.server.user.enums.LoginType;
 import lombok.AllArgsConstructor;
 import lombok.Data;

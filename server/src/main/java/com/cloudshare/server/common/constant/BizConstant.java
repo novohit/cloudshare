@@ -1,4 +1,4 @@
-package com.cloudshare.server.constant;
+package com.cloudshare.server.common.constant;
 
 /**
  * @author novo

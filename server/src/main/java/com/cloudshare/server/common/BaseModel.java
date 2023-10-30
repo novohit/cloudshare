@@ -1,4 +1,4 @@
-package com.cloudshare.server;
+package com.cloudshare.server.common;
 
 import lombok.Data;
 import org.hibernate.annotations.Comment;

@@ -1,4 +1,4 @@
-package com.cloudshare.server.controller;
+package com.cloudshare.server.common.controller;
 
 import com.cloudshare.web.response.Response;
 import org.springframework.stereotype.Controller;

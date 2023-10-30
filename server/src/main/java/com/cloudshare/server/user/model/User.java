@@ -1,6 +1,6 @@
 package com.cloudshare.server.user.model;
 
-import com.cloudshare.server.BaseModel;
+import com.cloudshare.server.common.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;
