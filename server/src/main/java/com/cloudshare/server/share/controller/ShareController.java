@@ -1,5 +1,6 @@
 package com.cloudshare.server.share.controller;
 
+import com.cloudshare.server.common.annotation.ShareTokenRequired;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;

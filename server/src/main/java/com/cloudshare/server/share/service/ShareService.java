@@ -6,6 +6,7 @@ import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
 import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
 import com.cloudshare.server.share.controller.response.ShareListRespVO;
+import com.cloudshare.server.share.model.Share;
 
 /**
  * @author novo
@@ -19,4 +20,6 @@ public interface ShareService {
     void delete(ShareCancelReqDTO reqDTO);
 
     String checkCode(ShareCheckCodeReqDTO reqDTO);
+
+    Share detail(Long shareId);
 }

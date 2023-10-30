@@ -1,7 +1,8 @@
 package com.cloudshare.server.auth.config;
 
 import com.cloudshare.server.auth.interceptor.LoginInterceptor;
-import com.cloudshare.server.user.repository.UserRepository;
+import com.cloudshare.server.auth.interceptor.ShareInterceptor;
+import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.server.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -30,8 +31,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private final UserService userService;
 
-    public WebConfiguration(UserService userService) {
+    private final ShareService shareService;
+
+    public WebConfiguration(UserService userService, ShareService shareService) {
         this.userService = userService;
+        this.shareService = shareService;
     }
 
     @Bean
@@ -39,10 +43,16 @@ public class WebConfiguration implements WebMvcConfigurer {
         return new LoginInterceptor(userService);
     }
 
+    @Bean
+    public ShareInterceptor shareInterceptor() {
+        return new ShareInterceptor(shareService);
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor())
                 .excludePathPatterns(getExcludePath());
+        registry.addInterceptor(shareInterceptor());
     }
 
     private List<String> getExcludePath() {

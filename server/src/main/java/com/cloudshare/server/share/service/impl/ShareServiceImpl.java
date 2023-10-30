@@ -93,7 +93,8 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public String checkCode(ShareCheckCodeReqDTO reqDTO) {
-        Optional<Share> optional = shareRepository.findById(reqDTO.shareId());
+        Long shareId = reqDTO.shareId();
+        Optional<Share> optional = shareRepository.findById(shareId);
         if (optional.isEmpty()) {
             throw new BizException("分享链接不存在");
         }
@@ -101,6 +102,15 @@ public class ShareServiceImpl implements ShareService {
         if (!share.getCode().equals(reqDTO.code())) {
             throw new BizException("提取码错误");
         }
-        return TokenUtil.generateAccessToken(0L);
+        return TokenUtil.generateAccessToken(shareId);
+    }
+
+    @Override
+    public Share detail(Long shareId) {
+        Optional<Share> optional = shareRepository.findById(shareId);
+        if (optional.isEmpty()) {
+            throw new BizException("分享链接不存在");
+        }
+        return optional.get();
     }
 }
