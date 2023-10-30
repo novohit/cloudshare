@@ -1,10 +1,12 @@
 package com.cloudshare.server.share.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
+import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
 import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
@@ -16,7 +18,7 @@ import com.cloudshare.server.share.enums.VisibleType;
 import com.cloudshare.server.share.model.Share;
 import com.cloudshare.server.share.repository.ShareRepository;
 import com.cloudshare.server.share.service.ShareService;
-import com.cloudshare.web.exception.BadRequestException;
+import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +54,7 @@ public class ShareServiceImpl implements ShareService {
         Long fileId = reqDTO.fileId();
         Optional<FileDocument> optional = fileRepository.findById(fileId);
         if (optional.isEmpty()) {
-            throw new BadRequestException("文件不存在");
+            throw new BizException("文件不存在");
         }
         Share share = new Share();
         share.setUserId(userId);
@@ -87,5 +89,18 @@ public class ShareServiceImpl implements ShareService {
                 .map(Share::getId)
                 .toList();
         shareRepository.deleteAllByIdInBatch(ids);
+    }
+
+    @Override
+    public String checkCode(ShareCheckCodeReqDTO reqDTO) {
+        Optional<Share> optional = shareRepository.findById(reqDTO.shareId());
+        if (optional.isEmpty()) {
+            throw new BizException("分享链接不存在");
+        }
+        Share share = optional.get();
+        if (!share.getCode().equals(reqDTO.code())) {
+            throw new BizException("提取码错误");
+        }
+        return TokenUtil.generateAccessToken(0L);
     }
 }

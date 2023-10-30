@@ -53,6 +53,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                         "/user/**/captcha",
                         "/user/**/send-code",
                         "/pay/callback/**",
+                        "/share/check-code",
                         "/**/test*"
                 )
                 .map(uri -> "/api" + uri)
@@ -71,6 +72,6 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 静态资源---图片url地址
-        registry.addResourceHandler("/img/**").addResourceLocations("file:"+ System.getProperty("user.dir") + File.separator + "temp" + File.separator);
+        registry.addResourceHandler("/img/**").addResourceLocations("file:" + System.getProperty("user.dir") + File.separator + "temp" + File.separator);
     }
 }

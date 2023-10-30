@@ -1,6 +1,7 @@
 package com.cloudshare.server.share.controller;
 
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
+import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
 import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
@@ -46,5 +47,11 @@ public class ShareController {
     public Response<Void> delete(@Validated @RequestBody ShareCancelReqDTO reqDTO) {
         shareService.delete(reqDTO);
         return Response.success();
+    }
+
+    @PostMapping("/check-code")
+    public Response<String> checkCode(@Validated @RequestBody ShareCheckCodeReqDTO reqDTO) {
+        String token = shareService.checkCode(reqDTO);
+        return Response.success(token);
     }
 }
