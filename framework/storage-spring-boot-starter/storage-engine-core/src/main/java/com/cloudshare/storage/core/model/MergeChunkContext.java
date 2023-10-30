@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class MergeChunkContext {
 
-    private List<String> chunkInfo;
+    private List<String> chunkInfoList;
 
     private String fileNameWithSuffix;
 

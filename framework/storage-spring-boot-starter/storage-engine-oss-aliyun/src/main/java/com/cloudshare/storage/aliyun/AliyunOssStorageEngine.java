@@ -5,8 +5,12 @@ import com.alibaba.fastjson2.JSONException;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.internal.Mimetypes;
+import com.aliyun.oss.model.CompleteMultipartUploadRequest;
+import com.aliyun.oss.model.CompleteMultipartUploadResult;
 import com.aliyun.oss.model.InitiateMultipartUploadRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadResult;
+import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
@@ -27,7 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,13 +62,16 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
         String fileNameWithSuffix = context.getFileNameWithSuffix();
         String path = generateFilePath("cloudshare", fileNameWithSuffix);
         String bucketName = properties.getBucketName();
-        String realPath;
         try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, path, context.getInputStream());
-            putObjectRequest.setProcess("true");
-            PutObjectResult result = ossClient.putObject(putObjectRequest);
+            PutObjectRequest request = new PutObjectRequest(bucketName, path, context.getInputStream());
+            request.setProcess("true");
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(Mimetypes.getInstance().getMimetype(fileNameWithSuffix));
+            request.setMetadata(metadata);
+
+            PutObjectResult result = ossClient.putObject(request);
             if (result.getResponse().getStatusCode() == 200) {
-                realPath = result.getResponse().getUri();
+                String realPath = result.getResponse().getUri();
                 log.debug("文件上传成功 url:[{}]", realPath);
                 context.setRealPath(realPath);
             } else {
@@ -105,7 +115,7 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
             ChunkInfo chunkInfo = new ChunkInfo();
             BeanUtils.copyProperties(partETag, chunkInfo);
             chunkInfo.setUploadId(entity.getUploadId());
-            chunkInfo.setUploadId(entity.getObjectKey());
+            chunkInfo.setObjectKey(entity.getObjectKey());
             String info = JSON.toJSONString(chunkInfo);
             context.setChunkInfo(info);
         } catch (OSSException | ClientException | JSONException e) {
@@ -116,7 +126,39 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
 
     @Override
     protected void doMergeChunk(MergeChunkContext context) throws IOException {
+        List<String> info = context.getChunkInfoList();
+        try {
+            List<PartETag> partETags = new ArrayList<>();
+            String objectKey = null;
+            String uploadId = null;
+            for (String json : info) {
+                ChunkInfo chunkInfo = JSON.parseObject(json, ChunkInfo.class);
+                PartETag partETag = new PartETag(
+                        chunkInfo.getPartNumber(),
+                        chunkInfo.getETag(),
+                        chunkInfo.partSize,
+                        chunkInfo.getPartCRC()
+                );
+                partETags.add(partETag);
+                objectKey = chunkInfo.getObjectKey();
+                uploadId = chunkInfo.getUploadId();
+            }
+            CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(
+                    properties.getBucketName(),
+                    objectKey,
+                    uploadId,
+                    partETags);
+            request.setProcess("true");
 
+            CompleteMultipartUploadResult result = ossClient.completeMultipartUpload(request);
+            // 合并后的 url 带 uploadId 参数
+            URL url = new URL(result.getResponse().getUri());
+            String realPath = url.getProtocol() + "://" + url.getHost() + url.getPath();
+            context.setRealPath(realPath);
+        } catch (OSSException | ClientException | JSONException e) {
+            log.error("阿里云OSS分片合并异常", e);
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -150,6 +192,10 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
         String fileNameWithSuffix = context.getFileNameWithSuffix();
         String path = generateFilePath("cloudshare", fileNameWithSuffix);
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(properties.getBucketName(), path);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(Mimetypes.getInstance().getMimetype(fileNameWithSuffix));
+        request.setObjectMetadata(metadata);
+
         InitiateMultipartUploadResult result = ossClient.initiateMultipartUpload(request);
         String uploadId = result.getUploadId();
         ChunkUploadEntity entity = new ChunkUploadEntity(uploadId, path);

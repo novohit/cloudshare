@@ -48,7 +48,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     @Override
     public void mergeChunk(MergeChunkContext context) throws IOException {
         Assert.isTrue(StringUtils.hasText(context.getFileNameWithSuffix()), "filename must be not null or empty");
-        Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkInfo()), "chunks path must be not null");
+        Assert.isTrue(!CollectionUtils.isEmpty(context.getChunkInfoList()), "chunkInfoList must be not null");
         doMergeChunk(context);
     }
 

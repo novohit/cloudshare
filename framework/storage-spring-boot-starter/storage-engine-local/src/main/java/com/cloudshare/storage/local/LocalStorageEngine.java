@@ -73,7 +73,7 @@ public class LocalStorageEngine extends AbstractStorageEngine {
         String path = generateFilePath(basePath, fileNameWithSuffix);
         File file = new File(path);
 
-        List<String> chunkRealPathList = context.getChunkInfo();
+        List<String> chunkRealPathList = context.getChunkInfoList();
         // 合并
         LocalStorageUtil.mergeFile(file, chunkRealPathList);
         // TODO 合并后删除分片交给上游定时删除

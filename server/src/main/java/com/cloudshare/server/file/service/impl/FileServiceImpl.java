@@ -314,7 +314,7 @@ public class FileServiceImpl implements FileService {
             // 1. 分片文件合并
             MergeChunkContext context = new MergeChunkContext();
             context.setFileNameWithSuffix(reqDTO.fileName());
-            context.setChunkInfo(chunkRealPathList);
+            context.setChunkInfoList(chunkRealPathList);
             storageEngine.mergeChunk(context);
 
             // 2. 删除分片记录和分片文件 交给定时任务 TODO
@@ -342,8 +342,8 @@ public class FileServiceImpl implements FileService {
             );
             saveFile2DB(fileDocument);
         } catch (IOException e) {
-            log.error("文件上传异常", e);
-            throw new BizException("文件上传异常");
+            log.error("文件合并异常", e);
+            throw new BizException("文件合并异常");
         }
     }
 
