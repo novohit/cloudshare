@@ -2,7 +2,7 @@
     <div>
         <div class="share-button-content">
             <div class="cancel-button-content">
-                <el-button type="danger" size="default" round @click="cancelShares">
+                <el-button type="danger" size="default" @click="cancelShares">
                     取消分享
                     <el-icon class="el-icon--right">
                         <SwitchButton/>
@@ -75,20 +75,34 @@
                     sortable
                     align="center"
                     label="分享时间"
-                    min-width="200">
+                    min-width="180">
                 </el-table-column>
                 <el-table-column
                     prop="expiredAt"
                     sortable
                     align="center"
                     label="过期时间"
-                    min-width="200">
+                    min-width="180">
+                </el-table-column>
+                <el-table-column
+                    prop="pv"
+                    sortable
+                    label="浏览量"
+                    min-width="100"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    prop="download"
+                    sortable
+                    label="下载量"
+                    min-width="100"
+                    align="center">
                 </el-table-column>
                 <el-table-column
                     prop="shareStatus"
                     sortable
                     label="分享状态"
-                    min-width="200"
+                    min-width="100"
                     align="center"
                     :formatter="formatShareStatus">
                 </el-table-column>
@@ -138,7 +152,7 @@ const doCancelShares = (shareIds) => {
         type: 'warning'
     }).then(() => {
         shareService.cancelShare({
-            shareIds: shareIds
+            ids: shareIds
         }, () => {
             ElMessage.success('取消分享成功')
             loadTableData()
@@ -150,11 +164,11 @@ const doCancelShares = (shareIds) => {
 
 const cancelShares = () => {
     if (multipleSelection.value && multipleSelection.value.length > 0) {
-        let shareIdArr = new Array()
+        let fileIdList = new Array()
         multipleSelection.value.forEach(item => {
-            shareIdArr.push(item.shareId)
+            fileIdList.push(item.shareId)
         })
-        doCancelShares(shareIdArr.join('__,__'))
+        doCancelShares(fileIdList)
         return
     }
     ElMessage.error('请选择要取消的分享')
@@ -178,12 +192,17 @@ const hiddenOperation = (row, column, cell, event) => {
 }
 
 const formatShareStatus = (row, column, cellValue, index) => {
-    if (row.shareStatus === 1) {
-        return '有分享文件被删除'
-    } else if (row.expiredAt === 0) {
-        return '永久有效'
+    // if (row.shareStatus === 1) {
+    //     return '有分享文件被删除'
+    // } else if (row.expiredAt === 0) {
+    //     return '永久有效'
+    // } else {
+    //     return row.shareEndTime + '到期'
+    // }
+    if (row.shareStatus === 'ACTIVE') {
+        return '正常'
     } else {
-        return row.shareEndTime + '到期'
+        return '被封禁'
     }
 }
 

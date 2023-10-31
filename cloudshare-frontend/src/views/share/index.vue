@@ -39,13 +39,13 @@
                             </div>
                         </div>
                         <div class="pan-share-list-card-button-group">
-                            <el-button type="success" size="default" round @click="saveFiles(undefined)">保存到我的R盘
+                            <el-button type="success" size="default" @click="saveFiles(undefined)">保存到我的R盘
                                 <el-icon
                                     class="el-icon--right">
                                     <DocumentCopy/>
                                 </el-icon>
                             </el-button>
-                            <el-button type="info" size="default" round @click="downloadFile">下载
+                            <el-button type="info" size="default" @click="downloadFile">下载
                                 <el-icon
                                     class="el-icon--right">
                                     <Download/>

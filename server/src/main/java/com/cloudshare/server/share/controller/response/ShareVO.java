@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  * @since 2023/10/30
  */
 public record ShareVO(
+        Long shareId,
         Long fileId,
         VisibleType visibleType,
         ShareStatus shareStatus,

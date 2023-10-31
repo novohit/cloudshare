@@ -35,6 +35,13 @@ public class ShareController {
         this.shareService = shareService;
     }
 
+    /**
+     * 分享文件
+     * TODO 支持多文件分享
+     *
+     * @param reqDTO
+     * @return
+     */
     @PostMapping
     public Response<ShareCreateRespVO> create(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
         ShareCreateRespVO resp = shareService.create(reqDTO);

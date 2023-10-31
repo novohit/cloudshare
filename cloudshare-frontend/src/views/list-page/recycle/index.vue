@@ -2,7 +2,7 @@
     <div>
         <div class="recycle-button-content">
             <div class="restore-button-content">
-                <el-button type="success" size="default" round @click="restoreRecycle">
+                <el-button type="success" size="default" @click="restoreRecycle">
                     还原
                     <el-icon class="el-icon--right">
                         <RefreshLeft/>
@@ -10,7 +10,7 @@
                 </el-button>
             </div>
             <div class="clean-button-content">
-                <el-button type="danger" size="default" round @click="cleanRecycle">
+                <el-button type="danger" size="default" @click="cleanRecycle">
                     清空回收站
                     <el-icon class="el-icon--right">
                         <Delete/>

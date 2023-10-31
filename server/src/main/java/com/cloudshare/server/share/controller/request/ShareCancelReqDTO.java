@@ -1,5 +1,6 @@
 package com.cloudshare.server.share.controller.request;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -7,6 +8,6 @@ import java.util.List;
  * @since 2023/10/30
  */
 public record ShareCancelReqDTO(
-        List<Long> ids
+        @NotNull List<Long> ids
 ) {
 }

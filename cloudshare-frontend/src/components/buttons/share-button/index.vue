@@ -117,6 +117,10 @@ const shareFile = () => {
         ElMessage.error('请选择要分享的文件')
         return
     }
+    if (!props.item && (!multipleSelection.value || multipleSelection.value.length !== 1)) {
+        ElMessage.error('暂不支持多选共享')
+        return
+    }
     if (props.item) {
         shareTitle.value = '分享文件（' + handleFilename(props.item.fileName) + ')'
     } else {
@@ -133,19 +137,20 @@ const doShareFile = async () => {
 
     await shareFormRef.value.validate((valid, fields) => {
         if (valid) {
-            let shareIdArr = new Array()
+            let fileIdList = new Array()
             loading.value = true
             if (props.item) {
-                shareIdArr.push(props.item.id)
+                fileIdList.push(props.item.id)
             } else {
                 multipleSelection.value.forEach(item => {
-                    shareIdArr.push(item.id)
+                    fileIdList.push(item.id)
                 })
             }
+            console.log(fileIdList)
             shareService.createShare({
                 visibleType: shareFileForm.visibleType,
                 expiredAt: shareFileForm.expiredAt,
-                fileId: 42
+                fileId: fileIdList[0]
             }, res => {
                 loading.value = false
                 shareTitle.value = '恭喜你！分享成功！'
