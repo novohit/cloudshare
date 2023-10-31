@@ -1,5 +1,6 @@
 package com.cloudshare.server.file.controller;
 
+import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
@@ -69,7 +70,8 @@ public class FileController {
 
     @PostMapping("/list")
     public Response<List<FileVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
-        List<FileVO> response = fileService.list(reqDTO);
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileVO> response = fileService.list(reqDTO, userId);
         return Response.success(response);
     }
 
@@ -87,6 +89,7 @@ public class FileController {
 
     /**
      * 查询已上传的分片数
+     *
      * @param md5
      * @return
      */
@@ -102,19 +105,19 @@ public class FileController {
         return Response.success(merge);
     }
 
-    @PostMapping( "/chunk-merge")
+    @PostMapping("/chunk-merge")
     public Response<Void> chunkMerge(@Validated @RequestBody FileChunkMergeReqDTO reqDTO) {
         fileService.chunkMerge(reqDTO);
         return Response.success();
     }
 
-    @GetMapping( "/download/{id}")
+    @GetMapping("/download/{id}")
     public Response<Void> download(@PathVariable("id") Long fileId, HttpServletResponse response) {
         fileService.download(fileId, response);
         return Response.success();
     }
 
-    @GetMapping( "/preview/{id}")
+    @GetMapping("/preview/{id}")
     public Response<Void> preview(@PathVariable("id") Long fileId, HttpServletResponse response) {
         fileService.preview(fileId, response);
         return Response.success();

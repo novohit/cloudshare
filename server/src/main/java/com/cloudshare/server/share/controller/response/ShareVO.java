@@ -18,6 +18,7 @@ public record ShareVO(
         LocalDateTime expiredAt,
         String fileName,
         Integer pv,
-        Integer download
+        Integer download,
+        LocalDateTime createdAt
 ) {
 }

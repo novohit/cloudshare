@@ -2,6 +2,7 @@ package com.cloudshare.server.share.controller.request;
 
 import com.cloudshare.server.share.enums.VisibleType;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -9,8 +10,8 @@ import java.time.LocalDateTime;
  * @since 2023/10/30
  */
 public record ShareCreateReqDTO(
-        Long fileId,
-        VisibleType visibleType,
-        LocalDateTime expiredAt
+        @NotNull Long fileId,
+        @NotNull VisibleType visibleType,
+        @NotNull LocalDateTime expiredAt
 ) {
 }

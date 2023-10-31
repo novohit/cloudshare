@@ -22,7 +22,7 @@ import java.util.List;
 public interface FileService {
     void createDir(DirCreateReqDTO reqDTO);
 
-    List<FileVO> list(FileListReqDTO reqDTO);
+    List<FileVO> list(FileListReqDTO reqDTO, Long userId);
 
     void updateDir(DirUpdateReqDTO reqDTO);
 
@@ -45,4 +45,8 @@ public interface FileService {
     void delete(FileDeleteReqDTO reqDTO);
 
     List<DirTreeNode> dirTree();
+
+    FileVO detail(Long fileId, Long userId);
+
+    boolean isSubFile(Long rootFileId, Long subFileId, Long userId);
 }

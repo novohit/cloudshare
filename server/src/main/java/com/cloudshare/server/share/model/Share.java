@@ -4,6 +4,7 @@ import com.cloudshare.server.common.BaseModel;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.share.enums.ShareStatus;
 import com.cloudshare.server.share.enums.VisibleType;
+import com.cloudshare.server.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,7 +61,11 @@ public class Share extends BaseModel {
     @Comment("过期时间，为null永久有效")
     private LocalDateTime expiredAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(insertable = false, updatable = false, name = "fileId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private FileDocument fileDocument;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "userId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private User user;
 }

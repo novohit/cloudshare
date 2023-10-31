@@ -108,14 +108,20 @@ public class FileServiceImpl implements FileService {
             }
         }
 
-        FileDocument fileDocument = new FileDocument();
-        BeanUtils.copyProperties(reqDTO, fileDocument);
-        fileDocument.setName(newName);
-        fileDocument.setUserId(userId);
-        fileDocument.setType(FileType.DIR);
-        fileDocument.setPath(reqDTO.curDirectory() + newName);
-        fileDocument.setSize(0L);
-        fileRepository.save(fileDocument);
+        FileDocument dir = assembleFileDocument(
+                userId,
+                reqDTO.parentId(),
+                null,
+                newName,
+                null,
+                reqDTO.curDirectory(),
+                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + newName,
+                null,
+                0L,
+                FileType.DIR,
+                null
+        );
+        saveFile2DB(dir);
     }
 
     @Override
@@ -456,19 +462,46 @@ public class FileServiceImpl implements FileService {
         return Collections.singletonList(root);
     }
 
+    @Override
+    public FileVO detail(Long fileId, Long userId) {
+        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        if (optional.isEmpty()) {
+            throw new BizException("文件不存在");
+        }
+        return fileConverter.DO2VO(optional.get());
+    }
 
     @Override
-    public List<FileVO> list(FileListReqDTO reqDTO) {
-        Long userId = UserContextThreadHolder.getUserId();
+    public boolean isSubFile(Long rootFileId, Long subFileId, Long userId) {
+        Optional<FileDocument> subOptional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(subFileId, userId);
+        Optional<FileDocument> rootOptional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(rootFileId, userId);
+        if (subOptional.isPresent() && rootOptional.isPresent()) {
+            FileDocument root = rootOptional.get();
+            FileDocument sub = subOptional.get();
+            if (sub.getId().equals(root.getId())) {
+                return true;
+            }
+            if (!FileType.DIR.equals(root.getType())) {
+                return false;
+            }
+            return sub.getCurDirectory().startsWith(root.getPath());
+        }
+        return false;
+    }
+
+    @Override
+    public List<FileVO> list(FileListReqDTO reqDTO, Long userId) {
+        String curDirectory = reqDTO.curDirectory();
+        List<FileType> fileTypes = reqDTO.fileTypeList();
         // 一级文件列表
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, reqDTO.curDirectory());
-        if (!CollectionUtils.isEmpty(reqDTO.fileTypeList())) {
+        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, curDirectory);
+        if (!CollectionUtils.isEmpty(fileTypes)) {
             fileList = fileList.stream()
-                    .filter(fileDocument -> reqDTO.fileTypeList().contains(fileDocument.getType()))
+                    .filter(fileDocument -> fileTypes.contains(fileDocument.getType()))
                     .toList();
         }
-        List<FileVO> voList = fileConverter.DOList2VOList(fileList);
-        return voList;
+        List<FileVO> resp = fileConverter.DOList2VOList(fileList);
+        return resp;
     }
 
 

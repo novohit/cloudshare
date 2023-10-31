@@ -27,16 +27,16 @@
                     width="55">
                 </el-table-column>
                 <el-table-column
-                    label="分享名称"
-                    prop="shareName"
+                    label="分享文件"
+                    prop="fileName"
                     sortable
                     show-overflow-tooltip
-                    min-width="750">
+                    min-width="200">
                     <template #default="scope">
                         <div class="share-name-content">
                             <i class="fa fa-share-alt"
                                style="margin-right: 15px; font-size: 20px; cursor: pointer;"/>
-                            <span style="cursor:pointer;">{{ scope.row.shareName }}</span>
+                            <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                         </div>
                         <div class="share-operation-content">
                             <el-tooltip class="item" effect="light" content="复制链接" placement="top">
@@ -52,36 +52,43 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                    prop="shareUrl"
+                    prop="url"
                     sortable
                     align="center"
                     label="分享链接"
-                    min-width="300">
+                    min-width="250">
                     <template #default="scope">
                         <el-link type="primary" :href="scope.row.shareUrl" target="_blank">
-                            {{ scope.row.shareUrl.substring(0, 30) + '...' }}
+                            {{ scope.row.url.substring(0, 30) + '...' }}
                         </el-link>
                     </template>
                 </el-table-column>
                 <el-table-column
-                    prop="shareCode"
+                    prop="code"
                     sortable
                     align="center"
                     label="提取码"
-                    min-width="140">
+                    min-width="100">
                 </el-table-column>
                 <el-table-column
-                    prop="createTime"
+                    prop="createdAt"
                     sortable
                     align="center"
                     label="分享时间"
-                    min-width="240">
+                    min-width="200">
+                </el-table-column>
+                <el-table-column
+                    prop="expiredAt"
+                    sortable
+                    align="center"
+                    label="过期时间"
+                    min-width="200">
                 </el-table-column>
                 <el-table-column
                     prop="shareStatus"
                     sortable
                     label="分享状态"
-                    min-width="240"
+                    min-width="200"
                     align="center"
                     :formatter="formatShareStatus">
                 </el-table-column>
@@ -93,10 +100,10 @@
 <script setup>
 
 import shareService from '@/api/share'
+import { useFileStore } from '@/stores/file'
 import panUtil from '@/utils/common'
-import {onMounted, ref} from 'vue'
-import {useFileStore} from '@/stores/file'
-import {ElMessage, ElMessageBox} from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { onMounted, ref } from 'vue'
 import useClipboard from 'vue-clipboard3'
 
 const {toClipboard} = useClipboard()
@@ -110,7 +117,7 @@ const tableLoading = ref(true)
 
 const loadTableData = () => {
     tableLoading.value = true
-    shareService.getShares(res => {
+    shareService.getShareList(res => {
         tableLoading.value = false
         tableData.value = res.data
     }, res => {
@@ -173,7 +180,7 @@ const hiddenOperation = (row, column, cell, event) => {
 const formatShareStatus = (row, column, cellValue, index) => {
     if (row.shareStatus === 1) {
         return '有分享文件被删除'
-    } else if (row.shareDayType === 0) {
+    } else if (row.expiredAt === 0) {
         return '永久有效'
     } else {
         return row.shareEndTime + '到期'
@@ -182,7 +189,7 @@ const formatShareStatus = (row, column, cellValue, index) => {
 
 const copy = async (row) => {
     try {
-        let shareMessage = '链接：' + row.shareUrl + '\n提取码：' + row.shareCode + '\n赶快分享给小伙伴吧！'
+        let shareMessage = '链接：' + row.url + '\n提取码：' + row.code + '\n赶快分享给小伙伴吧！'
         await toClipboard(shareMessage)
         ElMessage.success('复制成功')
     } catch (e) {
@@ -212,7 +219,7 @@ const copy = async (row) => {
 .share-operation-content {
     display: none;
     position: absolute;
-    right: 200px;
+    right: 10px;
     top: 8px;
 }
 

@@ -29,7 +29,7 @@ export function setShareToken(token) {
 export function getShareToken() {
     let token = cookie.get(SHARE_TOKEN)
     if (token) {
-        return 'Bearer ' + token
+        return token
     }
     return EMPTY_STR
 }

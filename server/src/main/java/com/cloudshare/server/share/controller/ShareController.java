@@ -1,22 +1,25 @@
 package com.cloudshare.server.share.controller;
 
 import com.cloudshare.server.common.annotation.ShareTokenRequired;
+import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
-import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
-import com.cloudshare.server.share.controller.response.ShareListRespVO;
+import com.cloudshare.server.share.controller.response.ShareVO;
+import com.cloudshare.server.share.controller.response.SharerRespVO;
 import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author novo
@@ -38,9 +41,28 @@ public class ShareController {
         return Response.success(resp);
     }
 
+
+    /**
+     * 我的分享列表
+     *
+     * @return
+     */
     @GetMapping("/list")
-    public Response<ShareListRespVO> list(@Validated @RequestBody ShareListReqDTO reqDTO) {
-        ShareListRespVO resp = shareService.list(reqDTO);
+    public Response<List<ShareVO>> list() {
+        List<ShareVO> resp = shareService.list(null);
+        return Response.success(resp);
+    }
+
+    @GetMapping("/access")
+    @ShareTokenRequired
+    public Response<List<FileVO>> access(@RequestParam(name = "fileId", required = false) Long fileId) {
+        List<FileVO> resp = shareService.access(fileId);
+        return Response.success(resp);
+    }
+
+    @GetMapping("/sharer")
+    public Response<SharerRespVO> sharer(@RequestParam("shareId") Long shareId) {
+        SharerRespVO resp = shareService.sharer(shareId);
         return Response.success(resp);
     }
 

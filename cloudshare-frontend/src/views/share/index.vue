@@ -328,16 +328,16 @@ const treeDialogVisible = ref(false)
 const item = ref(undefined)
 
 const refreshShareInfo = (data) => {
-    let username = data.shareUserInfoVO.username,
-        shareName = data.shareName
-    shareCodeHeader.value = username + '的分享：' + shareName
+    let username = data.username,
+        fileName = data.fileName
+    shareCodeHeader.value = username + '的分享：' + fileName
     shareDate.value = data.createTime
     if (data.shareDay === 0) {
         shareExpireDate.value = '永久有效'
     } else {
         shareExpireDate.value = data.shareEndTime
     }
-    tableData.value = data.rPanUserFileVOList
+    tableData.value = data
 }
 
 const getShareId = () => {
@@ -349,12 +349,12 @@ const openShareExpirePage = () => {
 }
 
 const openShareCodePage = () => {
-    shareService.getSimpleShareDetail({
+    shareService.getSharer({
         shareId: getShareId()
     }, res => {
         if (res.code === 0) {
             shareCodeDialogVisible.value = true
-            shareCodeHeader.value = res.data.shareUserInfoVO.username + '的分享：' + res.data.shareName
+            shareCodeHeader.value = res.data.username + '的分享：' + res.data.fileName
         } else {
             shareCodeDialogVisible.value = false
             openShareExpirePage()
@@ -363,10 +363,14 @@ const openShareCodePage = () => {
 }
 
 const loadShareInfo = () => {
-    shareService.getShareDetail(res => {
+    shareService.getShareDetail({
+        shareId: getShareId()
+    }, res => {
+        console.log(res)
         if (res.code === 0) {
             refreshShareInfo(res.data)
-        } else if (res.code === 4) {
+        } else if (res.message === 'Share-Token不存在') {
+            console.log("=========")
             openShareCodePage()
         } else {
             openShareExpirePage()
@@ -437,16 +441,16 @@ const doCheckShareCode = async () => {
             loading.value = true
             shareService.checkShareCode({
                 shareId: getShareId(),
-                shareCode: shareCodeForm.shareCode
+                code: shareCodeForm.shareCode
             }, res => {
-                if (res.code === 0) {
+                if (res.data === "") {
+                    loading.value = false
+                    ElMessage.error("提取码错误")
+                } else {
                     loading.value = false
                     setShareToken(res.data)
                     shareCodeDialogVisible.value = false
                     loadShareInfo()
-                } else {
-                    loading.value = false
-                    ElMessage.error(res.message)
                 }
             })
         }
@@ -480,8 +484,8 @@ const goInFolder = (row) => {
 }
 
 const reloadTableData = (parentId) => {
-    shareService.getShareFiles({
-        parentId: parentId
+    shareService.getShareDetail({
+        fileId: parentId
     }, res => {
         if (res.code === 0) {
             tableData.value = res.data
@@ -546,7 +550,7 @@ const doDownload = (item) => {
     }
     userService.infoWithoutPageJump(res => {
         if (res.code === 0) {
-            shareService.getSimpleShareDetail({
+            shareService.getSharer({
                 shareId: getShareId()
             }, res => {
                 if (res.code === 0) {
