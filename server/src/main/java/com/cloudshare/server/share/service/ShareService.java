@@ -4,9 +4,7 @@ import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
-import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
-import com.cloudshare.server.share.controller.response.ShareListRespVO;
 import com.cloudshare.server.share.controller.response.ShareVO;
 import com.cloudshare.server.share.controller.response.SharerRespVO;
 import com.cloudshare.server.share.model.Share;
@@ -18,11 +16,11 @@ import java.util.List;
  * @since 2023/10/30
  */
 public interface ShareService {
-    ShareCreateRespVO createShare(ShareCreateReqDTO reqDTO);
+    ShareCreateRespVO create(ShareCreateReqDTO reqDTO);
 
-    List<ShareVO> list(ShareListReqDTO reqDTO);
+    List<ShareVO> list();
 
-    void delete(ShareCancelReqDTO reqDTO);
+    void cancel(ShareCancelReqDTO reqDTO);
 
     String checkCode(ShareCheckCodeReqDTO reqDTO);
 

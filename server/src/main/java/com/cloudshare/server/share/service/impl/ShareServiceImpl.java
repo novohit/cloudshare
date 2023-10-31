@@ -14,7 +14,6 @@ import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
-import com.cloudshare.server.share.controller.request.ShareListReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
 import com.cloudshare.server.share.controller.response.ShareVO;
 import com.cloudshare.server.share.controller.response.SharerRespVO;
@@ -62,7 +61,7 @@ public class ShareServiceImpl implements ShareService {
 
 
     @Override
-    public ShareCreateRespVO createShare(ShareCreateReqDTO reqDTO) {
+    public ShareCreateRespVO create(ShareCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         Long fileId = reqDTO.fileId();
         Optional<FileDocument> optional = fileRepository.findById(fileId);
@@ -87,7 +86,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public List<ShareVO> list(ShareListReqDTO reqDTO) {
+    public List<ShareVO> list() {
         Long userId = UserContextThreadHolder.getUserId();
         List<Share> shareList = shareRepository.findByUserId(userId);
         List<ShareVO> resp = shareConverter.DOList2VOList(shareList);
@@ -95,7 +94,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public void delete(ShareCancelReqDTO reqDTO) {
+    public void cancel(ShareCancelReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         List<Share> shareList = shareRepository.findByIdInAndUserId(reqDTO.ids(), userId);
         List<Long> ids = shareList.stream()

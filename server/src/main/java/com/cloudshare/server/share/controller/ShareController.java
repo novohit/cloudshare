@@ -36,8 +36,8 @@ public class ShareController {
     }
 
     @PostMapping
-    public Response<ShareCreateRespVO> createShare(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
-        ShareCreateRespVO resp = shareService.createShare(reqDTO);
+    public Response<ShareCreateRespVO> create(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
+        ShareCreateRespVO resp = shareService.create(reqDTO);
         return Response.success(resp);
     }
 
@@ -49,7 +49,7 @@ public class ShareController {
      */
     @GetMapping("/list")
     public Response<List<ShareVO>> list() {
-        List<ShareVO> resp = shareService.list(null);
+        List<ShareVO> resp = shareService.list();
         return Response.success(resp);
     }
 
@@ -66,9 +66,15 @@ public class ShareController {
         return Response.success(resp);
     }
 
+    /**
+     * 取消分享
+     *
+     * @param reqDTO
+     * @return
+     */
     @DeleteMapping
-    public Response<Void> delete(@Validated @RequestBody ShareCancelReqDTO reqDTO) {
-        shareService.delete(reqDTO);
+    public Response<Void> cancel(@Validated @RequestBody ShareCancelReqDTO reqDTO) {
+        shareService.cancel(reqDTO);
         return Response.success();
     }
 
