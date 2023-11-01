@@ -1,6 +1,7 @@
 package com.cloudshare.server.share.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.server.auth.ShareContextThreadHolder;
 import com.cloudshare.server.auth.UserContextThreadHolder;
@@ -69,11 +70,13 @@ public class ShareServiceImpl implements ShareService {
             throw new BizException("文件不存在");
         }
         Share share = new Share();
+        long shareId = SnowflakeUtil.nextId();
+        share.setShareId(shareId);
         share.setUserId(userId);
         share.setFileId(fileId);
         share.setExpiredAt(reqDTO.expiredAt());
         share.setShareStatus(ShareStatus.ACTIVE);
-        share.setUrl("http://localhost:5173/share/");
+        share.setUrl("http://127.0.0.1:5173/share/" + shareId);
         if (VisibleType.PUBLIC.equals(reqDTO.visibleType())) {
             share.setVisibleType(VisibleType.PUBLIC);
         } else {
@@ -82,7 +85,7 @@ public class ShareServiceImpl implements ShareService {
             share.setCode(code);
         }
         shareRepository.save(share);
-        return new ShareCreateRespVO(share.getId(), share.getUrl() + share.getId(), share.getCode());
+        return new ShareCreateRespVO(share.getId(), share.getUrl(), share.getCode());
     }
 
     @Override
@@ -96,7 +99,7 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public void cancel(ShareCancelReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        List<Share> shareList = shareRepository.findByIdInAndUserId(reqDTO.ids(), userId);
+        List<Share> shareList = shareRepository.findByShareIdInAndUserId(reqDTO.ids(), userId);
         List<Long> ids = shareList.stream()
                 .map(Share::getId)
                 .toList();
@@ -106,7 +109,7 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public String checkCode(ShareCheckCodeReqDTO reqDTO) {
         Long shareId = reqDTO.shareId();
-        Optional<Share> optional = shareRepository.findById(shareId);
+        Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
             throw new BizException("分享链接不存在");
         }
@@ -120,7 +123,7 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public Share detail(Long shareId) {
-        Optional<Share> optional = shareRepository.findById(shareId);
+        Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
             throw new BizException("分享链接不存在");
         }
@@ -155,7 +158,7 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public SharerRespVO sharer(Long shareId) {
-        Optional<Share> optional = shareRepository.findById(shareId);
+        Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
             throw new BizException("分享不存在");
         }

@@ -10,7 +10,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author novo
@@ -39,9 +44,15 @@ public class Share extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private Long shareId;
+
     @Comment("分享的文件id")
+    @Column(nullable = false)
     private Long fileId;
 
+    @Comment("分享者")
+    @Column(nullable = false)
     private Long userId;
 
     @Comment("是否公开，私有则需要提取码")

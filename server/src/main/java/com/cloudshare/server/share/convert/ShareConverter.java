@@ -15,7 +15,6 @@ import java.util.List;
 public interface ShareConverter {
 
     @Mapping(target = "pv", constant = "0")
-    @Mapping(target = "shareId", source = "id")
     @Mapping(target = "download", constant = "0")
     @Mapping(target = "fileName", expression = "java(share.getFileDocument().getName())")
     ShareVO DO2VO(Share share);

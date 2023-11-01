@@ -58,7 +58,7 @@
                     label="分享链接"
                     min-width="250">
                     <template #default="scope">
-                        <el-link type="primary" :href="scope.row.shareUrl" target="_blank">
+                        <el-link type="primary" :href="scope.row.url" target="_blank">
                             {{ scope.row.url.substring(0, 30) + '...' }}
                         </el-link>
                     </template>

@@ -27,6 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/share")
+@Validated
 public class ShareController {
 
     private final ShareService shareService;

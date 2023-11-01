@@ -40,12 +40,12 @@
                     <el-form label-width="100px"
                              status-icon
                              @submit.native.prevent>
-                        <el-form-item label="分享链接" prop="shareUrl">
-                            <el-link :underline=false type="primary"><span>{{ shareResultForm.shareUrl }}</span>
+                        <el-form-item label="分享链接" prop="url">
+                            <el-link :underline=false type="primary"><span>{{ shareResultForm.url }}</span>
                             </el-link>
                         </el-form-item>
                         <el-form-item label="提取码">
-                            <el-link :underline=false type="success"><span>{{ shareResultForm.shareCode }}</span>
+                            <el-link :underline=false type="success"><span>{{ shareResultForm.code }}</span>
                             </el-link>
                         </el-form-item>
                         <div class="share-result-button-content">
@@ -101,8 +101,8 @@ const shareFileForm = reactive({
 })
 
 const shareResultForm = reactive({
-    shareUrl: '',
-    shareCode: ''
+    url: '',
+    code: ''
 })
 
 const handleFilename = (fileName) => {
@@ -153,9 +153,9 @@ const doShareFile = async () => {
                 fileId: fileIdList[0]
             }, res => {
                 loading.value = false
-                shareTitle.value = '恭喜你！分享成功！'
-                shareResultForm.shareUrl = res.data.shareUrl
-                shareResultForm.shareCode = res.data.shareCode
+                shareTitle.value = '分享成功！'
+                shareResultForm.url = res.data.url
+                shareResultForm.code = res.data.code
                 step.value = 2
             }, res => {
                 loading.value = false
@@ -172,14 +172,14 @@ const resetForm = () => {
     step.value = 1
     shareTitle.value = ''
     shareResultForm.value = {
-        shareUrl: '',
-        shareCode: ''
+        url: '',
+        code: ''
     }
 }
 
 const copy = async () => {
     try {
-        let shareMessage = '链接：' + shareResultForm.shareUrl + '\n提取码：' + shareResultForm.shareCode + '\n赶快分享给小伙伴吧！'
+        let shareMessage = '链接：' + shareResultForm.url + '\n提取码：' + shareResultForm.code + '\n赶快分享给小伙伴吧！'
         await toClipboard(shareMessage)
         ElMessage.success('复制成功')
     } catch (e) {

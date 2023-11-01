@@ -65,6 +65,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                         "/pay/callback/**",
                         "/share/check-code",
                         "/share/access",
+                        "/share/sharer",
                         "/**/test*"
                 )
                 .map(uri -> "/api" + uri)

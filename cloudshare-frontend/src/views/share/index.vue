@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div class="pan-share-list-card-button-group">
-                            <el-button type="success" size="default" @click="saveFiles(undefined)">保存到我的R盘
+                            <el-button type="success" size="default" @click="saveFiles(undefined)">保存
                                 <el-icon
                                     class="el-icon--right">
                                     <DocumentCopy/>
@@ -94,7 +94,7 @@
                                         <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                                     </div>
                                     <div class="file-operation-content">
-                                        <el-tooltip class="item" effect="light" content="保存到我的R盘" placement="top">
+                                        <el-tooltip class="item" effect="light" content="保存" placement="top">
                                             <el-button type="success" icon="DocumentCopy" size="small" circle
                                                        @click="saveFiles(scope.row)"/>
                                         </el-tooltip>
@@ -181,11 +181,11 @@
                             ref="shareCodeFormRef"
                             :model="shareCodeForm"
                             @submit.native.prevent>
-                            <el-form-item label="提取码" prop="shareCode">
+                            <el-form-item label="提取码" prop="code">
                                 <el-input type="text"
                                           ref="shareCodeEl"
                                           @keyup.enter.native="doCheckShareCode"
-                                          v-model="shareCodeForm.shareCode" autocomplete="off"/>
+                                          v-model="shareCodeForm.code" autocomplete="off"/>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" :loading="loading" @click="doCheckShareCode">确 定</el-button>
@@ -292,7 +292,7 @@ const loginRules = reactive({
 })
 
 const shareCodeFormRules = reactive({
-    shareCode: [
+    code: [
         {required: true, message: '请输入提取码', trigger: 'blur'}
     ]
 })
@@ -308,7 +308,7 @@ const loginDialogVisible = ref(false)
 const loginFlag = ref(false)
 const shareCodeDialogVisible = ref(false)
 const shareCodeForm = reactive({
-    shareCode: ''
+    code: ''
 })
 
 const shareCodeHeader = ref('')
@@ -441,7 +441,7 @@ const doCheckShareCode = async () => {
             loading.value = true
             shareService.checkShareCode({
                 shareId: getShareId(),
-                code: shareCodeForm.shareCode
+                code: shareCodeForm.code
             }, res => {
                 if (res.data === "") {
                     loading.value = false
@@ -703,7 +703,7 @@ onMounted(() => {
     font-size: 40px;
     font-weight: bolder;
     cursor: pointer;
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-share-content .pan-share-header-content .pan-share-header-content-wrapper .pan-share-header-user-info-content {
@@ -795,7 +795,7 @@ onMounted(() => {
 }
 
 .pan-share-content .pan-share-list-content .pan-share-list-wrapper .pan-share-list-card .pan-share-list-card-header .pan-share-list-card-header-share-info-content .pan-share-list-card-header-time .pan-share-list-card-header-expire-date {
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-share-content .pan-share-list-content .pan-share-list-wrapper .pan-share-list-card .pan-share-list-card-error-message {
@@ -803,7 +803,7 @@ onMounted(() => {
     height: 300px;
     padding-top: 50px;
     text-align: center;
-    color: #F56C6C;
+    color: #2faa69;
     font-size: 30px;
 }
 
@@ -819,7 +819,7 @@ span {
 
 .breadcrumb-item-a {
     cursor: pointer !important;
-    color: #409EFF !important;
+    color: #2faa69 !important;
 }
 
 .tree-content {
