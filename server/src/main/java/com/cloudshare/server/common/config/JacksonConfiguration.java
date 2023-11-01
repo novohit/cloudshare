@@ -1,5 +1,6 @@
 package com.cloudshare.server.common.config;
 
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -8,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -35,6 +37,10 @@ public class JacksonConfiguration {
             // serializers
             builder.serializers(new LocalDateSerializer(dateFormatter));
             builder.serializers(new LocalDateTimeSerializer(dateTimeFormatter));
+
+            builder.serializerByType(Long.class, ToStringSerializer.instance);
+            builder.serializerByType(Long.TYPE, ToStringSerializer.instance);
+            builder.serializerByType(BigInteger.class, ToStringSerializer.instance);
         };
     }
 }
