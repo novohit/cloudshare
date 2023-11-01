@@ -42,7 +42,7 @@ const renderCode = (id, fileName) => {
 }
 
 const init = () => {
-    let id = route.params.id,
+    let id = route.params.fileId,
         fileName = route.query.fileName
     renderCode(id, fileName)
 }

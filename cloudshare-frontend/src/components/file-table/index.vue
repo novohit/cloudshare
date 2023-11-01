@@ -142,13 +142,13 @@ const openNewPage = (path, name, params, query) => {
 
 const showOffice = (row) => {
     openNewPage('/preview/office', 'PreviewOffice', {
-        id: panUtil.handleId(row.id)
+        fileId: panUtil.handleId(row.fileId)
     })
 }
 
 const showIframe = (row) => {
     openNewPage('/preview/iframe', 'PreviewIframe', {
-        id: row.id
+        fileId: row.fileId
     })
 }
 
@@ -157,8 +157,8 @@ const showImg = (row) => {
     let imgIndex = 0
     for (let i = 0, iLength = fileList.value.length; i < iLength; ++i) {
         if (fileList.value[i].fileType === 'IMAGE') {
-            imgs.push(panUtil.getPreviewUrl(fileList.value[i].id))
-            if (fileList.value[i].id === row.id) {
+            imgs.push(panUtil.getPreviewUrl(fileList.value[i].fileId))
+            if (fileList.value[i].fileId === row.fileId) {
                 imgIndex = imgs.length - 1
             }
         }
@@ -180,7 +180,7 @@ const showImg = (row) => {
 
 const showMusic = (row) => {
     openNewPage('/preview/music', 'PreviewMusic', {
-        id: row.id,
+        fileId: row.fileId,
         curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
@@ -188,14 +188,14 @@ const showMusic = (row) => {
 const showVideo = (row) => {
     console.log(row)
     openNewPage('/preview/video', 'PreviewVideo', {
-        id: row.id,
+        fileId: row.fileId,
         curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
 
 const showCode = (row) => {
     openNewPage('/preview/code', 'PreviewCode', {
-        id: row.id,
+        fileId: row.fileId,
     }, {
         fileName: row.fileName
     })
@@ -208,7 +208,7 @@ const getFileFontElement = (type) => {
 const clickFilename = (row) => {
     switch (row.fileType) {
         case 'DIR':
-            // goInFolder(panUtil.handleId(row.id))
+            // goInFolder(panUtil.handleId(row.fileId))
             goInFolder(row.fileId, row.curDirectory, row.fileName)
             break
         case 3:

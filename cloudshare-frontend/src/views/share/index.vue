@@ -320,7 +320,7 @@ const pageLoading = ref(true)
 const shareDate = ref('')
 const shareExpireDate = ref('')
 const breadCrumbs = ref([{
-    id: '-1',
+    fileId: '-1',
     name: '全部文件'
 }])
 const treeData = ref([])
@@ -495,10 +495,10 @@ const reloadTableData = (parentId) => {
     })
 }
 
-const goToThis = (id) => {
-    if (id === '-1') {
+const goToThis = (fileId) => {
+    if (fileId === '-1') {
         breadCrumbs.value = [{
-            id: '-1',
+            fileId: '-1',
             name: '全部文件'
         }]
         loadShareInfo()
@@ -506,12 +506,12 @@ const goToThis = (id) => {
         let newBreadCrumbs = new Array()
         breadCrumbs.value.some(item => {
             newBreadCrumbs.push(item)
-            if (item.id === id) {
+            if (item.fileId === fileId) {
                 return true
             }
         })
         breadCrumbs.value = newBreadCrumbs
-        reloadTableData(id)
+        reloadTableData(fileId)
     }
 }
 

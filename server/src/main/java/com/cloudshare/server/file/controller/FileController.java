@@ -118,8 +118,8 @@ public class FileController {
         return Response.success();
     }
 
-    @GetMapping("/preview/{id}")
-    public Response<Void> preview(@PathVariable("id") Long fileId, HttpServletResponse response) {
+    @GetMapping("/preview/{fileId}")
+    public Response<Void> preview(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         fileService.preview(fileId, response);
         return Response.success();
     }
