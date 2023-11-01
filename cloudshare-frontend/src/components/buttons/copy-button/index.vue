@@ -119,7 +119,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doCopyFile(checkNode.id)
+    doCopyFile(checkNode.fileId)
 }
 
 const loading = ref(false)

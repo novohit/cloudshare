@@ -9,7 +9,7 @@
                     <el-link :underline=false type="primary" class="pan-share-username">
                         欢迎您,{{ username }}
                     </el-link>
-                    <el-link :underline=false type="primary" class="pan-share-exit-button" @click="exit">
+                    <el-link :underline=false type="primary" class="pan-share-exit-button" @click="logout">
                         退出
                     </el-link>
                 </div>
@@ -61,7 +61,7 @@
                         <div class="pan-share-list-card-operate-bread-crumb">
                             <el-breadcrumb separator-class="el-icon-arrow-right">
                                 <el-breadcrumb-item v-for="(item, index) in breadCrumbs" :key="index">
-                                    <a class="breadcrumb-item-a" @click="goToThis(item.id)" href="#">{{ item.name }}</a>
+                                    <a class="breadcrumb-item-a" @click="goToThis(item.fileId)" href="#">{{ item.name }}</a>
                                 </el-breadcrumb-item>
                             </el-breadcrumb>
                         </div>
@@ -496,9 +496,9 @@ const reloadTableData = (parentId) => {
 }
 
 const goToThis = (fileId) => {
-    if (fileId === '-1') {
+    if (fileId === '0') {
         breadCrumbs.value = [{
-            fileId: '-1',
+            fileId: '0',
             name: '全部文件'
         }]
         loadShareInfo()
@@ -507,6 +507,7 @@ const goToThis = (fileId) => {
         breadCrumbs.value.some(item => {
             newBreadCrumbs.push(item)
             if (item.fileId === fileId) {
+                console.log("share goToThis", item)
                 return true
             }
         })
@@ -554,7 +555,7 @@ const doDownload = (item) => {
                 shareId: getShareId()
             }, res => {
                 if (res.code === 0) {
-                    let url = panUtil.getUrlPrefix() + '/share/file/download/' + item.id + '?shareToken=' + getShareToken() + '&authorization=' + getToken(),
+                    let url = panUtil.getUrlPrefix() + '/share/file/download/' + item.fileId + '?shareToken=' + getShareToken() + '&authorization=' + getToken(),
                         fileName = item.fileName,
                         link = document.createElement('a')
                     link.style.display = 'none'
@@ -595,7 +596,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doSaveFiles(checkNode.id)
+    doSaveFiles(checkNode.fileId)
 }
 
 const saveFiles = (newItem) => {
