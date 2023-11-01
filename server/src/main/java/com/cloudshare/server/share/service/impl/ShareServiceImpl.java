@@ -65,7 +65,7 @@ public class ShareServiceImpl implements ShareService {
     public ShareCreateRespVO create(ShareCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         Long fileId = reqDTO.fileId();
-        Optional<FileDocument> optional = fileRepository.findById(fileId);
+        Optional<FileDocument> optional = fileRepository.findByFileId(fileId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }

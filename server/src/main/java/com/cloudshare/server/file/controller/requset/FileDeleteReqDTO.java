@@ -7,6 +7,6 @@ import java.util.List;
  * @since 2023/10/21
  */
 public record FileDeleteReqDTO(
-        List<Long> ids
+        List<Long> fileIds
 ) {
 }

@@ -6,6 +6,7 @@ import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -49,4 +50,6 @@ public interface FileService {
     FileVO detail(Long fileId, Long userId);
 
     boolean isSubFile(Long rootFileId, Long subFileId, Long userId);
+
+    void move(FileMoveReqDTO reqDTO);
 }

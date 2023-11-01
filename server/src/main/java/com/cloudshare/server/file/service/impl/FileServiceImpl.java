@@ -1,6 +1,7 @@
 package com.cloudshare.server.file.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
@@ -9,6 +10,7 @@ import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -138,7 +140,7 @@ public class FileServiceImpl implements FileService {
                     }, () -> {
                         FileDocument fileDocument = new FileDocument();
                         BeanUtils.copyProperties(reqDTO, fileDocument);
-                        int rows = fileRepository.updateDirByIdAndUserId(reqDTO.id(), userId, reqDTO.name(), reqDTO.description());
+                        int rows = fileRepository.updateDirByFileIdAndUserId(reqDTO.id(), userId, reqDTO.name(), reqDTO.description());
                         if (rows <= 0) {
                             throw new BadRequestException("更新失败");
                         }
@@ -357,7 +359,7 @@ public class FileServiceImpl implements FileService {
     public void download(Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
         // 1. 校验下载权限
-        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }
@@ -390,7 +392,7 @@ public class FileServiceImpl implements FileService {
     public void preview(Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
         // 1. 校验下载权限
-        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }
@@ -415,10 +417,10 @@ public class FileServiceImpl implements FileService {
     @Override
     public void delete(FileDeleteReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        if (CollectionUtils.isEmpty(reqDTO.ids())) {
+        if (CollectionUtils.isEmpty(reqDTO.fileIds())) {
             return;
         }
-        List<FileDocument> list = fileRepository.findByIdInAndUserId(reqDTO.ids(), userId);
+        List<FileDocument> list = fileRepository.findByFileIdInAndUserId(reqDTO.fileIds(), userId);
         List<FileDocument> delete = new ArrayList<>(list);
         for (FileDocument file : list) {
             // 文件直接设置删除时间
@@ -444,7 +446,7 @@ public class FileServiceImpl implements FileService {
         List<DirTreeNode> nodes = fileConverter.DOList2TreeNodeList(list);
 
         Map<Long, DirTreeNode> map = nodes.stream()
-                .collect(Collectors.toMap(DirTreeNode::getId, Function.identity()));
+                .collect(Collectors.toMap(DirTreeNode::getFileId, Function.identity()));
 
         // 构建目录树
         List<DirTreeNode> tree = new ArrayList<>();
@@ -464,7 +466,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileVO detail(Long fileId, Long userId) {
-        Optional<FileDocument> optional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
             throw new BizException("文件不存在");
         }
@@ -473,8 +475,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public boolean isSubFile(Long rootFileId, Long subFileId, Long userId) {
-        Optional<FileDocument> subOptional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(subFileId, userId);
-        Optional<FileDocument> rootOptional = fileRepository.findByIdAndUserIdAndDeletedAtIsNull(rootFileId, userId);
+        Optional<FileDocument> subOptional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(subFileId, userId);
+        Optional<FileDocument> rootOptional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(rootFileId, userId);
         if (subOptional.isPresent() && rootOptional.isPresent()) {
             FileDocument root = rootOptional.get();
             FileDocument sub = subOptional.get();
@@ -487,6 +489,11 @@ public class FileServiceImpl implements FileService {
             return sub.getCurDirectory().startsWith(root.getPath());
         }
         return false;
+    }
+
+    @Override
+    public void move(FileMoveReqDTO reqDTO) {
+        List<Long> fileIds = reqDTO.fileIds();
     }
 
     @Override
@@ -519,6 +526,7 @@ public class FileServiceImpl implements FileService {
             String suffix
     ) {
         FileDocument fileDocument = new FileDocument();
+        fileDocument.setFileId(SnowflakeUtil.nextId());
         fileDocument.setUserId(userId);
         fileDocument.setParentId(parentId);
         fileDocument.setMd5(md5);

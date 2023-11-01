@@ -60,11 +60,11 @@ const doSearch = () => {
     }, res => {
         breadcrumbStore.clear()
         breadcrumbStore.addItem({
-            id: defaultParentId.value,
+            fileId: defaultParentId.value,
             name: defaultCurDirectory.value
         })
         breadcrumbStore.addItem({
-            id: '-1',
+            fileId: '-1',
             name: '搜索：' + searchKey.value
         })
         fileStore.setFileList(res.data)

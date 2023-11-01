@@ -30,7 +30,7 @@ const buttonArray = ref(['upload', 'addDir', 'download', 'delete', 'rename', 'sh
 onMounted(() => {
     if (!searchFlag.value) {
         let firstItem = {
-            id: defaultParentId.value,
+            fileId: defaultParentId.value,
             name: defaultCurDirectory.value
         }
         breadcrumbStore.clear()

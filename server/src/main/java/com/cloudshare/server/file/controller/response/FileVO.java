@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @since 2023/10/8
  */
 public record FileVO(
-        Long id,
+        Long fileId,
         String path,
         String curDirectory,
         FileType fileType,

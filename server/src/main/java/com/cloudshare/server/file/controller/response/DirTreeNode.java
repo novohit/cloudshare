@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DirTreeNode {
-    private Long id;
+    private Long fileId;
 
     @JsonIgnore
     private Long parentId;

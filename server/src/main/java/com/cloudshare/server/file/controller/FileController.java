@@ -6,6 +6,7 @@ import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -120,6 +121,12 @@ public class FileController {
     @GetMapping("/preview/{id}")
     public Response<Void> preview(@PathVariable("id") Long fileId, HttpServletResponse response) {
         fileService.preview(fileId, response);
+        return Response.success();
+    }
+
+    @PostMapping("/move")
+    public Response<Void> move(@Validated @RequestBody FileMoveReqDTO reqDTO) {
+        fileService.move(reqDTO);
         return Response.success();
     }
 }

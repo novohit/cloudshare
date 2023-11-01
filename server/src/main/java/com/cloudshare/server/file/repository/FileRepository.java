@@ -26,30 +26,32 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     Optional<FileDocument> findByMd5(String md5);
 
+    Optional<FileDocument> findByFileIdAndUserIdAndDeletedAtIsNull(Long fileId, Long userId);
+
+    List<FileDocument> findByFileIdInAndUserId(List<Long> fileIds, Long userId);
+
+    List<FileDocument> findByUserIdAndTypeAndDeletedAtIsNull(Long userId, FileType type);
+
+    Optional<FileDocument> findByFileId(Long fileId);
+
     @Modifying
     @Query("UPDATE file AS f " +
             "SET f.name = :name, " +
             "f.description = :description " +
-            "WHERE f.id = :id AND f.userId = :userId")
-    int updateDirByIdAndUserId(@Param("id") Long id,
-                               @Param("userId") Long userId,
-                               @Param("name") String name,
-                               @Param("description") String description);
+            "WHERE f.fileId = :fileId AND f.userId = :userId")
+    int updateDirByFileIdAndUserId(@Param("fileId") Long fileId,
+                                   @Param("userId") Long userId,
+                                   @Param("name") String name,
+                                   @Param("description") String description);
 
     @Modifying
     @Query("UPDATE file AS f " +
             "SET f.name = :newName, " +
             "f.path = :newPath " +
-            "WHERE f.id = :id AND f.userId = :userId AND f.name = :oldName")
-    int renameDir(@Param("id") Long id,
+            "WHERE f.fileId = :fileId AND f.userId = :userId AND f.name = :oldName")
+    int renameDir(@Param("fileId") Long fileId,
                   @Param("userId") Long userId,
                   @Param("oldName") String oldName,
                   @Param("newName") String newName,
                   @Param("newPath") String newPath);
-
-    Optional<FileDocument> findByIdAndUserIdAndDeletedAtIsNull(Long fileId, Long userId);
-
-    List<FileDocument> findByIdInAndUserId(List<Long> ids, Long userId);
-
-    List<FileDocument> findByUserIdAndTypeAndDeletedAtIsNull(Long userId, FileType type);
 }

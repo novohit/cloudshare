@@ -477,10 +477,10 @@ const clickFilename = (row) => {
 
 const goInFolder = (row) => {
     breadCrumbs.value.push({
-        id: row.id,
+        fileId: row.fileId,
         name: row.fileName
     })
-    reloadTableData(row.id)
+    reloadTableData(row.fileId)
 }
 
 const reloadTableData = (parentId) => {

@@ -27,14 +27,14 @@ const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
 const {parentId, curDirectory} = storeToRefs(fileStore)
 
-const doDeleteFile = (ids) => {
+const doDeleteFile = (fileIds) => {
     ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
         fileService.delete({
-            ids: ids
+            fileIds: fileIds
         }, res => {
             ElMessage.success('删除成功')
             fileStore.loadFileList()
@@ -46,12 +46,12 @@ const doDeleteFile = (ids) => {
 
 const deleteFile = () => {
     if (props.item) {
-        doDeleteFile(props.item.id)
+        doDeleteFile(props.item.fileId)
         return
     }
     if (multipleSelection.value && multipleSelection.value.length > 0) {
         let idArr = new Array()
-        multipleSelection.value.forEach(item => idArr.push(item.id))
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
         doDeleteFile(idArr)
         return
     }

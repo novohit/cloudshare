@@ -10,9 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
@@ -27,7 +24,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * @author novo
@@ -73,7 +69,7 @@ public class Share extends BaseModel {
     private LocalDateTime expiredAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable = false, updatable = false, name = "fileId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(insertable = false, updatable = false, name = "fileId", referencedColumnName = "fileId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private FileDocument fileDocument;
 
     @ManyToOne(fetch = FetchType.EAGER)

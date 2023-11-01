@@ -140,10 +140,10 @@ const doShareFile = async () => {
             let fileIdList = new Array()
             loading.value = true
             if (props.item) {
-                fileIdList.push(props.item.id)
+                fileIdList.push(props.item.fileId)
             } else {
                 multipleSelection.value.forEach(item => {
-                    fileIdList.push(item.id)
+                    fileIdList.push(item.fileId)
                 })
             }
             console.log(fileIdList)

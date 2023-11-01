@@ -118,13 +118,13 @@ const hiddenOperation = (row, column, cell, event) => {
     panUtil.hiddenOperation(cell)
 }
 
-const goInFolder = (id, curDirectory, fileName) => {
+const goInFolder = (fileId, curDirectory, fileName) => {
     fileStore.setSearchFlag(false)
     breadcrumbStore.addItem({
-            id: id,
+            fileId: fileId,
             name: fileName
         })
-    fileStore.setParentId(id)
+    fileStore.setParentId(fileId)
     const newCurDirectory = curDirectory === '/' ? curDirectory + fileName : curDirectory + '/' + fileName
     fileStore.setCurDirectory(newCurDirectory)
     fileStore.loadFileList()
@@ -209,7 +209,7 @@ const clickFilename = (row) => {
     switch (row.fileType) {
         case 'DIR':
             // goInFolder(panUtil.handleId(row.id))
-            goInFolder(row.id, row.curDirectory, row.fileName)
+            goInFolder(row.fileId, row.curDirectory, row.fileName)
             break
         case 3:
         case 4:
