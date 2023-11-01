@@ -40,8 +40,8 @@ const goToThis = (fileId, index) => {
         .map(item => item.name)
         .join('/');
     // 去除多余的 /
-    curDirectory = curDirectory.length > 1 ? curDirectory.replace(/^\//, '') : curDirectory;
-    console.log("curDirectory", curDirectory)
+    curDirectory = curDirectory.length > 1 ? curDirectory.replace(/^\//, '') + "/" : curDirectory;
+    console.log("goToThis", curDirectory)
     if (fileId !== '-1') {
         let newBreadCrumbs = new Array()
         breadCrumbs.value.some(item => {

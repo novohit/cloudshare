@@ -117,7 +117,7 @@ public class FileServiceImpl implements FileService {
                 newName,
                 null,
                 reqDTO.curDirectory(),
-                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + newName,
+                reqDTO.curDirectory() + newName + BizConstant.LINUX_SEPARATOR,
                 null,
                 0L,
                 FileType.DIR,
@@ -201,7 +201,7 @@ public class FileServiceImpl implements FileService {
                     context.getFileName(),
                     null,
                     reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileName(),
+                    reqDTO.curDirectory() + context.getFileName(),
                     context.getRealPath(),
                     context.getTotalSize(),
                     FileType.suffix2Type(suffix),
@@ -238,7 +238,7 @@ public class FileServiceImpl implements FileService {
                 reqDTO.fileName(),
                 null,
                 reqDTO.curDirectory(),
-                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
+                reqDTO.curDirectory() + reqDTO.fileName(),
                 same.getRealPath(),
                 same.getSize(),
                 FileType.suffix2Type(suffix),
@@ -342,7 +342,7 @@ public class FileServiceImpl implements FileService {
                     reqDTO.fileName(),
                     null,
                     reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
+                    reqDTO.curDirectory() + reqDTO.fileName(),
                     context.getRealPath(),
                     totalSize.get(),
                     FileType.suffix2Type(suffix),
@@ -427,7 +427,7 @@ public class FileServiceImpl implements FileService {
             file.setDeletedAt(LocalDateTime.now());
             if (FileType.DIR.equals(file.getType())) {
                 // 查询文件夹下的所有文件
-                List<FileDocument> subList = fileRepository.findByUserIdAndCurDirectoryStartsWithAndDeletedAtIsNull(userId, file.getPath());
+                List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(file.getPath(), userId);
                 for (FileDocument subFile : subList) {
                     subFile.setDeletedAt(LocalDateTime.now());
                 }
@@ -438,6 +438,12 @@ public class FileServiceImpl implements FileService {
         fileRepository.saveAll(delete);
     }
 
+    /**
+     * 唯一一个用了 parentId 的方法
+     * TODO 根 parentId 魔法值
+     *
+     * @return
+     */
     @Override
     public List<DirTreeNode> dirTree() {
         // TODO set cache
@@ -493,7 +499,34 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void move(FileMoveReqDTO reqDTO) {
+        // TODO 性能优化
+        Long userId = UserContextThreadHolder.getUserId();
         List<Long> fileIds = reqDTO.fileIds();
+        for (Long fileId : fileIds) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+            if (optional.isPresent()) {
+                FileDocument file = optional.get();
+                if (!FileType.DIR.equals(file.getType())) {
+                    file.setCurDirectory(reqDTO.target());
+                    file.setParentId(reqDTO.parentId());
+                    file.setPath(reqDTO.target() + file.getName());
+                    saveFile2DB(file);
+                } else {
+                    String originalPath = file.getPath();
+                    String originalCurDirectory = file.getCurDirectory();
+                    file.setCurDirectory(reqDTO.target());
+                    file.setParentId(reqDTO.parentId());
+                    file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
+                    saveFile2DB(file);
+                    List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
+                    for (FileDocument sub : subList) {
+                        sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
+                        sub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
+                        saveFile2DB(sub);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -543,9 +576,6 @@ public class FileServiceImpl implements FileService {
     private void saveFile2DB(FileDocument fileDocument) {
         // 正常规则是 /A/B + / + name
         // 当前目录是根目录时会多加一个 /
-        if (BizConstant.LINUX_SEPARATOR.equals(fileDocument.getCurDirectory())) {
-            fileDocument.setPath(fileDocument.getCurDirectory() + fileDocument.getName());
-        }
         fileRepository.save(fileDocument);
     }
 }

@@ -45,12 +45,13 @@ const doDeleteFile = (fileIds) => {
 }
 
 const deleteFile = () => {
+    let idArr = new Array()
     if (props.item) {
-        doDeleteFile(props.item.fileId)
+        idArr.push(props.item.fileId)
+        doDeleteFile(idArr)
         return
     }
     if (multipleSelection.value && multipleSelection.value.length > 0) {
-        let idArr = new Array()
         multipleSelection.value.forEach(item => idArr.push(item.fileId))
         doDeleteFile(idArr)
         return

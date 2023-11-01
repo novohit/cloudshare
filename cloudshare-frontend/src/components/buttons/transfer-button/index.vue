@@ -88,18 +88,17 @@ const resetTreeData = () => {
 
 const treeData = ref([])
 
-const doTransferFile = (targetParentId) => {
-    let ids = ''
+const doTransferFile = (target, parentId) => {
+    let idArr = new Array()
     if (props.item) {
-        ids = props.item.id
+        idArr.push(props.item.fileId)
     } else {
-        let idArr = new Array()
-        multipleSelection.value.forEach(item => idArr.push(item.id))
-        ids = idArr.join('__,__')
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
     }
     fileService.transfer({
-        ids: ids,
-        targetParentId: targetParentId
+        parentId: parentId,
+        fileIds: idArr,
+        target: target
     }, res => {
         loading.value = false
         treeDialogVisible.value = false
@@ -119,7 +118,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doTransferFile(checkNode.id)
+    doTransferFile(checkNode.path, checkNode.fileId)
 }
 
 const loading = ref(false)

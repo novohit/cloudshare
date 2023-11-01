@@ -125,7 +125,8 @@ const goInFolder = (fileId, curDirectory, fileName) => {
             name: fileName
         })
     fileStore.setParentId(fileId)
-    const newCurDirectory = curDirectory === '/' ? curDirectory + fileName : curDirectory + '/' + fileName
+    const newCurDirectory =  curDirectory + fileName + "/"
+    console.log("goInFolder", newCurDirectory)
     fileStore.setCurDirectory(newCurDirectory)
     fileStore.loadFileList()
 }

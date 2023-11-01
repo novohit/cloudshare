@@ -40,7 +40,7 @@ let fileService = {
     },
     transfer: function (data, resolve, reject) {
         http({
-            url: '/file/transfer',
+            url: '/file/move',
             data: data,
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))

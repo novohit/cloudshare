@@ -18,7 +18,7 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     List<FileDocument> findByUserIdAndCurDirectoryAndDeletedAtIsNull(Long userId, String curDirectory);
 
-    List<FileDocument> findByUserIdAndCurDirectoryStartsWithAndDeletedAtIsNull(Long userId, String curDirectory);
+    List<FileDocument> findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(String curDirectory, Long userId);
 
     List<FileDocument> findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(Long userId, String curDirectory, String key);
 
@@ -31,8 +31,6 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
     List<FileDocument> findByFileIdInAndUserId(List<Long> fileIds, Long userId);
 
     List<FileDocument> findByUserIdAndTypeAndDeletedAtIsNull(Long userId, FileType type);
-
-    Optional<FileDocument> findByFileId(Long fileId);
 
     @Modifying
     @Query("UPDATE file AS f " +
