@@ -112,16 +112,14 @@ public class FileController {
         return Response.success();
     }
 
-    @GetMapping("/download/{id}")
-    public Response<Void> download(@PathVariable("id") Long fileId, HttpServletResponse response) {
+    @GetMapping("/download/{fileId}")
+    public void download(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         fileService.download(fileId, response);
-        return Response.success();
     }
 
     @GetMapping("/preview/{fileId}")
-    public Response<Void> preview(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
+    public void preview(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         fileService.preview(fileId, response);
-        return Response.success();
     }
 
     @PostMapping("/move")
