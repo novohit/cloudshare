@@ -530,6 +530,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceUser, Long targetUser) {
         List<Long> fileIds = reqDTO.fileIds();
+        String target = reqDTO.target();
         for (Long fileId : fileIds) {
             Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceUser);
             if (optional.isPresent()) {
@@ -541,7 +542,7 @@ public class FileServiceImpl implements FileService {
                         file.getMd5(),
                         file.getName(),
                         file.getRealName(),
-                        reqDTO.target(), // curDirectory
+                        target, // curDirectory
                         null,
                         file.getRealPath(),
                         file.getSize(),
@@ -552,11 +553,11 @@ public class FileServiceImpl implements FileService {
                 String originalPath = file.getPath();
                 String originalCurDirectory = file.getCurDirectory();
                 if (!FileType.DIR.equals(copyFile.getType())) {
-                    copyFile.setPath(reqDTO.target() + copyFile.getName());
+                    copyFile.setPath(target + copyFile.getName());
                     saveFile2DB(copyFile);
                 } else {
-                    copyFile.setPath(reqDTO.target() + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
-                    saveFile2DB(copyFile);
+                    copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
+                    String newName = saveFile2DB(copyFile);
                     List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
                     for (FileDocument sub : subList) {
                         FileDocument copySub = assembleFileDocument(
@@ -572,8 +573,25 @@ public class FileServiceImpl implements FileService {
                                 sub.getType(),
                                 sub.getSuffix()
                         );
-                        copySub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
-                        copySub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
+                        String curDirectory = sub.getCurDirectory().replaceFirst(originalCurDirectory, target);
+                        String path = sub.getPath().replaceFirst(originalCurDirectory, target);
+
+                        if (!file.getName().equals(newName)) {
+                            int startI = curDirectory.indexOf(target);
+                            if (startI >= 0) {
+                                String rightPortion = curDirectory.substring(startI + target.length());
+                                String leftPortion = curDirectory.substring(0, startI + target.length());
+                                curDirectory = leftPortion + rightPortion.replaceFirst(file.getName(), newName);
+                            }
+                            int startJ = path.indexOf(target);
+                            if (startJ >= 0) {
+                                String rightPortion = path.substring(startJ + target.length());
+                                String leftPortion = path.substring(0, startJ + target.length());
+                                path = leftPortion + rightPortion.replaceFirst(file.getName(), newName);
+                            }
+                        }
+                        copySub.setCurDirectory(curDirectory);
+                        copySub.setPath(path);
                         saveFile2DB(copySub);
                     }
                 }
@@ -625,9 +643,45 @@ public class FileServiceImpl implements FileService {
         return fileDocument;
     }
 
-    private void saveFile2DB(FileDocument fileDocument) {
-        // 正常规则是 /A/B + / + name
-        // 当前目录是根目录时会多加一个 /
+    private String saveFile2DB(FileDocument fileDocument) {
+        Long userId = UserContextThreadHolder.getUserId();
+        String curDirectory = fileDocument.getCurDirectory();
+        String name = fileDocument.getName();
+
+        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(userId, curDirectory, name);
+        // 第一个括号 (\\d+) 是一个分组 用于匹配一个或多个数字
+        // 第二个括号是字面量
+        // Pattern.quote(name) 方法来确保将 name 视为普通的字符串，而不是正则表达式的一部分。
+        String regex = "^" + Pattern.quote(name) + "\\((\\d+)\\)$";
+        Pattern pattern = Pattern.compile(regex);
+        String newName = name;
+        if (!CollectionUtils.isEmpty(fileList)) {
+            // exist AA add A
+            AtomicBoolean hasSame = new AtomicBoolean(false);
+            int max = fileList.stream()
+                    .map(FileDocument::getName)
+                    .mapToInt(fileName -> {
+                                Matcher matcher = pattern.matcher(fileName);
+                                if (fileName.equals(name)) {
+                                    hasSame.set(true);
+                                }
+                                return matcher.matches() ? Integer.parseInt(matcher.group(1)) : 0;
+                            }
+                    ).max()
+                    .orElse(-1);
+            if (hasSame.get()) {
+                newName = name + "(%d)".formatted(max + 1);
+            }
+        }
+        if (!newName.equals(fileDocument.getName())) {
+            fileDocument.setName(newName);
+            String newPath = fileDocument.getType() == FileType.DIR
+                    ? fileDocument.getCurDirectory() + newName + BizConstant.LINUX_SEPARATOR
+                    : fileDocument.getCurDirectory() + newName;
+            fileDocument.setPath(newPath);
+        }
+
         fileRepository.save(fileDocument);
+        return newName;
     }
 }
