@@ -84,40 +84,14 @@ public class FileServiceImpl implements FileService {
     public void createDir(DirCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String name = reqDTO.dirName();
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(userId, reqDTO.curDirectory(), name);
-        // 第一个括号 (\\d+) 是一个分组 用于匹配一个或多个数字
-        // 第二个括号是字面量
-        // Pattern.quote(name) 方法来确保将 name 视为普通的字符串，而不是正则表达式的一部分。
-        String regex = "^" + Pattern.quote(name) + "\\((\\d+)\\)$";
-        Pattern pattern = Pattern.compile(regex);
-        String newName = name;
-        if (!CollectionUtils.isEmpty(fileList)) {
-            // exist AA add A
-            AtomicBoolean hasSame = new AtomicBoolean(false);
-            int max = fileList.stream()
-                    .map(FileDocument::getName)
-                    .mapToInt(fileName -> {
-                                Matcher matcher = pattern.matcher(fileName);
-                                if (fileName.equals(name)) {
-                                    hasSame.set(true);
-                                }
-                                return matcher.matches() ? Integer.parseInt(matcher.group(1)) : 0;
-                            }
-                    ).max()
-                    .orElse(-1);
-            if (hasSame.get()) {
-                newName = name + "(%d)".formatted(max + 1);
-            }
-        }
-
         FileDocument dir = assembleFileDocument(
                 userId,
                 reqDTO.parentId(),
                 null,
-                newName,
+                name,
                 null,
                 reqDTO.curDirectory(),
-                reqDTO.curDirectory() + newName + BizConstant.LINUX_SEPARATOR,
+                reqDTO.curDirectory() + name + BizConstant.LINUX_SEPARATOR,
                 null,
                 0L,
                 FileType.DIR,
@@ -643,6 +617,12 @@ public class FileServiceImpl implements FileService {
         return fileDocument;
     }
 
+    /**
+     * 解决重名冲突
+     *
+     * @param fileDocument
+     * @return
+     */
     private String saveFile2DB(FileDocument fileDocument) {
         Long userId = UserContextThreadHolder.getUserId();
         String curDirectory = fileDocument.getCurDirectory();
