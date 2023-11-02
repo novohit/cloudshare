@@ -94,6 +94,7 @@ export const useFileStore = defineStore('file', () => {
                 ElMessage.error(res.message)
             })
         } else {
+            console.log("refresh", curDirectory.value)
             fileService.list({
                 parentId: parentId.value,
                 curDirectory: curDirectory.value,

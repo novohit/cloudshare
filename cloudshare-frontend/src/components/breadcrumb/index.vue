@@ -25,6 +25,7 @@ const fileStore = useFileStore()
 const {breadCrumbs} = storeToRefs(breadcrumbStore)
 
 const goBack = () => {
+    console.log("goBack")
     fileStore.setSearchFlag(false)
     if (breadCrumbs.value.length > 1) {
         let resolveBreadCrumbs = [...breadCrumbs.value]
@@ -42,20 +43,19 @@ const goToThis = (fileId, index) => {
     // 去除多余的 /
     curDirectory = curDirectory.length > 1 ? curDirectory.replace(/^\//, '') + "/" : curDirectory;
     console.log("goToThis", curDirectory)
-    if (fileId !== '-1') {
-        let newBreadCrumbs = new Array()
-        breadCrumbs.value.some(item => {
-            newBreadCrumbs.push(item)
-            if (item.fileId == fileId) {
-                return true
-            }
-        })
-        breadcrumbStore.reset(newBreadCrumbs)
-        fileStore.setParentId(fileId)
-        fileStore.setCurDirectory(curDirectory)
-        fileStore.setSearchFlag(false)
-        fileStore.loadFileList()
-    }
+    let newBreadCrumbs = new Array()
+    breadCrumbs.value.some(item => {
+        console.log("xxx",curDirectory)
+        newBreadCrumbs.push(item)
+        if (item.fileId == fileId) {
+            return true
+        }
+    })
+    breadcrumbStore.reset(newBreadCrumbs)
+    fileStore.setParentId(fileId)
+    fileStore.setCurDirectory(curDirectory)
+    fileStore.setSearchFlag(false)
+    fileStore.loadFileList()
 }
 
 </script>

@@ -61,7 +61,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {multipleSelection} = storeToRefs(fileStore)
+const {curDirectory, multipleSelection} = storeToRefs(fileStore)
 const treeRef = ref(null)
 
 const transferFile = () => {
@@ -75,6 +75,7 @@ const transferFile = () => {
 const treeDialogVisible = ref(false)
 
 const loadTreeData = () => {
+    console.log("loadTreeData", fileStore.curDirectory)
     fileService.getDirTree(res => {
         treeData.value = res.data
     }, res => {
@@ -102,8 +103,9 @@ const doTransferFile = (target, parentId) => {
     }, res => {
         loading.value = false
         treeDialogVisible.value = false
-        ElMessage.success('文件移动成功')
+        console.log("文件移动成功 curDirectory", curDirectory.value)
         fileStore.loadFileList()
+        ElMessage.success('文件移动成功')
     }, res => {
         loading.value = false
     })
