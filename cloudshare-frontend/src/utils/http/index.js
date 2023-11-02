@@ -46,8 +46,8 @@ http.interceptors.request.use(config => {
     }
     return config
 }, error => {
-    ElMessage.error('请求失败')
-    return
+    ElMessage.error(error.response.data.message)
+    return Promise.reject(error)
 })
 
 http.interceptors.response.use(res => {
@@ -61,8 +61,8 @@ http.interceptors.response.use(res => {
     }
     return res.data
 }, error => {
-    ElMessage.error('请求失败')
-    return
+    ElMessage.error(error.response.data.message)
+    return Promise.reject(error)
 })
 
 export default http

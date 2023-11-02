@@ -32,6 +32,7 @@ import com.cloudshare.web.exception.BadRequestException;
 import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -97,7 +98,7 @@ public class FileServiceImpl implements FileService {
                 FileType.DIR,
                 null
         );
-        saveFile2DB(dir);
+        saveFile2DB(dir, true);
     }
 
     @Override
@@ -181,7 +182,7 @@ public class FileServiceImpl implements FileService {
                     FileType.suffix2Type(suffix),
                     suffix
             );
-            saveFile2DB(fileDocument);
+            saveFile2DB(fileDocument, true);
         } catch (IOException e) {
             log.error("文件上传异常", e);
             throw new BizException("文件上传异常");
@@ -218,7 +219,7 @@ public class FileServiceImpl implements FileService {
                 FileType.suffix2Type(suffix),
                 suffix
         );
-        saveFile2DB(fileDocument);
+        saveFile2DB(fileDocument, true);
         return true;
     }
 
@@ -322,7 +323,7 @@ public class FileServiceImpl implements FileService {
                     FileType.suffix2Type(suffix),
                     suffix
             );
-            saveFile2DB(fileDocument);
+            saveFile2DB(fileDocument, true);
         } catch (IOException e) {
             log.error("文件合并异常", e);
             throw new BizException("文件合并异常");
@@ -486,15 +487,15 @@ public class FileServiceImpl implements FileService {
                 file.setParentId(reqDTO.parentId());
                 if (!FileType.DIR.equals(file.getType())) {
                     file.setPath(reqDTO.target() + file.getName());
-                    saveFile2DB(file);
+                    saveFile2DB(file, false);
                 } else {
                     file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
-                    saveFile2DB(file);
+                    saveFile2DB(file, false);
                     List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
                     for (FileDocument sub : subList) {
                         sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
                         sub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
-                        saveFile2DB(sub);
+                        saveFile2DB(sub, false);
                     }
                 }
             }
@@ -528,10 +529,10 @@ public class FileServiceImpl implements FileService {
                 String originalCurDirectory = file.getCurDirectory();
                 if (!FileType.DIR.equals(copyFile.getType())) {
                     copyFile.setPath(target + copyFile.getName());
-                    saveFile2DB(copyFile);
+                    saveFile2DB(copyFile, true);
                 } else {
                     copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
-                    String newName = saveFile2DB(copyFile);
+                    String newName = saveFile2DB(copyFile, true);
                     List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
                     for (FileDocument sub : subList) {
                         FileDocument copySub = assembleFileDocument(
@@ -549,24 +550,13 @@ public class FileServiceImpl implements FileService {
                         );
                         String curDirectory = sub.getCurDirectory().replaceFirst(originalCurDirectory, target);
                         String path = sub.getPath().replaceFirst(originalCurDirectory, target);
-
                         if (!file.getName().equals(newName)) {
-                            int startI = curDirectory.indexOf(target);
-                            if (startI >= 0) {
-                                String rightPortion = curDirectory.substring(startI + target.length());
-                                String leftPortion = curDirectory.substring(0, startI + target.length());
-                                curDirectory = leftPortion + rightPortion.replaceFirst(file.getName(), newName);
-                            }
-                            int startJ = path.indexOf(target);
-                            if (startJ >= 0) {
-                                String rightPortion = path.substring(startJ + target.length());
-                                String leftPortion = path.substring(0, startJ + target.length());
-                                path = leftPortion + rightPortion.replaceFirst(file.getName(), newName);
-                            }
+                            curDirectory = renamePath(target, file, newName, curDirectory);
+                            path = renamePath(target, file, newName, path);
                         }
                         copySub.setCurDirectory(curDirectory);
                         copySub.setPath(path);
-                        saveFile2DB(copySub);
+                        saveFile2DB(copySub, true);
                     }
                 }
             }
@@ -586,6 +576,17 @@ public class FileServiceImpl implements FileService {
         }
         List<FileVO> resp = fileConverter.DOList2VOList(fileList);
         return resp;
+    }
+
+
+    private String renamePath(String target, FileDocument file, String newName, String path) {
+        int startJ = path.indexOf(target);
+        if (startJ >= 0) {
+            String rightPortion = path.substring(startJ + target.length());
+            String leftPortion = path.substring(0, startJ + target.length());
+            path = leftPortion + rightPortion.replaceFirst(file.getName(), newName);
+        }
+        return path;
     }
 
 
@@ -623,7 +624,15 @@ public class FileServiceImpl implements FileService {
      * @param fileDocument
      * @return
      */
-    private String saveFile2DB(FileDocument fileDocument) {
+    private String saveFile2DB(FileDocument fileDocument, boolean autoCheck) {
+        if (!autoCheck) {
+            try {
+                fileRepository.save(fileDocument);
+            } catch (DataIntegrityViolationException e) {
+                throw new BizException("重名冲突");
+            }
+            return null;
+        }
         Long userId = UserContextThreadHolder.getUserId();
         String curDirectory = fileDocument.getCurDirectory();
         String name = fileDocument.getName();

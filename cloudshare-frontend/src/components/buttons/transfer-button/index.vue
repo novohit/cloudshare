@@ -106,7 +106,6 @@ const doTransferFile = (target, parentId) => {
         fileStore.loadFileList()
     }, res => {
         loading.value = false
-        ElMessage.error(res.message)
     })
 }
 

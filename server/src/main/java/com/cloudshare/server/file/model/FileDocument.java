@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -28,6 +29,8 @@ import java.io.Serializable;
 @Table(indexes = {
         @Index(name = "idx_md5", columnList = "md5"),
         @Index(name = "idx_cur_directory_user_id", columnList = "curDirectory,userId"),
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uk_path", columnNames = {"path"})
 })
 public class FileDocument extends BaseModel implements Serializable {
 
