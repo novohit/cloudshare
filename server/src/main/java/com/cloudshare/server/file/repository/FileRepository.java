@@ -24,7 +24,7 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     Optional<FileDocument> findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(Long userId, String curDirectory, String name);
 
-    Optional<FileDocument> findByMd5(String md5);
+    List<FileDocument> findByMd5AndDeletedAtIsNull(String md5);
 
     Optional<FileDocument> findByFileIdAndUserIdAndDeletedAtIsNull(Long fileId, Long userId);
 

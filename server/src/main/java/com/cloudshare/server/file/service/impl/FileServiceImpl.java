@@ -198,11 +198,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public Boolean secUpload(FileSecUploadReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        Optional<FileDocument> optional = fileRepository.findByMd5(reqDTO.md5());
-        if (optional.isEmpty()) {
+        List<FileDocument> fileList = fileRepository.findByMd5AndDeletedAtIsNull(reqDTO.md5());
+        if (CollectionUtils.isEmpty(fileList)) {
             return false;
         }
-        FileDocument same = optional.get();
+        FileDocument same = fileList.get(0);
         String suffix = FileUtil.getSuffix(reqDTO.fileName());
         suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
         // fileType suffix 以用户新给的文件名为主
