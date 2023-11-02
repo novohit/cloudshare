@@ -6,7 +6,7 @@ import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
-import com.cloudshare.server.file.controller.requset.FileMoveReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveOrCopyReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -123,8 +123,15 @@ public class FileController {
     }
 
     @PostMapping("/move")
-    public Response<Void> move(@Validated @RequestBody FileMoveReqDTO reqDTO) {
+    public Response<Void> move(@Validated @RequestBody FileMoveOrCopyReqDTO reqDTO) {
         fileService.move(reqDTO);
+        return Response.success();
+    }
+
+    @PostMapping("/copy")
+    public Response<Void> copy(@Validated @RequestBody FileMoveOrCopyReqDTO reqDTO) {
+        Long userId = UserContextThreadHolder.getUserId();
+        fileService.copy(reqDTO, userId, userId);
         return Response.success();
     }
 }

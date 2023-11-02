@@ -61,7 +61,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {multipleSelection} = storeToRefs(fileStore)
+const {curDirectory, multipleSelection} = storeToRefs(fileStore)
 const treeRef = ref(null)
 
 const copyFile = () => {
@@ -88,18 +88,17 @@ const resetTreeData = () => {
 
 const treeData = ref([])
 
-const doCopyFile = (targetParentId) => {
-    let ids = ''
+const doCopyFile = (target, parentId) => {
+    let idArr = new Array()
     if (props.item) {
-        ids = props.item.id
+        idArr.push(props.item.fileId)
     } else {
-        let idArr = new Array()
-        multipleSelection.value.forEach(item => idArr.push(item.id))
-        ids = idArr.join('__,__')
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
     }
     fileService.copy({
-        ids: ids,
-        targetParentId: targetParentId
+        parentId: parentId,
+        fileIds: idArr,
+        target: target
     }, res => {
         loading.value = false
         treeDialogVisible.value = false
@@ -119,7 +118,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doCopyFile(checkNode.fileId)
+    doCopyFile(checkNode.path, checkNode.fileId)
 }
 
 const loading = ref(false)

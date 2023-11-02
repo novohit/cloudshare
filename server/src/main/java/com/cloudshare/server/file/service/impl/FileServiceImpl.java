@@ -10,7 +10,7 @@ import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileDeleteReqDTO;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
-import com.cloudshare.server.file.controller.requset.FileMoveReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveOrCopyReqDTO;
 import com.cloudshare.server.file.controller.requset.FileRenameReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
@@ -498,7 +498,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void move(FileMoveReqDTO reqDTO) {
+    public void move(FileMoveOrCopyReqDTO reqDTO) {
         // TODO 性能优化
         Long userId = UserContextThreadHolder.getUserId();
         List<Long> fileIds = reqDTO.fileIds();
@@ -506,16 +506,14 @@ public class FileServiceImpl implements FileService {
             Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
             if (optional.isPresent()) {
                 FileDocument file = optional.get();
+                String originalPath = file.getPath();
+                String originalCurDirectory = file.getCurDirectory();
+                file.setCurDirectory(reqDTO.target());
+                file.setParentId(reqDTO.parentId());
                 if (!FileType.DIR.equals(file.getType())) {
-                    file.setCurDirectory(reqDTO.target());
-                    file.setParentId(reqDTO.parentId());
                     file.setPath(reqDTO.target() + file.getName());
                     saveFile2DB(file);
                 } else {
-                    String originalPath = file.getPath();
-                    String originalCurDirectory = file.getCurDirectory();
-                    file.setCurDirectory(reqDTO.target());
-                    file.setParentId(reqDTO.parentId());
                     file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
                     saveFile2DB(file);
                     List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
@@ -523,6 +521,60 @@ public class FileServiceImpl implements FileService {
                         sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
                         sub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
                         saveFile2DB(sub);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceUser, Long targetUser) {
+        List<Long> fileIds = reqDTO.fileIds();
+        for (Long fileId : fileIds) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceUser);
+            if (optional.isPresent()) {
+                FileDocument file = optional.get();
+                // copy
+                FileDocument copyFile = assembleFileDocument(
+                        targetUser,
+                        reqDTO.parentId(), // parentId
+                        file.getMd5(),
+                        file.getName(),
+                        file.getRealName(),
+                        reqDTO.target(), // curDirectory
+                        null,
+                        file.getRealPath(),
+                        file.getSize(),
+                        file.getType(),
+                        file.getSuffix()
+                );
+
+                String originalPath = file.getPath();
+                String originalCurDirectory = file.getCurDirectory();
+                if (!FileType.DIR.equals(copyFile.getType())) {
+                    copyFile.setPath(reqDTO.target() + copyFile.getName());
+                    saveFile2DB(copyFile);
+                } else {
+                    copyFile.setPath(reqDTO.target() + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
+                    saveFile2DB(copyFile);
+                    List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
+                    for (FileDocument sub : subList) {
+                        FileDocument copySub = assembleFileDocument(
+                                targetUser,
+                                sub.getParentId(), // 子文件的 parentId 不会变
+                                sub.getMd5(),
+                                sub.getName(),
+                                sub.getRealName(),
+                                null,
+                                null,
+                                sub.getRealPath(),
+                                sub.getSize(),
+                                sub.getType(),
+                                sub.getSuffix()
+                        );
+                        copySub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
+                        copySub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
+                        saveFile2DB(copySub);
                     }
                 }
             }

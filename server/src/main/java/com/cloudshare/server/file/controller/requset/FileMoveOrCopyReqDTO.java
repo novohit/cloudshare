@@ -8,7 +8,7 @@ import java.util.List;
  * @author novo
  * @since 2023/11/1
  */
-public record FileMoveReqDTO(
+public record FileMoveOrCopyReqDTO(
         @NotNull Long parentId,
         @NotNull List<Long> fileIds,
         @NotBlank String target // 目标目录
