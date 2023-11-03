@@ -10,4 +10,6 @@ public final class BizConstant {
 
     public static final String DOT = ".";
 
+    public static final String REPEAT_NAME = "重名冲突";
+
 }

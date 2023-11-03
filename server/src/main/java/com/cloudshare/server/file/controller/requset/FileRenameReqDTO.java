@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
  * @since 2023/10/9
  */
 public record FileRenameReqDTO(
-        @NotNull Long id,
+        @NotNull Long fileId,
         @NotBlank String oldName,
         @NotBlank String newName,
         String curDirectory

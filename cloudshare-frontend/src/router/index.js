@@ -129,7 +129,7 @@ router.beforeEach((to, from, next) => {
             let redirect = from.query.redirect
             if (!redirect || to.path === redirect) {
                 // 防止有token直接跳转首页的情况下没有初始化用户信息的情况
-                if (!userStore.username.value) {
+                if (!userStore.username) {
                     userService.info(res => {
                         fileStore.setParentId(res.data.rootId)
                         fileStore.setDefaultParentId(res.data.rootId)

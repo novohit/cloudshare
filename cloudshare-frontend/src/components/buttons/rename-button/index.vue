@@ -84,7 +84,7 @@ const renameRules = reactive({
 
 const renameFile = () => {
     if (props.item) {
-        renameForm.id = props.item.id
+        renameForm.fileId = props.item.fileId
         renameForm.oldName = props.item.fileName
         renameForm.newName = props.item.fileName
         renameForm.curDirectory = props.item.curDirectory
@@ -101,7 +101,7 @@ const renameFile = () => {
         return
     }
     let item = multipleSelection.value[0]
-    renameForm.id = item.id
+    renameForm.fileId = item.fileId
     renameForm.oldName = item.fileName
     renameForm.newName = item.fileName
     renameForm.curDirectory = item.curDirectory
@@ -113,7 +113,7 @@ const doRenameFile = async () => {
         if (valid) {
             loading.value = true
             fileService.rename({
-                id: renameForm.id,
+                fileId: renameForm.fileId,
                 oldName: renameForm.oldName,
                 newName: renameForm.newName,
                 curDirectory: renameForm.curDirectory,
@@ -123,7 +123,6 @@ const doRenameFile = async () => {
                 ElMessage.success('重命名成功')
                 fileStore.loadFileList()
             }, res => {
-                ElMessage.error(res.message)
                 loading.value = false
             })
         }

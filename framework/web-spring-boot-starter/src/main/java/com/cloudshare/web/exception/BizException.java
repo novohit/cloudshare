@@ -4,12 +4,17 @@ import com.cloudshare.web.enums.BizCodeEnum;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
+
 /**
  * @author novo
  * @since  2023-02-21
  */
 @Getter
 public class BizException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 5076786211711660879L;
 
     protected Integer code;
 

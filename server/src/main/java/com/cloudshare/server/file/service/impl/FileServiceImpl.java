@@ -35,6 +35,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,12 +74,16 @@ public class FileServiceImpl implements FileService {
 
     private final FileChunkRepository fileChunkRepository;
 
+    private final TransactionTemplate transactionTemplate;
+
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
-                           StorageEngine storageEngine, FileChunkRepository fileChunkRepository) {
+                           StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
+                           TransactionTemplate transactionTemplate) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
         this.fileChunkRepository = fileChunkRepository;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @Override
@@ -127,25 +132,41 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @Transactional
     public void rename(FileRenameReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        if (reqDTO.oldName().equals(reqDTO.newName())) {
+        String newName = reqDTO.newName();
+        if (reqDTO.oldName().equals(newName)) {
             return;
         }
-        fileRepository.findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(userId, reqDTO.curDirectory(), reqDTO.newName())
-                .ifPresentOrElse((fileDocument) -> {
-                    if (!fileDocument.getId().equals(reqDTO.id())) {
-                        throw new BadRequestException("已存在该目录");
-                    }
-                    throw new BadRequestException("更新失败");
-                }, () -> {
-                    String newPath = reqDTO.curDirectory() + reqDTO.newName();
-                    int rows = fileRepository.renameDir(reqDTO.id(), userId, reqDTO.oldName(), reqDTO.newName(), newPath);
-                    if (rows <= 0) {
-                        throw new BadRequestException("更新失败");
-                    }
-                });
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(reqDTO.fileId(), userId);
+        if (optional.isPresent()) {
+            FileDocument file = optional.get();
+            String originalPath = file.getPath();
+            String originalCurDirectory = file.getCurDirectory();
+            file.setName(newName);
+            if (!FileType.DIR.equals(file.getType())) {
+                file.setPath(originalCurDirectory + newName);
+                saveFile2DB(file, false);
+            } else {
+                try {
+                    transactionTemplate.execute(status -> {
+                        file.setPath(originalCurDirectory + newName + BizConstant.LINUX_SEPARATOR);
+                        saveFile2DB(file, false);
+                        List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
+                        for (FileDocument sub : subList) {
+                            // rename 是换旧目录后面的
+                            // move 是换旧目录前面的
+                            sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalPath, file.getPath()));
+                            sub.setPath(sub.getPath().replaceFirst(originalPath, file.getPath()));
+                            saveFile2DB(sub, false);
+                        }
+                        return null;
+                    });
+                } catch (DataIntegrityViolationException e) {
+                    throw new BizException(BizConstant.REPEAT_NAME);
+                }
+            }
+        }
     }
 
     /**
@@ -489,14 +510,22 @@ public class FileServiceImpl implements FileService {
                     file.setPath(reqDTO.target() + file.getName());
                     saveFile2DB(file, false);
                 } else {
-                    file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
-                    saveFile2DB(file, false);
-                    List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
-                    for (FileDocument sub : subList) {
-                        sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
-                        sub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
-                        saveFile2DB(sub, false);
+                    try {
+                        transactionTemplate.execute(status -> {
+                            file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
+                            saveFile2DB(file, false);
+                            List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
+                            for (FileDocument sub : subList) {
+                                sub.setCurDirectory(sub.getCurDirectory().replaceFirst(originalCurDirectory, reqDTO.target()));
+                                sub.setPath(sub.getPath().replaceFirst(originalCurDirectory, reqDTO.target()));
+                                saveFile2DB(sub, false);
+                            }
+                            return null;
+                        });
+                    } catch (DataIntegrityViolationException e) {
+                        throw new BizException(BizConstant.REPEAT_NAME);
                     }
+
                 }
             }
         }
@@ -531,33 +560,36 @@ public class FileServiceImpl implements FileService {
                     copyFile.setPath(target + copyFile.getName());
                     saveFile2DB(copyFile, true);
                 } else {
-                    copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
-                    String newName = saveFile2DB(copyFile, true);
-                    List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
-                    for (FileDocument sub : subList) {
-                        FileDocument copySub = assembleFileDocument(
-                                targetUser,
-                                sub.getParentId(), // 子文件的 parentId 不会变
-                                sub.getMd5(),
-                                sub.getName(),
-                                sub.getRealName(),
-                                null,
-                                null,
-                                sub.getRealPath(),
-                                sub.getSize(),
-                                sub.getType(),
-                                sub.getSuffix()
-                        );
-                        String curDirectory = sub.getCurDirectory().replaceFirst(originalCurDirectory, target);
-                        String path = sub.getPath().replaceFirst(originalCurDirectory, target);
-                        if (!file.getName().equals(newName)) {
-                            curDirectory = renamePath(target, file, newName, curDirectory);
-                            path = renamePath(target, file, newName, path);
+                    transactionTemplate.execute(status -> {
+                        copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
+                        String newName = saveFile2DB(copyFile, true);
+                        List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
+                        for (FileDocument sub : subList) {
+                            FileDocument copySub = assembleFileDocument(
+                                    targetUser,
+                                    sub.getParentId(), // 子文件的 parentId 不会变
+                                    sub.getMd5(),
+                                    sub.getName(),
+                                    sub.getRealName(),
+                                    null,
+                                    null,
+                                    sub.getRealPath(),
+                                    sub.getSize(),
+                                    sub.getType(),
+                                    sub.getSuffix()
+                            );
+                            String curDirectory = sub.getCurDirectory().replaceFirst(originalCurDirectory, target);
+                            String path = sub.getPath().replaceFirst(originalCurDirectory, target);
+                            if (!file.getName().equals(newName)) {
+                                curDirectory = renamePath(target, file, newName, curDirectory);
+                                path = renamePath(target, file, newName, path);
+                            }
+                            copySub.setCurDirectory(curDirectory);
+                            copySub.setPath(path);
+                            saveFile2DB(copySub, true);
                         }
-                        copySub.setCurDirectory(curDirectory);
-                        copySub.setPath(path);
-                        saveFile2DB(copySub, true);
-                    }
+                        return null;
+                    });
                 }
             }
         }
@@ -624,14 +656,10 @@ public class FileServiceImpl implements FileService {
      * @param fileDocument
      * @return
      */
-    private String saveFile2DB(FileDocument fileDocument, boolean autoCheck) {
+    private String saveFile2DB(FileDocument fileDocument, boolean autoCheck) throws DataIntegrityViolationException {
         if (!autoCheck) {
-            try {
-                fileRepository.save(fileDocument);
-            } catch (DataIntegrityViolationException e) {
-                throw new BizException("重名冲突");
-            }
-            return null;
+            fileRepository.save(fileDocument);
+            return fileDocument.getName();
         }
         Long userId = UserContextThreadHolder.getUserId();
         String curDirectory = fileDocument.getCurDirectory();

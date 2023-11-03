@@ -30,7 +30,7 @@ import java.io.Serializable;
         @Index(name = "idx_md5", columnList = "md5"),
         @Index(name = "idx_cur_directory_user_id", columnList = "curDirectory,userId"),
 }, uniqueConstraints = {
-        @UniqueConstraint(name = "uk_path", columnNames = {"path"})
+        @UniqueConstraint(name = "uk_user_id_path", columnNames = {"userId", "path"})
 })
 public class FileDocument extends BaseModel implements Serializable {
 
