@@ -1,13 +1,13 @@
 <template>
     <div>
-        <span style="">欢迎您&nbsp</span>
-        <el-dropdown @command="handleCommand">
+      <span style="font-size: large; color:#2faa69;"> {{ username }}  &nbsp&nbsp </span>
+      <el-dropdown @command="handleCommand">
             <div class="pan-user-info">
-                <img class="avatar" :src="photo === ''?'/src/assets/imgs/avatar.png':photo">
+                <img class="avatar" :src="avatar === ''?'/src/assets/imgs/avatar.png':avatar">
             </div>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item command="#">用户名：{{ username }}</el-dropdown-item>
+<!--                    <el-dropdown-item command="#">用户名：{{ username }}</el-dropdown-item>-->
                     <el-dropdown-item command="payment">套餐购买</el-dropdown-item>
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item command="logout">退出登录</el-dropdown-item>
@@ -73,7 +73,7 @@ import {useNavbarStore} from '@/stores/navbar'
 import {useTaskStore} from '@/stores/task'
 
 const userStore = useUserStore()
-const {username} = storeToRefs(userStore)
+const {username, avatar} = storeToRefs(userStore)
 
 const router = useRouter()
 
@@ -90,9 +90,6 @@ const changePasswordForm = reactive({
     newPassword: '',
     reNewPassword: ''
 })
-
-//后端头像
-let photo = ref('')
 
 const goLogin = () => {
     clearToken()
@@ -201,6 +198,7 @@ const initUserInfoIfNecessary = () => {
             fileStore.setCurDirectory(res.data.rootName)
             fileStore.setDefaultCurDirectory(res.data.rootName)
             userStore.setUsername(res.data.username)
+            userStore.setAvatar(res.data.avatar)
         }, res => {
             ElMessage.error(res.message)
         })

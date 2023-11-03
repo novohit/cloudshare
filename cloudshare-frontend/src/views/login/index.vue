@@ -44,7 +44,7 @@
 import {onMounted, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import panUtil from '@/utils/common'
-import {ElMeElMessage,ElCard,ElForm,ElInput,ElButton,ElFormItemssage} from 'element-plus'
+import {ElMessage,ElCard,ElForm,ElInput,ElButton,ElFormItem} from 'element-plus'
 import userService from '@/api/user'
 import {setToken} from '@/utils/cookie'
 import {useFileStore} from '@/stores/file'
@@ -68,7 +68,7 @@ const fileStore = useFileStore()
 const userStore = useUserStore()
 
 const {setParentId, setDefaultParentId, setCurDirectory, setDefaultCurDirectory} = fileStore
-const {setUsername} = userStore
+const {setUsername, setAvatar} = userStore
 
 const usernameEl = ref(null)
 onMounted(() => {
@@ -86,6 +86,7 @@ const doLogin = () => {
                 setCurDirectory(res.data.rootName)
                 setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
+                setAvatar(res.data.avatar)
                 router.push({name: 'Index'})
             }, res => {
                 ElMessage.error(res.message)
@@ -107,6 +108,7 @@ const visitor = ()=>{
                 setCurDirectory(res.data.rootName)
                 setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
+                setAvatar(res.data.avatar)
                 router.push({name: 'Index'})
             }, res => {
                 ElMessage.error(res.message)

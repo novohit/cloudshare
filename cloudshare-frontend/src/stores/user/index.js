@@ -4,14 +4,20 @@ import {defineStore} from 'pinia'
 export const useUserStore = defineStore('user', () => {
 
     const username = ref('')
+    const avatar = ref('')
 
     function setUsername(newUsername) {
         username.value = newUsername
     }
 
-    function clear() {
-        username.value = ''
+    function setAvatar(newAvatar) {
+        avatar.value = newAvatar
     }
 
-    return {username, setUsername, clear}
+    function clear() {
+        username.value = ''
+        avatar.value = ''
+    }
+
+    return {username, avatar, setUsername, setAvatar, clear}
 })

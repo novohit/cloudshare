@@ -141,6 +141,7 @@ router.beforeEach((to, from, next) => {
                         fileStore.setCurDirectory(res.data.rootName)
                         fileStore.setDefaultCurDirectory(res.data.rootName)
                         userStore.setUsername(res.data.username)
+                        userStore.setAvatar(res.data.avatar)
                         next()
                     }, res => {
                         ElMessage.error(res.message)
