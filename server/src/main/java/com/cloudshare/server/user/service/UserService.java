@@ -1,8 +1,9 @@
 package com.cloudshare.server.user.service;
 
-import com.cloudshare.server.user.api.request.UserInfoRepDTO;
-import com.cloudshare.server.user.api.request.UserLoginReqDTO;
-import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
+import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
+import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.controller.request.UserUpdateReqDTO;
 import com.cloudshare.server.user.enums.LoginType;
 import com.cloudshare.server.user.model.User;
 import me.zhyd.oauth.model.AuthUser;
@@ -23,4 +24,6 @@ public interface UserService {
     UserInfoRepDTO getUserInfo();
 
     String login(LoginType loginType, AuthUser authUser);
+
+    void update(Long userId, UserUpdateReqDTO reqDTO);
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="upload-button-content">
-        <el-button v-if="roundFlag" type="primary" id="uploadButton" :size="size" round
+        <el-button v-if="roundFlag" type="default" id="uploadButton" :size="size"
                    @click="uploadDialogVisible = true">
             上传
             <el-icon class="el-icon--right">
@@ -57,7 +57,7 @@ import {storeToRefs} from 'pinia'
 const fileStore = useFileStore()
 const taskStore = useTaskStore()
 
-const {paramParentId} = storeToRefs(fileStore)
+const {parentId, curDirectory} = storeToRefs(fileStore)
 
 const uploadDialogVisible = ref(false)
 
@@ -67,7 +67,7 @@ const fileOptions = {
         if (panUtil.getChunkUploadSwitch()) {
             return panUtil.getUrlPrefix() + '/file/chunk-upload'
         }
-        return panUtil.getUrlPrefix() + '/file/upload'
+        return panUtil.getUrlPrefix() + '/file/single-upload'
     },
     singleFile: false,
     chunkSize: panUtil.getChunkSize(),
@@ -75,9 +75,21 @@ const fileOptions = {
     forceChunkSize: false,
     simultaneousUploads: 3,
     fileParameterName: 'file',
+    processParams: function (params) {
+        return {
+            chunkNum: params.chunkNumber,
+            totalChunkSize: params.totalChunks,
+            chunkSize: params.chunkSize,
+            totalSize: params.totalSize,
+            md5: params.identifier,
+            fileName: params.filename,
+            relativePath: params.relativePath,
+        }
+    },
     query: function (file, chunk) {
         return {
-            parentId: paramParentId.value
+            parentId: parentId.value,
+            curDirectory: curDirectory.value
         }
     },
     headers: {
@@ -130,7 +142,7 @@ const filesAdded = (files, fileList, event) => {
             }
             let taskItem = {
                 target: f,
-                filename: f.name,
+                fileName: f.name,
                 fileSize: panUtil.translateFileSize(f.size),
                 uploadedSize: panUtil.translateFileSize(0),
                 status: panUtil.fileStatus.PARSING.code,
@@ -138,18 +150,20 @@ const filesAdded = (files, fileList, event) => {
                 timeRemaining: panUtil.translateTime(Number.POSITIVE_INFINITY),
                 speed: panUtil.translateSpeed(f.averageSpeed),
                 percentage: 0,
-                parentId: new String(paramParentId.value)
+                parentId: parentId.value,
+                curDirectory: curDirectory.value
             }
             // 添加
             taskStore.add(taskItem)
             MD5(f.file, (e, md5) => {
                 f['uniqueIdentifier'] = md5
                 fileService.secUpload({
-                    filename: f.name,
-                    identifier: md5,
-                    parentId: paramParentId.value
+                    fileName: f.name,
+                    md5: md5,
+                    parentId: parentId.value,
+                    curDirectory: curDirectory.value,
                 }, res => {
-                    if (res.code === 0) {
+                    if (res.data === true) {
                         ElMessage.success('文件：' + f.name + ' 上传完成')
                         f.cancel()
                         taskStore.remove(f.name)
@@ -160,7 +174,7 @@ const filesAdded = (files, fileList, event) => {
                     } else {
                         f.resume()
                         taskStore.updateStatus({
-                            filename: f.name,
+                            fileName: f.name,
                             status: panUtil.fileStatus.WAITING.code,
                             statusText: panUtil.fileStatus.WAITING.text
                         })
@@ -168,7 +182,7 @@ const filesAdded = (files, fileList, event) => {
                 }, res => {
                     f.resume()
                     taskStore.updateStatus({
-                        filename: f.name,
+                        fileName: f.name,
                         status: panUtil.fileStatus.WAITING.code,
                         statusText: panUtil.fileStatus.WAITING.text
                     })
@@ -190,13 +204,13 @@ const uploadProgress = (rootFile, file, chunk) => {
     if (file.isUploading()) {
         if (uploadTaskItem.status !== panUtil.fileStatus.UPLOADING.code) {
             taskStore.updateStatus({
-                filename: file.name,
+                fileName: file.name,
                 status: panUtil.fileStatus.UPLOADING.code,
                 statusText: panUtil.fileStatus.UPLOADING.text
             })
         }
         taskStore.updateProcess({
-            filename: file.name,
+            fileName: file.name,
             speed: panUtil.translateSpeed(file.averageSpeed),
             percentage: Math.floor(file.progress() * 100),
             uploadedSize: panUtil.translateFileSize(file.sizeUploaded()),
@@ -208,28 +222,29 @@ const uploadProgress = (rootFile, file, chunk) => {
 const doMerge = (file) => {
     let uploadTaskItem = taskStore.getUploadTask(file.name)
     taskStore.updateStatus({
-        filename: file.name,
+        fileName: file.name,
         status: panUtil.fileStatus.MERGE.code,
         statusText: panUtil.fileStatus.MERGE.text
     })
     taskStore.updateProcess({
-        filename: file.name,
+        fileName: file.name,
         speed: panUtil.translateSpeed(file.averageSpeed),
         percentage: 99,
         uploadedSize: panUtil.translateFileSize(file.sizeUploaded()),
         timeRemaining: panUtil.translateTime(file.timeRemaining())
     })
-    fileService.merge({
-        filename: uploadTaskItem.filename,
-        identifier: uploadTaskItem.target.uniqueIdentifier,
+    fileService.mergeChunk({
+        fileName: uploadTaskItem.fileName,
+        md5: uploadTaskItem.target.uniqueIdentifier,
         parentId: uploadTaskItem.parentId,
+        curDirectory: uploadTaskItem.curDirectory,
         totalSize: uploadTaskItem.target.size
     }, res => {
         ElMessage.success('文件：' + file.name + ' 上传完成')
         uploader.removeFile(file)
         fileStore.loadFileList()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.SUCCESS.code,
             statusText: panUtil.fileStatus.SUCCESS.text
         })
@@ -240,7 +255,7 @@ const doMerge = (file) => {
     }, res => {
         file.pause()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.FAIL.code,
             statusText: panUtil.fileStatus.FAIL.text
         })
@@ -255,7 +270,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
     }
     if (res.code === 0) {
         if (res.data) {
-            if (res.data.mergeFlag) {
+            if (res.data) {
                 doMerge(file)
             } else if (res.data.uploadedChunks && res.data.uploadedChunks.length === file.chunks.length) {
                 doMerge(file)
@@ -265,7 +280,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
             uploader.removeFile(file)
             fileStore.loadFileList()
             taskStore.updateStatus({
-                filename: file.name,
+                fileName: file.name,
                 status: panUtil.fileStatus.SUCCESS.code,
                 statusText: panUtil.fileStatus.SUCCESS.text
             })
@@ -277,7 +292,7 @@ const fileUploaded = (rootFile, file, message, chunk) => {
     } else {
         file.pause()
         taskStore.updateStatus({
-            filename: file.name,
+            fileName: file.name,
             status: panUtil.fileStatus.FAIL.code,
             statusText: panUtil.fileStatus.FAIL.text
         })
@@ -289,12 +304,12 @@ const uploadComplete = () => {
 
 const uploadError = (rootFile, file, message, chunk) => {
     taskStore.updateStatus({
-        filename: file.name,
+        fileName: file.name,
         status: panUtil.fileStatus.FAIL.code,
         statusText: panUtil.fileStatus.FAIL.text
     })
     taskStore.updateProcess({
-        filename: file.name,
+        fileName: file.name,
         speed: panUtil.translateSpeed(0),
         percentage: 0,
         uploadedSize: panUtil.translateFileSize(0),
@@ -354,7 +369,7 @@ onMounted(() => {
 }
 
 .upload-content .drag-content:hover {
-    border: 0.2em dashed #409EFF;
+    border: 0.2em dashed #2faa69;
 }
 
 .upload-content .drag-content .drag-icon-content {

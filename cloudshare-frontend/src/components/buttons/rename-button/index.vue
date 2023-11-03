@@ -1,6 +1,6 @@
 <template>
     <div class="rename-button-content">
-        <el-button v-if="roundFlag" type="warning" :size="size" round @click="renameFile">
+        <el-button v-if="roundFlag" type="warning" :size="size" @click="renameFile">
             重命名
             <el-icon class="el-icon--right">
                 <EditPen/>
@@ -21,11 +21,11 @@
                          :model="renameForm"
                          status-icon
                          @submit.native.prevent>
-                    <el-form-item label="文件名称" prop="filename">
+                    <el-form-item label="文件名称" prop="newName">
                         <el-input type="text"
-                                  ref="filenameEl"
+                                  ref="fileNameEl"
                                   @keyup.enter.native="doRenameFile"
-                                  v-model="renameForm.filename" autocomplete="off"/>
+                                  v-model="renameForm.newName" autocomplete="off"/>
                     </el-form-item>
                 </el-form>
             </div>
@@ -56,14 +56,16 @@ import {ElMessage} from 'element-plus'
 const renameDialogVisible = ref(false)
 const loading = ref(false)
 const renameFormRef = ref(null)
-const filenameEl = ref(null)
+const fileNameEl = ref(null)
 
 const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
 
 const renameForm = reactive({
-    fileId: '',
-    filename: ''
+    id: '',
+    oldName: '',
+    newName: '',
+    curDirectory: '',
 })
 
 const resetForm = () => {
@@ -71,11 +73,11 @@ const resetForm = () => {
 }
 
 const focusInput = () => {
-    filenameEl.value.focus()
+    fileNameEl.value.focus()
 }
 
 const renameRules = reactive({
-    filename: [
+    newName: [
         {required: true, message: '请输入新文件名称', trigger: 'blur'}
     ]
 })
@@ -83,8 +85,11 @@ const renameRules = reactive({
 const renameFile = () => {
     if (props.item) {
         renameForm.fileId = props.item.fileId
-        renameForm.filename = props.item.filename
+        renameForm.oldName = props.item.fileName
+        renameForm.newName = props.item.fileName
+        renameForm.curDirectory = props.item.curDirectory
         renameDialogVisible.value = true
+        
         return
     }
     if (!multipleSelection.value || multipleSelection.value.length == 0) {
@@ -97,7 +102,9 @@ const renameFile = () => {
     }
     let item = multipleSelection.value[0]
     renameForm.fileId = item.fileId
-    renameForm.filename = item.filename
+    renameForm.oldName = item.fileName
+    renameForm.newName = item.fileName
+    renameForm.curDirectory = item.curDirectory
     renameDialogVisible.value = true
 }
 
@@ -105,16 +112,17 @@ const doRenameFile = async () => {
     await renameFormRef.value.validate((valid, fields) => {
         if (valid) {
             loading.value = true
-            fileService.update({
+            fileService.rename({
                 fileId: renameForm.fileId,
-                newFilename: renameForm.filename
+                oldName: renameForm.oldName,
+                newName: renameForm.newName,
+                curDirectory: renameForm.curDirectory,
             }, res => {
                 loading.value = false
                 renameDialogVisible.value = false
                 ElMessage.success('重命名成功')
                 fileStore.loadFileList()
             }, res => {
-                ElMessage.error(res.message)
                 loading.value = false
             })
         }

@@ -6,10 +6,10 @@
                     <span class="pan-share-header-title-font" @click="goHome">Cloudshare</span>
                 </div>
                 <div v-if="loginFlag" class="pan-share-header-user-info-content">
-                    <el-link :underline=false type="success" class="pan-share-username">
+                    <el-link :underline=false type="primary" class="pan-share-username">
                         欢迎您,{{ username }}
                     </el-link>
-                    <el-link :underline=false type="success" class="pan-share-exit-button" @click="exit">
+                    <el-link :underline=false type="primary" class="pan-share-exit-button" @click="logout">
                         退出
                     </el-link>
                 </div>
@@ -39,13 +39,13 @@
                             </div>
                         </div>
                         <div class="pan-share-list-card-button-group">
-                            <el-button type="success" size="default" round @click="saveFiles(undefined)">保存到我的R盘
+                            <el-button type="success" size="default" @click="saveFiles(undefined)">保存
                                 <el-icon
                                     class="el-icon--right">
                                     <DocumentCopy/>
                                 </el-icon>
                             </el-button>
-                            <el-button type="info" size="default" round @click="downloadFile">下载
+                            <el-button type="info" size="default" @click="downloadFile">下载
                                 <el-icon
                                     class="el-icon--right">
                                     <Download/>
@@ -61,7 +61,7 @@
                         <div class="pan-share-list-card-operate-bread-crumb">
                             <el-breadcrumb separator-class="el-icon-arrow-right">
                                 <el-breadcrumb-item v-for="(item, index) in breadCrumbs" :key="index">
-                                    <a class="breadcrumb-item-a" @click="goToThis(item.id)" href="#">{{ item.name }}</a>
+                                    <a class="breadcrumb-item-a" @click="goToThis(item.fileId)" href="#">{{ item.name }}</a>
                                 </el-breadcrumb-item>
                             </el-breadcrumb>
                         </div>
@@ -83,7 +83,7 @@
                             </el-table-column>
                             <el-table-column
                                 label="文件名"
-                                prop="filename"
+                                prop="fileName"
                                 sortable
                                 show-overflow-tooltip
                                 min-width="750">
@@ -91,10 +91,10 @@
                                     <div @click="clickFilename(scope.row)" class="file-name-content">
                                         <i :class="getFileFontElement(scope.row.fileType)"
                                            style="margin-right: 15px; font-size: 20px; cursor: pointer;"/>
-                                        <span style="cursor:pointer;">{{ scope.row.filename }}</span>
+                                        <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                                     </div>
                                     <div class="file-operation-content">
-                                        <el-tooltip class="item" effect="light" content="保存到我的R盘" placement="top">
+                                        <el-tooltip class="item" effect="light" content="保存" placement="top">
                                             <el-button type="success" icon="DocumentCopy" size="small" circle
                                                        @click="saveFiles(scope.row)"/>
                                         </el-tooltip>
@@ -106,14 +106,14 @@
                                 </template>
                             </el-table-column>
                             <el-table-column
-                                prop="fileSizeDesc"
+                                prop="size"
                                 sortable
                                 label="大小"
                                 min-width="120"
                                 align="center">
                             </el-table-column>
                             <el-table-column
-                                prop="updateTime"
+                                prop="updatedAt"
                                 sortable
                                 align="center"
                                 label="修改日期"
@@ -181,11 +181,11 @@
                             ref="shareCodeFormRef"
                             :model="shareCodeForm"
                             @submit.native.prevent>
-                            <el-form-item label="提取码" prop="shareCode">
+                            <el-form-item label="提取码" prop="code">
                                 <el-input type="text"
                                           ref="shareCodeEl"
                                           @keyup.enter.native="doCheckShareCode"
-                                          v-model="shareCodeForm.shareCode" autocomplete="off"/>
+                                          v-model="shareCodeForm.code" autocomplete="off"/>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" :loading="loading" @click="doCheckShareCode">确 定</el-button>
@@ -196,7 +196,7 @@
             </div>
         </el-dialog>
         <el-dialog
-            title="保存到我的R盘"
+            title="保存到我的空间"
             v-model="treeDialogVisible"
             @open="loadTreeData"
             @closed="resetTreeData"
@@ -217,7 +217,7 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <el-icon :size="20" style="margin-right: 15px; cursor: pointer;"><Folder/></el-icon>
-                            <span>{{ node.label }}</span>
+                            <span>{{ data.name }}</span>
                         </span>
                     </template>
                 </el-tree>
@@ -292,7 +292,7 @@ const loginRules = reactive({
 })
 
 const shareCodeFormRules = reactive({
-    shareCode: [
+    code: [
         {required: true, message: '请输入提取码', trigger: 'blur'}
     ]
 })
@@ -308,7 +308,7 @@ const loginDialogVisible = ref(false)
 const loginFlag = ref(false)
 const shareCodeDialogVisible = ref(false)
 const shareCodeForm = reactive({
-    shareCode: ''
+    code: ''
 })
 
 const shareCodeHeader = ref('')
@@ -320,7 +320,7 @@ const pageLoading = ref(true)
 const shareDate = ref('')
 const shareExpireDate = ref('')
 const breadCrumbs = ref([{
-    id: '-1',
+    fileId: '-1',
     name: '全部文件'
 }])
 const treeData = ref([])
@@ -328,16 +328,16 @@ const treeDialogVisible = ref(false)
 const item = ref(undefined)
 
 const refreshShareInfo = (data) => {
-    let username = data.shareUserInfoVO.username,
-        shareName = data.shareName
-    shareCodeHeader.value = username + '的分享：' + shareName
+    let username = data.username,
+        fileName = data.fileName
+    shareCodeHeader.value = username + '的分享：' + fileName
     shareDate.value = data.createTime
     if (data.shareDay === 0) {
         shareExpireDate.value = '永久有效'
     } else {
         shareExpireDate.value = data.shareEndTime
     }
-    tableData.value = data.rPanUserFileVOList
+    tableData.value = data
 }
 
 const getShareId = () => {
@@ -349,12 +349,12 @@ const openShareExpirePage = () => {
 }
 
 const openShareCodePage = () => {
-    shareService.getSimpleShareDetail({
+    shareService.getSharer({
         shareId: getShareId()
     }, res => {
         if (res.code === 0) {
             shareCodeDialogVisible.value = true
-            shareCodeHeader.value = res.data.shareUserInfoVO.username + '的分享：' + res.data.shareName
+            shareCodeHeader.value = res.data.username + '的分享：' + res.data.fileName
         } else {
             shareCodeDialogVisible.value = false
             openShareExpirePage()
@@ -363,10 +363,14 @@ const openShareCodePage = () => {
 }
 
 const loadShareInfo = () => {
-    shareService.getShareDetail(res => {
+    shareService.getShareDetail({
+        shareId: getShareId()
+    }, res => {
+        console.log(res)
         if (res.code === 0) {
             refreshShareInfo(res.data)
-        } else if (res.code === 4) {
+        } else if (res.message === 'Share-Token不存在') {
+            console.log("=========")
             openShareCodePage()
         } else {
             openShareExpirePage()
@@ -390,13 +394,13 @@ const login = () => {
     loginDialogVisible.value = true
 }
 
-const exit = () => {
+const logout = () => {
     ElMessageBox.confirm('确定要退出登录吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        userService.exit(() => {
+        userService.logout(() => {
             clearToken()
             loginFlag.value = false
             username.value = ''
@@ -437,16 +441,16 @@ const doCheckShareCode = async () => {
             loading.value = true
             shareService.checkShareCode({
                 shareId: getShareId(),
-                shareCode: shareCodeForm.shareCode
+                code: shareCodeForm.code
             }, res => {
-                if (res.code === 0) {
+                if (res.data === "") {
+                    loading.value = false
+                    ElMessage.error("提取码错误")
+                } else {
                     loading.value = false
                     setShareToken(res.data)
                     shareCodeDialogVisible.value = false
                     loadShareInfo()
-                } else {
-                    loading.value = false
-                    ElMessage.error(res.message)
                 }
             })
         }
@@ -466,22 +470,22 @@ const hiddenOperation = (row, column, cell, event) => {
 }
 
 const clickFilename = (row) => {
-    if (row.folderFlag === 1) {
+    if (row.fileType === 'DIR') {
         goInFolder(row)
     }
 }
 
 const goInFolder = (row) => {
     breadCrumbs.value.push({
-        id: row.fileId,
-        name: row.filename
+        fileId: row.fileId,
+        name: row.fileName
     })
     reloadTableData(row.fileId)
 }
 
 const reloadTableData = (parentId) => {
-    shareService.getShareFiles({
-        parentId: parentId
+    shareService.getShareDetail({
+        fileId: parentId
     }, res => {
         if (res.code === 0) {
             tableData.value = res.data
@@ -491,10 +495,10 @@ const reloadTableData = (parentId) => {
     })
 }
 
-const goToThis = (id) => {
-    if (id === '-1') {
+const goToThis = (fileId) => {
+    if (fileId === '0') {
         breadCrumbs.value = [{
-            id: '-1',
+            fileId: '0',
             name: '全部文件'
         }]
         loadShareInfo()
@@ -502,12 +506,13 @@ const goToThis = (id) => {
         let newBreadCrumbs = new Array()
         breadCrumbs.value.some(item => {
             newBreadCrumbs.push(item)
-            if (item.id === id) {
+            if (item.fileId === fileId) {
+                console.log("share goToThis", item)
                 return true
             }
         })
         breadCrumbs.value = newBreadCrumbs
-        reloadTableData(id)
+        reloadTableData(fileId)
     }
 }
 
@@ -517,7 +522,7 @@ const downloadFile = () => {
         return
     }
     for (let i = 0, iLength = multipleSelection.value.length; i < iLength; i++) {
-        if (multipleSelection.value[i].folderFlag === 1) {
+        if (multipleSelection.value[i].fileType === 'DIR') {
             ElMessage.error('文件夹暂不支持下载')
             return
         }
@@ -540,22 +545,22 @@ const doDownLoads = (items, i) => {
 }
 
 const doDownload = (item) => {
-    if (item.folderFlag === 1) {
+    if (item.fileType === 'DIR') {
         ElMessage.error('文件夹暂不支持下载')
         return
     }
     userService.infoWithoutPageJump(res => {
         if (res.code === 0) {
-            shareService.getSimpleShareDetail({
+            shareService.getSharer({
                 shareId: getShareId()
             }, res => {
                 if (res.code === 0) {
-                    let url = panUtil.getUrlPrefix() + '/share/file/download?fileId=' + item.fileId.replace(/\+/g, '%2B') + '&shareToken=' + getShareToken() + '&authorization=' + getToken(),
-                        filename = item.filename,
+                    let url = panUtil.getUrlPrefix() + '/share/file/download/' + item.fileId + '?shareToken=' + getShareToken() + '&authorization=' + getToken(),
+                        fileName = item.fileName,
                         link = document.createElement('a')
                     link.style.display = 'none'
                     link.href = url
-                    link.setAttribute('download', filename)
+                    link.setAttribute('download', fileName)
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
@@ -576,7 +581,7 @@ const resetTreeData = () => {
 }
 
 const loadTreeData = () => {
-    fileService.getFolderTree(res => {
+    fileService.getDirTree(res => {
         treeData.value = res.data
     }, res => {
         ElMessage.error(res.message)
@@ -591,7 +596,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doSaveFiles(checkNode.id)
+    doSaveFiles(checkNode.fileId)
 }
 
 const saveFiles = (newItem) => {
@@ -611,18 +616,18 @@ const saveFiles = (newItem) => {
 }
 
 const doSaveFiles = (targetParentId) => {
-    let fileIds = ''
+    let ids = ''
     if (item.value) {
-        fileIds = item.value.fileId
+        ids = item.value.id
     } else {
-        let fileIdArr = new Array()
+        let idArr = new Array()
         multipleSelection.value.forEach(item => {
-            fileIdArr.push(item.fileId)
+            idArr.push(item.id)
         })
-        fileIds = fileIdArr.join('__,__')
+        ids = idArr.join('__,__')
     }
     shareService.saveShareFiles({
-        fileIds: fileIds,
+        ids: ids,
         targetParentId: targetParentId
     }, res => {
         if (res.code === 0) {
@@ -699,7 +704,7 @@ onMounted(() => {
     font-size: 40px;
     font-weight: bolder;
     cursor: pointer;
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-share-content .pan-share-header-content .pan-share-header-content-wrapper .pan-share-header-user-info-content {
@@ -791,7 +796,7 @@ onMounted(() => {
 }
 
 .pan-share-content .pan-share-list-content .pan-share-list-wrapper .pan-share-list-card .pan-share-list-card-header .pan-share-list-card-header-share-info-content .pan-share-list-card-header-time .pan-share-list-card-header-expire-date {
-    color: #F56C6C;
+    color: #2faa69;
 }
 
 .pan-share-content .pan-share-list-content .pan-share-list-wrapper .pan-share-list-card .pan-share-list-card-error-message {
@@ -799,7 +804,7 @@ onMounted(() => {
     height: 300px;
     padding-top: 50px;
     text-align: center;
-    color: #F56C6C;
+    color: #2faa69;
     font-size: 30px;
 }
 
@@ -815,7 +820,7 @@ span {
 
 .breadcrumb-item-a {
     cursor: pointer !important;
-    color: #409EFF !important;
+    color: #2faa69 !important;
 }
 
 .tree-content {

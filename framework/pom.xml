@@ -16,6 +16,7 @@
         <module>web-spring-boot-starter</module>
         <module>lock-spring-boot-starter</module>
         <module>common-spring-boot-starter</module>
+        <module>storage-spring-boot-starter</module>
     </modules>
 
     <properties>

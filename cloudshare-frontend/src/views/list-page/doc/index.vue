@@ -23,7 +23,7 @@ const buttonArray = ref(['upload', 'download', 'delete', 'rename', 'share', 'cop
 onMounted(() => {
     fileStore.setSearchFlag(false)
     fileStore.setParentId('-1')
-    fileStore.setFileTypes('3__,__4__,__5__,__6__,__10__,__11')
+    fileStore.setFileTypeList(['EXCEL', 'WORD', 'PPT', 'PDF', 'TXT', 'CSV'])
     fileStore.loadFileList()
 })
 

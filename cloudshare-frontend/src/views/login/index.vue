@@ -3,23 +3,33 @@
         <el-card class="content">
             <div class="box">
                 <div class="loginBox">
-                    <h3>网盘登录</h3>
+                    <h3>Cloudshare Login</h3>
                     <el-form class="loginForm" :model="loginForm">
                         <el-form-item label="账号">
-                            <el-input type="text" v-model="loginForm.username" autocomplete="off" placeholder="请输入"/>
+                            <el-input type="text" v-model="loginForm.username" autocomplete="off" placeholder="请输入" ref="usernameEl"/>
                         </el-form-item>
                         <el-form-item label="密码">
                             <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入"/>
                         </el-form-item>
                         <el-form-item>
-                            <el-button style="width: 100%;" type="success" :loading="loading" @click="doLogin">登录</el-button>
+                            <el-button style="width: 100%;" type="primary" :loading="loading" @click="doLogin">登录</el-button>
                         </el-form-item>
                     </el-form>
                     
                     <div class="btns">
-                        <el-button link>&lt&lt首页</el-button>
-                        <el-button @click="visitor" link>游客登录</el-button>
-                        <el-button @click="google" link>第三方登录</el-button>
+                        <el-button link>
+                            &lt&lt
+                            <el-icon><HomeFilled /></el-icon>
+                            首页
+                        </el-button>
+                        <el-button @click="visitor" link>
+                            <el-icon><UserFilled /></el-icon>
+                            游客登录
+                        </el-button>
+                        <el-button @click="google" link>
+                            <el-icon><ChromeFilled /></el-icon>
+                            Google
+                        </el-button>
                     </div>
                 </div>
                 <div style="flex:1">
@@ -34,7 +44,7 @@
 import {onMounted, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import panUtil from '@/utils/common'
-import {ElMessage,ElCard,ElForm,ElInput,ElButton,ElFormItem} from 'element-plus'
+import {ElMeElMessage,ElCard,ElForm,ElInput,ElButton,ElFormItemssage} from 'element-plus'
 import userService from '@/api/user'
 import {setToken} from '@/utils/cookie'
 import {useFileStore} from '@/stores/file'
@@ -50,20 +60,20 @@ const loginForm = reactive({
 })
 
 const visitorForm = reactive({
-    username: 'root',
-    password: 'root'
+    username: 'guest',
+    password: 'guest'
 })
 
 const fileStore = useFileStore()
 const userStore = useUserStore()
 
-const {setParentId, setDefaultParentId, setDefaultParentFilename} = fileStore
+const {setParentId, setDefaultParentId, setCurDirectory, setDefaultCurDirectory} = fileStore
 const {setUsername} = userStore
 
-// const usernameEl = ref(null)
-// onMounted(() => {
-//     usernameEl.value.focus()
-// })
+const usernameEl = ref(null)
+onMounted(() => {
+    usernameEl.value.focus()
+})
 
 const doLogin = () => {
     if (checkLoginForm()) {
@@ -71,9 +81,10 @@ const doLogin = () => {
         userService.login(loginForm, res => {
             setToken(res.data)
             userService.info(res => {
-                setParentId(res.data.rootFileId)
-                setDefaultParentId(res.data.rootFileId)
-                setDefaultParentFilename(res.data.rootFilename)
+                setParentId(res.data.rootId)
+                setDefaultParentId(res.data.rootId)
+                setCurDirectory(res.data.rootName)
+                setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 router.push({name: 'Index'})
             }, res => {
@@ -91,9 +102,10 @@ const visitor = ()=>{
         userService.login(visitorForm, res => {
             setToken(res.data)
             userService.info(res => {
-                setParentId(res.data.rootFileId)
-                setDefaultParentId(res.data.rootFileId)
-                setDefaultParentFilename(res.data.rootFilename)
+                setParentId(res.data.rootId)
+                setDefaultParentId(res.data.rootId)
+                setCurDirectory(res.data.rootName)
+                setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 router.push({name: 'Index'})
             }, res => {
@@ -107,6 +119,7 @@ const visitor = ()=>{
 
 const google = ()=>{
     window.location.href ="/api/oauth/render/google";
+    console.log(window.location.href);
 }
 
 const goForget = () => {

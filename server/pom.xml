@@ -34,6 +34,18 @@
 
         <dependency>
             <groupId>com.cloudshare</groupId>
+            <artifactId>storage-engine-local</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudshare</groupId>
+            <artifactId>storage-engine-oss-aliyun</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudshare</groupId>
             <artifactId>common-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -51,6 +63,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!--@ConfigurationProperties提示-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <!-- <optional>true</optional> 不注释掉子模块无法引用到此依赖 -->
         </dependency>
 
         <!--数据校验validation新版的要自己导入包，spring boot 版本是2.3.1或者更高，此时的spring boot 已经不在starter-web内置验证-->

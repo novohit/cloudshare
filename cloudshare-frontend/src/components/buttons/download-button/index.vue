@@ -1,6 +1,6 @@
 <template>
     <div class="download-button-content">
-        <el-button v-if="roundFlag" type="info" :size="size" round @click="downloadFile" :loading="loading">
+        <el-button v-if="roundFlag" type="info" :size="size" @click="downloadFile" :loading="loading">
             下载
             <el-icon class="el-icon--right">
                 <Download/>
@@ -32,12 +32,13 @@ const {multipleSelection} = storeToRefs(fileStore)
 const loading = ref(false)
 
 const doDownload = (item) => {
-    let url = panUtil.getUrlPrefix() + '/file/download?fileId=' + item.fileId.replace(/\+/g, '%2B') + '&authorization=' + getToken(),
-        filename = item.filename,
+    let url = panUtil.getUrlPrefix() + '/file/download/' + item.fileId + '?Authorization=' + getToken(),
+        fileName = item.fileName,
         link = document.createElement('a')
+    console.log(url)
     link.style.display = 'none'
     link.href = url
-    link.setAttribute('download', filename)
+    link.setAttribute('download', fileName)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -64,7 +65,7 @@ const downloadFile = () => {
     }
     if (!props.item) {
         for (let i = 0, iLength = multipleSelection.value.length; i < iLength; i++) {
-            if (multipleSelection.value[i].folderFlag === 1) {
+            if (multipleSelection.value[i].fileType === 'DIR') {
                 ElMessage.error('文件夹暂不支持下载')
                 return
             }
@@ -72,7 +73,7 @@ const downloadFile = () => {
         doDownLoads(multipleSelection.value)
     }
     if (props.item) {
-        if (props.item.folderFlag === 1) {
+        if (props.item.fileType === 'DIR') {
             ElMessage.error('文件夹暂不支持下载')
             return
         }

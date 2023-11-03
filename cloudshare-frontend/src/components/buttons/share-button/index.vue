@@ -1,6 +1,6 @@
 <template>
     <div class="share-button-content">
-        <el-button class="share-button" v-if="roundFlag" :size="size" round @click="shareFile">
+        <el-button class="share-button" v-if="roundFlag" :size="size" @click="shareFile">
             分享
             <el-icon class="el-icon--right">
                 <Share/>
@@ -11,7 +11,6 @@
         <el-dialog
             :title="shareTitle"
             v-model="shareDialogVisible"
-            @opened="focusInput"
             @closed="resetForm"
             width="30%"
             append-to-body
@@ -19,25 +18,20 @@
             center>
             <div>
                 <div v-if="step === 1">
-                    <el-form label-width="100px" :rules="shareFileRules" ref="shareFormRef"
+                    <el-form label-width="100px" ref="shareFormRef"
                              :model="shareFileForm"
                              status-icon
                              @submit.native.prevent>
-                        <el-form-item label="分享名称" prop="shareName">
-                            <el-input type="text"
-                                      ref="shareNameEl"
-                                      v-model="shareFileForm.shareName" clearable/>
-                        </el-form-item>
                         <el-form-item label="分享类型">
-                            <el-radio-group v-model="shareFileForm.shareType">
+                            <el-radio-group v-model="shareFileForm.visibleType">
                                 <el-radio disabled label="0">有提取码</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="分享有效期">
-                            <el-select v-model="shareFileForm.shareDayType">
-                                <el-option label="永久有效" value="0"></el-option>
-                                <el-option label="7天有效" value="1"></el-option>
-                                <el-option label="30天有效" value="2"></el-option>
+                            <el-select v-model="shareFileForm.expiredAt">
+                                <el-option label="永久有效" value="PUBLIC"></el-option>
+                                <el-option label="7天有效" value="PUBLIC"></el-option>
+                                <el-option label="30天有效" value="PUBLIC"></el-option>
                             </el-select>
                         </el-form-item>
                     </el-form>
@@ -46,12 +40,12 @@
                     <el-form label-width="100px"
                              status-icon
                              @submit.native.prevent>
-                        <el-form-item label="分享链接" prop="shareUrl">
-                            <el-link :underline=false type="primary"><span>{{ shareResultForm.shareUrl }}</span>
+                        <el-form-item label="分享链接" prop="url">
+                            <el-link :underline=false type="primary"><span>{{ shareResultForm.url }}</span>
                             </el-link>
                         </el-form-item>
                         <el-form-item label="提取码">
-                            <el-link :underline=false type="success"><span>{{ shareResultForm.shareCode }}</span>
+                            <el-link :underline=false type="success"><span>{{ shareResultForm.code }}</span>
                             </el-link>
                         </el-form-item>
                         <div class="share-result-button-content">
@@ -99,31 +93,23 @@ const shareTitle = ref('')
 const shareDialogVisible = ref(false)
 const loading = ref(false)
 const shareFormRef = ref(null)
-const shareNameEl = ref(null)
 const step = ref(1)
 
 const shareFileForm = reactive({
-    shareName: '',
-    shareType: '0',
-    shareDayType: '0'
+    visibleType: 'PRIVATE',
+    expiredAt: '2035-11-11 00:00:00'
 })
 
 const shareResultForm = reactive({
-    shareUrl: '',
-    shareCode: ''
+    url: '',
+    code: ''
 })
 
-const shareFileRules = reactive({
-    shareName: [
-        {required: true, message: '请输入分享名称', trigger: 'blur'}
-    ]
-})
-
-const handleFilename = (filename) => {
-    if (filename.length > 10) {
-        filename = filename.substring(0, 11) + '...'
+const handleFilename = (fileName) => {
+    if (fileName.length > 10) {
+        fileName = fileName.substring(0, 11) + '...'
     }
-    return filename
+    return fileName
 }
 
 const shareFile = () => {
@@ -131,13 +117,17 @@ const shareFile = () => {
         ElMessage.error('请选择要分享的文件')
         return
     }
+    if (!props.item && (!multipleSelection.value || multipleSelection.value.length !== 1)) {
+        ElMessage.error('暂不支持多选共享')
+        return
+    }
     if (props.item) {
-        shareTitle.value = '分享文件（' + handleFilename(props.item.filename) + ')'
+        shareTitle.value = '分享文件（' + handleFilename(props.item.fileName) + ')'
     } else {
         if (multipleSelection.value.length === 1) {
-            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].filename) + ')'
+            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].fileName) + ')'
         } else {
-            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].filename) + '等)'
+            shareTitle.value = '分享文件（' + handleFilename(multipleSelection.value[0].fileName) + '等)'
         }
     }
     shareDialogVisible.value = true
@@ -147,25 +137,25 @@ const doShareFile = async () => {
 
     await shareFormRef.value.validate((valid, fields) => {
         if (valid) {
-            let shareFileIdArr = new Array()
+            let fileIdList = new Array()
             loading.value = true
             if (props.item) {
-                shareFileIdArr.push(props.item.fileId)
+                fileIdList.push(props.item.fileId)
             } else {
                 multipleSelection.value.forEach(item => {
-                    shareFileIdArr.push(item.fileId)
+                    fileIdList.push(item.fileId)
                 })
             }
+            console.log(fileIdList)
             shareService.createShare({
-                shareName: shareFileForm.shareName,
-                shareType: parseInt(shareFileForm.shareType),
-                shareDayType: parseInt(shareFileForm.shareDayType),
-                shareFileIds: shareFileIdArr.join('__,__')
+                visibleType: shareFileForm.visibleType,
+                expiredAt: shareFileForm.expiredAt,
+                fileId: fileIdList[0]
             }, res => {
                 loading.value = false
-                shareTitle.value = '恭喜你！分享成功！'
-                shareResultForm.shareUrl = res.data.shareUrl
-                shareResultForm.shareCode = res.data.shareCode
+                shareTitle.value = '分享成功！'
+                shareResultForm.url = res.data.url
+                shareResultForm.code = res.data.code
                 step.value = 2
             }, res => {
                 loading.value = false
@@ -182,18 +172,14 @@ const resetForm = () => {
     step.value = 1
     shareTitle.value = ''
     shareResultForm.value = {
-        shareUrl: '',
-        shareCode: ''
+        url: '',
+        code: ''
     }
-}
-
-const focusInput = () => {
-    shareNameEl.value.focus()
 }
 
 const copy = async () => {
     try {
-        let shareMessage = '链接：' + shareResultForm.shareUrl + '\n提取码：' + shareResultForm.shareCode + '\n赶快分享给小伙伴吧！'
+        let shareMessage = '链接：' + shareResultForm.url + '\n提取码：' + shareResultForm.code + '\n赶快分享给小伙伴吧！'
         await toClipboard(shareMessage)
         ElMessage.success('复制成功')
     } catch (e) {

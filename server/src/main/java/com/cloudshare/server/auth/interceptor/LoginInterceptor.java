@@ -40,11 +40,13 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
-        System.out.println(request.getRequestURI());
         // token为空
         if (!StringUtils.hasText(authorization)) {
-            log.info("token为空");
-            throw new BizException(BizCodeEnum.USER_UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            authorization = request.getParameter(AUTHORIZATION_HEADER);
+            if (!StringUtils.hasText(authorization)) {
+                log.info("token为空");
+                throw new BizException(BizCodeEnum.USER_UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
         }
         // token格式不正确
         if (!authorization.startsWith(BEARER)) {
@@ -71,6 +73,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 user.getId(),
                 user.getUsername(),
                 user.getPhone(),
+                user.getAvatar(),
                 1
         );
         BeanUtils.copyProperties(user, userContext);

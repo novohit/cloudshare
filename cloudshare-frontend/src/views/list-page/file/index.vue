@@ -23,20 +23,21 @@ import {storeToRefs} from 'pinia'
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 
-const {searchFlag, defaultParentId, defaultParentFilename} = storeToRefs(fileStore)
+const {searchFlag, defaultParentId, defaultCurDirectory} = storeToRefs(fileStore)
 
-const buttonArray = ref(['upload', 'createFolder', 'download', 'delete', 'rename', 'share', 'copy', 'transfer'])
+const buttonArray = ref(['upload', 'addDir', 'download', 'delete', 'rename', 'share', 'copy', 'transfer'])
 
 onMounted(() => {
     if (!searchFlag.value) {
         let firstItem = {
-            id: defaultParentId.value,
-            name: defaultParentFilename.value
+            fileId: defaultParentId.value,
+            name: defaultCurDirectory.value
         }
         breadcrumbStore.clear()
         breadcrumbStore.addItem(firstItem)
         fileStore.refreshParentId()
-        fileStore.setFileTypes('-1')
+        fileStore.refreshCurDirectory()
+        fileStore.setFileTypeList([])
         fileStore.loadFileList()
     }
 })

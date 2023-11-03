@@ -89,7 +89,7 @@ let panUtil = {
     getFileFontElement(type) {
         let tagStr = 'fa fa-file'
         switch (type) {
-            case 0:
+            case 'DIR':
                 tagStr = 'fa fa-folder-o'
                 break
             case 2:
@@ -104,22 +104,22 @@ let panUtil = {
             case 5:
                 tagStr = 'fa fa-file-pdf-o'
                 break
-            case 6:
+            case 'TXT':
                 tagStr = 'fa fa-file-text-o'
                 break
-            case 7:
+            case 'IMAGE':
                 tagStr = 'fa fa-file-image-o'
                 break
-            case 8:
+            case 'AUDIO':
                 tagStr = 'fa fa-file-audio-o'
                 break
-            case 9:
+            case 'VIDEO':
                 tagStr = 'fa fa-file-video-o'
                 break
             case 10:
                 tagStr = 'fa fa-file-powerpoint-o'
                 break
-            case 11:
+            case 'SOURCE_CODE':
                 tagStr = 'fa fa-file-code-o'
                 break
             default:
@@ -127,20 +127,20 @@ let panUtil = {
         }
         return tagStr
     },
-    getPreviewUrl(fileId) {
-        return 'http://127.0.0.1:8080/file/preview?fileId=' + this.handleId(fileId) + '&authorization=' + getToken()
+    getPreviewUrl(id) {
+        return panUtil.getUrlPrefix() + '/file/preview/' + id + '?Authorization=' + getToken()
     },
     getUrlPrefix() {
         return '/api'
     },
     getChunkSize() {
         if (this.getChunkUploadSwitch()) {
-            return 1024 * 1024 * 1
+            return 1024 * 1024 * 2
         }
         return this.getMaxFileSize()
     },
     getMaxFileSize() {
-        return 1024 * 1024 * 1024 * 3
+        return 1024 * 1024 * 1024 * 1
     },
     getChunkUploadSwitch() {
         return true

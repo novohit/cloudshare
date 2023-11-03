@@ -33,7 +33,7 @@ const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 const navbarStore = useNavbarStore()
 
-const {defaultParentId, defaultParentFilename} = storeToRefs(fileStore)
+const {defaultParentId, defaultCurDirectory} = storeToRefs(fileStore)
 
 const searchKey = ref('')
 
@@ -46,8 +46,8 @@ const querySearchHistory = (queryString, cb) => {
 }
 
 const doSearch = () => {
-    // 设置FileTypes
-    fileStore.setFileTypes('-1')
+    // 设置FileTypeList
+    fileStore.setFileTypeList([])
     // 设置搜索模式
     fileStore.setSearchFlag(true)
     // 跳转到Files页面
@@ -56,15 +56,15 @@ const doSearch = () => {
     fileStore.setSearchKey(searchKey.value)
     fileService.search({
         keyword: searchKey.value,
-        fileTypes: '-1'
+        fileTypeList: []
     }, res => {
         breadcrumbStore.clear()
         breadcrumbStore.addItem({
-            id: defaultParentId.value,
-            name: defaultParentFilename.value
+            fileId: defaultParentId.value,
+            name: defaultCurDirectory.value
         })
         breadcrumbStore.addItem({
-            id: '-1',
+            fileId: '-1',
             name: '搜索：' + searchKey.value
         })
         fileStore.setFileList(res.data)

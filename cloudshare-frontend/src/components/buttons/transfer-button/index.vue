@@ -1,6 +1,6 @@
 <template>
     <div class="transfer-button-content">
-        <el-button v-if="roundFlag" :size="size" round @click="transferFile">
+        <el-button v-if="roundFlag" :size="size" @click="transferFile">
             移动到
             <el-icon class="el-icon--right">
                 <Position/>
@@ -30,7 +30,7 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <el-icon :size="20" style="margin-right: 15px; cursor: pointer;"><Folder/></el-icon>
-                            <span>{{ node.label }}</span>
+                            <span>{{ data.name }}</span>
                         </span>
                     </template>
                 </el-tree>
@@ -61,7 +61,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {multipleSelection} = storeToRefs(fileStore)
+const {curDirectory, multipleSelection} = storeToRefs(fileStore)
 const treeRef = ref(null)
 
 const transferFile = () => {
@@ -75,7 +75,8 @@ const transferFile = () => {
 const treeDialogVisible = ref(false)
 
 const loadTreeData = () => {
-    fileService.getFolderTree(res => {
+    console.log("loadTreeData", fileStore.curDirectory)
+    fileService.getDirTree(res => {
         treeData.value = res.data
     }, res => {
         ElMessage.error(res.message)
@@ -88,26 +89,25 @@ const resetTreeData = () => {
 
 const treeData = ref([])
 
-const doTransferFile = (targetParentId) => {
-    let fileIds = ''
+const doTransferFile = (target, parentId) => {
+    let idArr = new Array()
     if (props.item) {
-        fileIds = props.item.fileId
+        idArr.push(props.item.fileId)
     } else {
-        let fileIdArr = new Array()
-        multipleSelection.value.forEach(item => fileIdArr.push(item.fileId))
-        fileIds = fileIdArr.join('__,__')
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
     }
     fileService.transfer({
-        fileIds: fileIds,
-        targetParentId: targetParentId
+        parentId: parentId,
+        fileIds: idArr,
+        target: target
     }, res => {
         loading.value = false
         treeDialogVisible.value = false
-        ElMessage.success('文件移动成功')
+        console.log("文件移动成功 curDirectory", curDirectory.value)
         fileStore.loadFileList()
+        ElMessage.success('文件移动成功')
     }, res => {
         loading.value = false
-        ElMessage.error(res.message)
     })
 }
 
@@ -119,7 +119,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doTransferFile(checkNode.id)
+    doTransferFile(checkNode.path, checkNode.fileId)
 }
 
 const loading = ref(false)

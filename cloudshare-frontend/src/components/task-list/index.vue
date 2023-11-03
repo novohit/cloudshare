@@ -17,7 +17,7 @@
                         align="center"
                         header-align="center"
                         label="文件名称"
-                        prop="filename"
+                        prop="fileName"
                         width="120"
                         :show-overflow-tooltip="true"
                     >
@@ -79,7 +79,7 @@
                                             effect="light" content="暂停上传" placement="top">
                                         <span>
                                             <el-button v-show="scope.row.status === fileStatus.UPLOADING.code"
-                                                       @click="pause(scope.row.filename)" size="small" type="primary"
+                                                       @click="pause(scope.row.fileName)" size="small" type="primary"
                                                        icon="VideoPause" circle></el-button>
                                         </span>
                                 </el-tooltip>
@@ -87,7 +87,7 @@
                                             effect="light" content="继续上传" placement="top">
                                         <span>
                                             <el-button v-show="scope.row.status === fileStatus.PAUSE.code"
-                                                       @click="resume(scope.row.filename)" size="small" type="success"
+                                                       @click="resume(scope.row.fileName)" size="small" type="success"
                                                        icon="VideoPlay" circle></el-button>
                                         </span>
                                 </el-tooltip>
@@ -96,7 +96,7 @@
                                         <span>
                                             <el-button
                                                 v-show="scope.row.status === fileStatus.UPLOADING.code || scope.row.status === fileStatus.WAITING.code || scope.row.status === fileStatus.PAUSE.code || scope.row.status === fileStatus.FAIL.code"
-                                                @click="cancel(scope.row.filename)" size="small"
+                                                @click="cancel(scope.row.fileName)" size="small"
                                                 type="danger" icon="SwitchButton" circle></el-button>
                                         </span>
                                 </el-tooltip>
@@ -104,7 +104,7 @@
                                             effect="light" content="重新上传" placement="top">
                                         <span>
                                             <el-button v-show="scope.row.status === fileStatus.FAIL.code"
-                                                       @click="retry(scope.row.filename)" size="small" type="warning"
+                                                       @click="retry(scope.row.fileName)" size="small" type="warning"
                                                        icon="RefreshRight" circle></el-button>
                                         </span>
                                 </el-tooltip>

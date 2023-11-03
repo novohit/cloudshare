@@ -4,10 +4,10 @@ import http from '@/utils/http'
 import simpleHttp from '@/utils/simple-http'
 
 let shareService = {
-    getShareDetail: function (resolve) {
+    getShareDetail: function (params, resolve) {
         simpleHttp({
-            url: '/share',
-            params: {},
+            url: '/share/access',
+            params: params,
             method: 'get'
         }).then(res => resolve(res))
     },
@@ -27,7 +27,7 @@ let shareService = {
     },
     checkShareCode: function (data, resolve) {
         simpleHttp({
-            url: '/share/code/check',
+            url: '/share/check-code',
             data: data,
             method: 'post'
         }).then(res => resolve(res))
@@ -46,16 +46,16 @@ let shareService = {
             method: 'post'
         }).then(res => resolve(res))
     },
-    getShares: function (resolve, reject) {
+    getShareList: function (resolve, reject) {
         http({
-            url: '/shares',
+            url: '/share/list',
             params: {},
             method: 'get'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    getSimpleShareDetail: function (params, resolve) {
+    getSharer: function (params, resolve) {
         simpleHttp({
-            url: '/share/simple',
+            url: '/share/sharer',
             params: params,
             method: 'get'
         }).then(res => resolve(res))

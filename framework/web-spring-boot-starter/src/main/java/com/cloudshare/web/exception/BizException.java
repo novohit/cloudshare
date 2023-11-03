@@ -4,6 +4,8 @@ import com.cloudshare.web.enums.BizCodeEnum;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
+
 /**
  * @author novo
  * @since  2023-02-21
@@ -11,15 +13,18 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class BizException extends RuntimeException {
 
+    @Serial
+    private static final long serialVersionUID = 5076786211711660879L;
+
     protected Integer code;
 
     protected String message;
 
-    protected Integer httpStatusCode = 200;
+    protected HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
     public BizException(String message) {
         super(message);
-        this.code = 500;
+        this.code = -1;
         this.message = message;
     }
 
@@ -33,6 +38,6 @@ public class BizException extends RuntimeException {
         super(bizCodeEnum.getMessage());
         this.code = bizCodeEnum.getCode();
         this.message = bizCodeEnum.getMessage();
-        this.httpStatusCode = httpStatus.value();
+        this.httpStatus = httpStatus;
     }
 }

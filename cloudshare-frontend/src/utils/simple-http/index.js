@@ -20,22 +20,22 @@ httpSimple.interceptors.request.use(config => {
     let token = getToken(),
         shareToken = getShareToken()
     if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token
+        config.headers['Authorization'] = token
     }
     if (shareToken) {
         config.headers['Share-Token'] = shareToken
     }
     return config
 }, error => {
-    ElMessage.error('请求失败')
-    return
+    ElMessage.error(error.response.data.message)
+    return Promise.reject(error)
 })
 
 httpSimple.interceptors.response.use(res => {
     return res.data
 }, error => {
-    ElMessage.error('请求失败')
-    return
+    ElMessage.error(error.response.data.message)
+    return Promise.reject(error)
 })
 
 export default httpSimple

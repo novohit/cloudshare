@@ -8,7 +8,7 @@
         <el-divider direction="vertical" style="vertical-align: top !important;"/>
         <el-breadcrumb separator-icon="ArrowRight" style="display: inline-block;">
             <el-breadcrumb-item v-for="(item, index) in breadCrumbs" :key="index">
-                <a class="breadcrumb-item-a" @click="goToThis(item.id)" href="#">{{ item.name }}</a>
+                <a class="breadcrumb-item-a" @click="goToThis(item.fileId, index)" href="#">{{ item.name }}</a>
             </el-breadcrumb-item>
         </el-breadcrumb>
     </div>
@@ -25,29 +25,37 @@ const fileStore = useFileStore()
 const {breadCrumbs} = storeToRefs(breadcrumbStore)
 
 const goBack = () => {
+    console.log("goBack")
     fileStore.setSearchFlag(false)
     if (breadCrumbs.value.length > 1) {
         let resolveBreadCrumbs = [...breadCrumbs.value]
         resolveBreadCrumbs.pop()
-        let newId = resolveBreadCrumbs.pop().id
-        goToThis(newId)
+        let newId = resolveBreadCrumbs.pop().fileId
+        goToThis(newId, breadCrumbs.value.length - 2)
     }
 }
 
-const goToThis = (id) => {
-    if (id !== '-1') {
-        let newBreadCrumbs = new Array()
-        breadCrumbs.value.some(item => {
-            newBreadCrumbs.push(item)
-            if (item.id == id) {
-                return true
-            }
-        })
-        breadcrumbStore.reset(newBreadCrumbs)
-        fileStore.setParentId(id)
-        fileStore.setSearchFlag(false)
-        fileStore.loadFileList()
-    }
+const goToThis = (fileId, index) => {
+    let curDirectory = breadCrumbs.value
+        .slice(0, index + 1)
+        .map(item => item.name)
+        .join('/');
+    // 去除多余的 /
+    curDirectory = curDirectory.length > 1 ? curDirectory.replace(/^\//, '') + "/" : curDirectory;
+    console.log("goToThis", curDirectory)
+    let newBreadCrumbs = new Array()
+    breadCrumbs.value.some(item => {
+        console.log("xxx",curDirectory)
+        newBreadCrumbs.push(item)
+        if (item.fileId == fileId) {
+            return true
+        }
+    })
+    breadcrumbStore.reset(newBreadCrumbs)
+    fileStore.setParentId(fileId)
+    fileStore.setCurDirectory(curDirectory)
+    fileStore.setSearchFlag(false)
+    fileStore.loadFileList()
 }
 
 </script>
@@ -60,6 +68,6 @@ const goToThis = (id) => {
 
 .breadcrumb-item-a {
     cursor: pointer !important;
-    color: #409EFF !important;
+    color: #2faa69 !important;
 }
 </style>

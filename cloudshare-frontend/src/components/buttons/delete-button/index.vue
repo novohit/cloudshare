@@ -1,6 +1,6 @@
 <template>
     <div class="download-button-content">
-        <el-button v-if="roundFlag" type="danger" :size="size" round @click="deleteFile">
+        <el-button v-if="roundFlag" type="danger" :size="size" @click="deleteFile">
             删除
             <el-icon class="el-icon--right">
                 <Delete/>
@@ -25,6 +25,7 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 
 const fileStore = useFileStore()
 const {multipleSelection} = storeToRefs(fileStore)
+const {parentId, curDirectory} = storeToRefs(fileStore)
 
 const doDeleteFile = (fileIds) => {
     ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
@@ -44,14 +45,15 @@ const doDeleteFile = (fileIds) => {
 }
 
 const deleteFile = () => {
+    let idArr = new Array()
     if (props.item) {
-        doDeleteFile(props.item.fileId)
+        idArr.push(props.item.fileId)
+        doDeleteFile(idArr)
         return
     }
     if (multipleSelection.value && multipleSelection.value.length > 0) {
-        let fileIdArr = new Array()
-        multipleSelection.value.forEach(item => fileIdArr.push(item.fileId))
-        doDeleteFile(fileIdArr.join('__,__'))
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
+        doDeleteFile(idArr)
         return
     }
     ElMessage.error('请选择要删除的文件')

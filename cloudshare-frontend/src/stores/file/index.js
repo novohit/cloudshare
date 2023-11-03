@@ -6,16 +6,15 @@ import {ElMessage} from 'element-plus'
 export const useFileStore = defineStore('file', () => {
 
     const parentId = ref('')
+    const curDirectory = ref('')
     const defaultParentId = ref('')
-    const defaultParentFilename = ref('')
+    const defaultCurDirectory = ref('')
     const fileList = ref([])
     const multipleSelection = ref([])
-    const fileTypes = ref('-1')
+    const fileTypeList = ref([])
     const searchFlag = ref(false)
     const searchKey = ref('')
     const tableLoading = ref(true)
-
-    const paramParentId = computed(() => parentId.value === '-1' ? defaultParentId.value : parentId.value)
 
     function setParentId(newParentId) {
         parentId.value = newParentId
@@ -29,8 +28,16 @@ export const useFileStore = defineStore('file', () => {
         defaultParentId.value = newDefaultParentId
     }
 
-    function setDefaultParentFilename(newDefaultParentFilename) {
-        defaultParentFilename.value = newDefaultParentFilename
+    function setCurDirectory(newCurDirectory) {
+        curDirectory.value = newCurDirectory
+    }
+
+    function refreshCurDirectory() {
+        curDirectory.value = defaultCurDirectory.value
+    }
+
+    function setDefaultCurDirectory(newDefaultCurDirectory) {
+        defaultCurDirectory.value = newDefaultCurDirectory
     }
 
     function setFileList(newFileList) {
@@ -41,8 +48,8 @@ export const useFileStore = defineStore('file', () => {
         multipleSelection.value = newMultipleSelection
     }
 
-    function setFileTypes(newFileTypes) {
-        fileTypes.value = newFileTypes
+    function setFileTypeList(newFileTypeList) {
+        fileTypeList.value = newFileTypeList
     }
 
     function setSearchFlag(newSearchFlag) {
@@ -63,10 +70,11 @@ export const useFileStore = defineStore('file', () => {
     function clear(state) {
         parentId.value = ''
         defaultParentId.value = ''
-        defaultParentFilename.value = ''
+        curDirectory.value = ''
+        defaultCurDirectory.value = ''
         fileList.value = new Array()
         multipleSelection.value = new Array()
-        fileTypes.value = '-1'
+        fileTypeList.value = []
         searchFlag.value = false
         searchKey.value = ''
         tableLoading.value = true
@@ -77,7 +85,7 @@ export const useFileStore = defineStore('file', () => {
         if (searchFlag.value) {
             fileService.search({
                 keyword: searchKey.value,
-                fileTypes: '-1'
+                fileTypeList: []
             }, res => {
                 setFileList(res.data)
                 setTableLoading(false)
@@ -86,9 +94,11 @@ export const useFileStore = defineStore('file', () => {
                 ElMessage.error(res.message)
             })
         } else {
+            console.log("refresh", curDirectory.value)
             fileService.list({
                 parentId: parentId.value,
-                fileTypes: fileTypes.value
+                curDirectory: curDirectory.value,
+                fileTypeList: fileTypeList.value
             }, res => {
                 setTableLoading(false)
                 setFileList(res.data)
@@ -102,21 +112,23 @@ export const useFileStore = defineStore('file', () => {
     return {
         parentId,
         defaultParentId,
-        defaultParentFilename,
+        curDirectory,
+        defaultCurDirectory,
         fileList,
         multipleSelection,
-        fileTypes,
+        fileTypeList,
         searchFlag,
         searchKey,
         tableLoading,
-        paramParentId,
         setParentId,
         refreshParentId,
         setDefaultParentId,
-        setDefaultParentFilename,
+        setCurDirectory,
+        refreshCurDirectory,
+        setDefaultCurDirectory,
         setFileList,
         setMultipleSelection,
-        setFileTypes,
+        setFileTypeList,
         setSearchFlag,
         setSearchKey,
         setTableLoading,

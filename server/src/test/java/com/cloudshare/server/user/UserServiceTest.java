@@ -1,7 +1,7 @@
 package com.cloudshare.server.user;
 
-import com.cloudshare.server.user.api.request.UserLoginReqDTO;
-import com.cloudshare.server.user.api.request.UserRegisterReqDTO;
+import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
+import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.web.exception.BizException;
 import org.junit.jupiter.api.Assertions;
@@ -23,7 +23,7 @@ public class UserServiceTest {
 
     @Test
     void authTest() {
-        UserRegisterReqDTO registerReqDTO = new UserRegisterReqDTO("dev", "test");
+        UserRegisterReqDTO registerReqDTO = new UserRegisterReqDTO("dev", "test", "");
         Long userId = userService.register(registerReqDTO);
         Assertions.assertNotNull(userId);
         // 重复注册

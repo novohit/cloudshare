@@ -17,7 +17,7 @@
             </el-table-column>
             <el-table-column
                 label="文件名"
-                prop="filename"
+                prop="fileName"
                 sortable
                 show-overflow-tooltip
                 min-width="750">
@@ -25,7 +25,7 @@
                     <div @click="clickFilename(scope.row)" class="file-name-content">
                         <i :class="getFileFontElement(scope.row.fileType)"
                            style="margin-right: 15px; font-size: 20px; cursor: pointer;"/>
-                        <span style="cursor:pointer;">{{ scope.row.filename }}</span>
+                        <span style="cursor:pointer;">{{ scope.row.fileName }}</span>
                     </div>
                     <div class="file-operation-content">
                         <el-tooltip class="item" effect="light" content="下载" placement="top">
@@ -61,14 +61,14 @@
                 </template>
             </el-table-column>
             <el-table-column
-                prop="fileSizeDesc"
+                prop="size"
                 sortable
                 label="大小"
                 min-width="120"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="updateTime"
+                prop="updatedAt"
                 sortable
                 align="center"
                 label="修改日期"
@@ -118,18 +118,17 @@ const hiddenOperation = (row, column, cell, event) => {
     panUtil.hiddenOperation(cell)
 }
 
-const goInFolder = (fileId) => {
-    fileService.getBreadcrumbs({
-        fileId: fileId
-    }, res => {
-        fileStore.setSearchFlag(false)
-        breadcrumbStore.clear()
-        breadcrumbStore.reset(res.data)
-        fileStore.setParentId(fileId)
-        fileStore.loadFileList()
-    }, res => {
-        ElMessage.error(res.message)
-    })
+const goInFolder = (fileId, curDirectory, fileName) => {
+    fileStore.setSearchFlag(false)
+    breadcrumbStore.addItem({
+            fileId: fileId,
+            name: fileName
+        })
+    fileStore.setParentId(fileId)
+    const newCurDirectory =  curDirectory + fileName + "/"
+    console.log("goInFolder", newCurDirectory)
+    fileStore.setCurDirectory(newCurDirectory)
+    fileStore.loadFileList()
 }
 
 const openNewPage = (path, name, params, query) => {
@@ -150,7 +149,7 @@ const showOffice = (row) => {
 
 const showIframe = (row) => {
     openNewPage('/preview/iframe', 'PreviewIframe', {
-        fileId: panUtil.handleId(row.fileId)
+        fileId: row.fileId
     })
 }
 
@@ -158,7 +157,7 @@ const showImg = (row) => {
     let imgs = new Array()
     let imgIndex = 0
     for (let i = 0, iLength = fileList.value.length; i < iLength; ++i) {
-        if (fileList.value[i].fileType === 7) {
+        if (fileList.value[i].fileType === 'IMAGE') {
             imgs.push(panUtil.getPreviewUrl(fileList.value[i].fileId))
             if (fileList.value[i].fileId === row.fileId) {
                 imgIndex = imgs.length - 1
@@ -182,23 +181,24 @@ const showImg = (row) => {
 
 const showMusic = (row) => {
     openNewPage('/preview/music', 'PreviewMusic', {
-        fileId: panUtil.handleId(row.fileId),
-        parentId: panUtil.handleId(row.parentId)
+        fileId: row.fileId,
+        curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
 
 const showVideo = (row) => {
+    console.log(row)
     openNewPage('/preview/video', 'PreviewVideo', {
-        fileId: panUtil.handleId(row.fileId),
-        parentId: panUtil.handleId(row.parentId)
+        fileId: row.fileId,
+        curDirectory: panUtil.handleId(row.curDirectory)
     })
 }
 
 const showCode = (row) => {
     openNewPage('/preview/code', 'PreviewCode', {
-        fileId: panUtil.handleId(row.fileId),
+        fileId: row.fileId,
     }, {
-        filename: row.filename
+        fileName: row.fileName
     })
 }
 
@@ -208,8 +208,9 @@ const getFileFontElement = (type) => {
 
 const clickFilename = (row) => {
     switch (row.fileType) {
-        case 0:
-            goInFolder(panUtil.handleId(row.fileId))
+        case 'DIR':
+            // goInFolder(panUtil.handleId(row.fileId))
+            goInFolder(row.fileId, row.curDirectory, row.fileName)
             break
         case 3:
         case 4:
@@ -217,19 +218,19 @@ const clickFilename = (row) => {
             showOffice(row)
             break
         case 5:
-        case 6:
+        case 'TXT':
             showIframe(row)
             break
-        case 7:
+        case 'IMAGE':
             showImg(row)
             break
-        case 8:
+        case 'AUDIO':
             showMusic(row)
             break
-        case 9:
+        case 'VIDEO':
             showVideo(row)
             break
-        case 11:
+        case 'SOURCE_CODE':
             showCode(row)
         default:
             break

@@ -18,8 +18,8 @@ const showPath = ref('')
 const route = useRoute()
 
 const init = () => {
-    let fileId = route.params.fileId
-    showPath.value = panUtil.getPreviewUrl(fileId)
+    let id = route.params.fileId
+    showPath.value = panUtil.getPreviewUrl(id)
 }
 
 onMounted(() => {

@@ -23,7 +23,7 @@
                                  @select="selectMusic">
                             <el-menu-item v-for="(item, index) in musicList" :key="index" :index="item.fileId">
                                 <i class="fa fa-music"></i>
-                                <span slot="title">{{ item.filename }}</span>
+                                <span slot="title">{{ item.fileName }}</span>
                             </el-menu-item>
                         </el-menu>
                     </div>
@@ -51,12 +51,12 @@ const activeIndex = ref('0')
 const renderMusicList = (dataList) => {
     musicList.value = new Array()
     dataList.forEach((item, index) => {
-        item.filename = item.filename.substring(0, item.filename.lastIndexOf('.'))
-        if (item.filename.length > 15) {
-            item.filename = item.filename.substring(0, 16) + '...'
+        item.fileName = item.fileName.substring(0, item.fileName.lastIndexOf('.'))
+        if (item.fileName.length > 15) {
+            item.fileName = item.fileName.substring(0, 16) + '...'
         }
         if (item.fileId === route.params.fileId) {
-            musicName.value = item.filename
+            musicName.value = item.fileName
             musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
         }
         musicList.value.push(item)
@@ -66,9 +66,9 @@ const renderMusicList = (dataList) => {
 
 const selectNext = () => {
     let i = '',
-        currentFileId = activeIndex.value
+        currentId = activeIndex.value
     musicList.value.some((item, index) => {
-        if (item.fileId === currentFileId) {
+        if (item.fileId === currentId) {
             i = index
             return true
         }
@@ -77,7 +77,7 @@ const selectNext = () => {
         return
     }
     let item = musicList.value[++i]
-    musicName.value = item.filename
+    musicName.value = item.fileName
     musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
     activeIndex.value = item.fileId
 }
@@ -86,7 +86,7 @@ const selectMusic = (index, indexPath) => {
     activeIndex.value = index
     musicList.value.some(item => {
         if (item.fileId === index) {
-            musicName.value = item.filename
+            musicName.value = item.fileName
             musicShowPath.value = panUtil.getPreviewUrl(item.fileId)
             return true
         }
@@ -101,11 +101,15 @@ const listenMusicPlayer = () => {
 
 const init = () => {
     fileService.list({
-        parentId: route.params.parentId,
-        fileTypes: '8'
+        curDirectory: route.params.curDirectory,
+        fileTypeList: ['AUDIO']
     }, res => {
         if (res.code === 0) {
-            renderMusicList(res.data)
+            const list = res.data.map(video => {
+            // 将视频对象的 id 属性转换为字符串
+            return { ...video, id: String(video.id) };
+            });
+            renderMusicList(list)
             listenMusicPlayer()
         } else {
             ElMessage.error(res.message)

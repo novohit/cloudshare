@@ -1,6 +1,6 @@
 package com.cloudshare.server.user.model;
 
-import com.cloudshare.server.BaseModel;
+import com.cloudshare.server.common.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;
@@ -44,4 +44,8 @@ public class User extends BaseModel {
     @Column(length = 64)
     @Comment("密保答案")
     private String answer;
+
+    @Column(length = 255)
+    @Comment("头像")
+    private String avatar;
 }

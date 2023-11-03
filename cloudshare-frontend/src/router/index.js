@@ -93,12 +93,12 @@ const router = createRouter({
             component: () => import('@/views/preview/iframe/index.vue')
         },
         {
-            path: '/preview/music/:parentId/:fileId',
+            path: '/preview/music/:curDirectory/:fileId',
             name: 'PreviewMusic',
             component: () => import('@/views/preview/music/index.vue')
         },
         {
-            path: '/preview/video/:parentId/:fileId',
+            path: '/preview/video/:curDirectory/:fileId',
             name: 'PreviewVideo',
             component: () => import('@/views/preview/video/index.vue')
         },
@@ -134,11 +134,12 @@ router.beforeEach((to, from, next) => {
             let redirect = from.query.redirect
             if (!redirect || to.path === redirect) {
                 // 防止有token直接跳转首页的情况下没有初始化用户信息的情况
-                if (!userStore.username.value) {
+                if (!userStore.username) {
                     userService.info(res => {
-                        fileStore.setParentId(res.data.rootFileId)
-                        fileStore.setDefaultParentId(res.data.rootFileId)
-                        fileStore.setDefaultParentFilename(res.data.rootFilename)
+                        fileStore.setParentId(res.data.rootId)
+                        fileStore.setDefaultParentId(res.data.rootId)
+                        fileStore.setCurDirectory(res.data.rootName)
+                        fileStore.setDefaultCurDirectory(res.data.rootName)
                         userStore.setUsername(res.data.username)
                         next()
                     }, res => {

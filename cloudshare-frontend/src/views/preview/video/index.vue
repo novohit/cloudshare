@@ -20,7 +20,7 @@
                                  @select="selectVideo">
                             <el-menu-item v-for="(item, index) in videoList" :key="index" :index="item.fileId">
                                 <i class="fa fa-video-camera"></i>
-                                <span slot="title">{{ item.filename }}</span>
+                                <span slot="title">{{ item.fileName }}</span>
                             </el-menu-item>
                         </el-menu>
                     </div>
@@ -48,24 +48,26 @@ const activeIndex = ref('0')
 const renderVideoList = (dataList) => {
     videoList.value = new Array()
     dataList.forEach((item, index) => {
-        item.filename = item.filename.substring(0, item.filename.lastIndexOf('.'))
-        if (item.filename.length > 15) {
-            item.filename = item.filename.substring(0, 16) + '...'
+        item.fileName = item.fileName.substring(0, item.fileName.lastIndexOf('.'))
+        if (item.fileName.length > 15) {
+            item.fileName = item.fileName.substring(0, 16) + '...'
         }
         if (item.fileId === route.params.fileId) {
-            videoName.value = item.filename
+            videoName.value = item.fileName
             videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
         }
         videoList.value.push(item)
     })
+    console.log(route.params.fileId)
     activeIndex.value = route.params.fileId
+    console.log("active", activeIndex.value)
 }
 
 const selectNext = () => {
     let i = '',
-        currentFileId = activeIndex.value
+        currentId = activeIndex.value
     videoList.value.some((item, index) => {
-        if (item.fileId === currentFileId) {
+        if (item.fileId === currentId) {
             i = index
             return true
         }
@@ -74,7 +76,7 @@ const selectNext = () => {
         return
     }
     let item = videoList.value[++i]
-    videoName.value = item.filename
+    videoName.value = item.fileName
     videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
     activeIndex.value = item.fileId
 }
@@ -83,7 +85,7 @@ const selectVideo = (index) => {
     activeIndex.value = index
     videoList.value.some(item => {
         if (item.fileId === index) {
-            videoName.value = item.filename
+            videoName.value = item.fileName
             videoShowPath.value = panUtil.getPreviewUrl(item.fileId)
             return true
         }
@@ -98,11 +100,15 @@ const listenVideoPlayer = () => {
 
 const init = () => {
     fileService.list({
-        parentId: route.params.parentId,
-        fileTypes: '9'
+        curDirectory: route.params.curDirectory,
+        fileTypeList: ['VIDEO']
     }, function (res) {
         if (res.code === 0) {
-            renderVideoList(res.data)
+            const list = res.data.map(video => {
+            // 将视频对象的 id 属性转换为字符串
+            return { ...video, id: String(video.id) };
+            });
+            renderVideoList(list)
             listenVideoPlayer()
         } else {
             ElMessage.error(res.message)

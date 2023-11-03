@@ -1,6 +1,6 @@
 <template>
     <div class="copy-button-content">
-        <el-button color="#626aef" v-if="roundFlag" :size="size" round @click="copyFile" plain>
+        <el-button color="#626aef" v-if="roundFlag" :size="size" @click="copyFile" plain>
             复制到
             <el-icon class="el-icon--right">
                 <CopyDocument/>
@@ -30,7 +30,7 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <el-icon :size="20" style="margin-right: 15px; cursor: pointer;"><Folder/></el-icon>
-                            <span>{{ node.label }}</span>
+                            <span>{{ data.name }}</span>
                         </span>
                     </template>
                 </el-tree>
@@ -61,7 +61,7 @@ import {storeToRefs} from 'pinia'
 import {ElMessage} from 'element-plus'
 
 const fileStore = useFileStore()
-const {multipleSelection} = storeToRefs(fileStore)
+const {curDirectory, multipleSelection} = storeToRefs(fileStore)
 const treeRef = ref(null)
 
 const copyFile = () => {
@@ -75,7 +75,7 @@ const copyFile = () => {
 const treeDialogVisible = ref(false)
 
 const loadTreeData = () => {
-    fileService.getFolderTree(res => {
+    fileService.getDirTree(res => {
         treeData.value = res.data
     }, res => {
         ElMessage.error(res.message)
@@ -88,18 +88,17 @@ const resetTreeData = () => {
 
 const treeData = ref([])
 
-const doCopyFile = (targetParentId) => {
-    let fileIds = ''
+const doCopyFile = (target, parentId) => {
+    let idArr = new Array()
     if (props.item) {
-        fileIds = props.item.fileId
+        idArr.push(props.item.fileId)
     } else {
-        let fileIdArr = new Array()
-        multipleSelection.value.forEach(item => fileIdArr.push(item.fileId))
-        fileIds = fileIdArr.join('__,__')
+        multipleSelection.value.forEach(item => idArr.push(item.fileId))
     }
     fileService.copy({
-        fileIds: fileIds,
-        targetParentId: targetParentId
+        parentId: parentId,
+        fileIds: idArr,
+        target: target
     }, res => {
         loading.value = false
         treeDialogVisible.value = false
@@ -119,7 +118,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doCopyFile(checkNode.id)
+    doCopyFile(checkNode.path, checkNode.fileId)
 }
 
 const loading = ref(false)

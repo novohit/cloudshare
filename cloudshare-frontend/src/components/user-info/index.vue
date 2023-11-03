@@ -10,7 +10,7 @@
                     <el-dropdown-item command="#">用户名：{{ username }}</el-dropdown-item>
                     <el-dropdown-item command="payment">套餐购买</el-dropdown-item>
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
-                    <el-dropdown-item command="exit">退出登录</el-dropdown-item>
+                    <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -104,13 +104,13 @@ const goLogin = () => {
     window.location.reload()
 }
 
-const doExit = () => {
+const doLogout = () => {
     ElMessageBox.confirm('确定要退出登录吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        userService.exit(() => {
+        userService.logout(() => {
             goLogin()
         }, res => {
             ElMessage.error(res.message)
@@ -129,8 +129,8 @@ const passwordEl = ref(null)
 const handleCommand = (command) => {
     if (command === 'changePassword') {
         changePasswordDialogVisible.value = true
-    } else if (command === 'exit') {
-        doExit()
+    } else if (command === 'logout') {
+        doLogout()
     } else if (command === 'payment') {
         doPayment()
     }
@@ -196,9 +196,10 @@ const doChangePassword = async () => {
 const initUserInfoIfNecessary = () => {
     if (!username.value) {
         userService.info(res => {
-            fileStore.setParentId(res.data.rootFileId)
-            fileStore.setDefaultParentId(res.data.rootFileId)
-            fileStore.setDefaultParentFilename(res.data.rootFilename)
+            fileStore.setParentId(res.data.rootId)
+            fileStore.setDefaultParentId(res.data.rootId)
+            fileStore.setCurDirectory(res.data.rootName)
+            fileStore.setDefaultCurDirectory(res.data.rootName)
             userStore.setUsername(res.data.username)
         }, res => {
             ElMessage.error(res.message)
@@ -214,7 +215,7 @@ onMounted(() => {
 
 <style scoped>
 .pan-user-info {
-    color: #409EFF;
+    color: #16904f;
     margin-top:10px;
 }
 .avatar{

@@ -8,6 +8,7 @@ public record UserContext(
         Long id,
         String username,
         String phone,
+        String avatar,
         Integer scope
 ) {
 }

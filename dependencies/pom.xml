@@ -20,7 +20,7 @@
         <freemarker.version>2.3.28</freemarker.version>
         <lombok.version>1.18.24</lombok.version>
         <commons.lang3.version>3.9</commons.lang3.version>
-        <guava.version>20.0</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <hutool.version>5.8.22</hutool.version>
         <commons.math3.version>3.6.1</commons.math3.version>
         <commons.codec.version>1.15</commons.codec.version>
