@@ -170,8 +170,6 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * TODO　多次上传同名字文件处理
-     *
      * @param reqDTO
      */
     @Override
@@ -455,14 +453,14 @@ public class FileServiceImpl implements FileService {
         for (DirTreeNode node : nodes) {
             Long parentId = node.getParentId();
             // 根目录
-            if (parentId == 0 || !map.containsKey(parentId)) {
+            if (parentId == BizConstant.ROOT_PARENT_ID || !map.containsKey(parentId)) {
                 tree.add(node);
             } else {
                 DirTreeNode parentNode = map.get(parentId);
                 parentNode.getChildren().add(node);
             }
         }
-        DirTreeNode root = new DirTreeNode(0L, null, "/", "/", "/", tree);
+        DirTreeNode root = new DirTreeNode(BizConstant.ROOT_PARENT_ID, null, "/", "/", "/", tree);
         return Collections.singletonList(root);
     }
 

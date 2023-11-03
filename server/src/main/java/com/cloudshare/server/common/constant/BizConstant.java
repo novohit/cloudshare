@@ -12,4 +12,6 @@ public final class BizConstant {
 
     public static final String REPEAT_NAME = "重名冲突";
 
+    public static final Long ROOT_PARENT_ID = 0L;
+
 }
