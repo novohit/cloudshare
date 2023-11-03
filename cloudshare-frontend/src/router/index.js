@@ -68,6 +68,11 @@ const router = createRouter({
             component: () => import('@/views/forget/index.vue')
         },
         {
+            path:'/pay',
+            name:'Pay',
+            component: () => import('@/views/pay/index.vue')
+        },
+        {
             path: '/share/:shareId',
             name: 'Share',
             component: () => import('@/views/share/index.vue')

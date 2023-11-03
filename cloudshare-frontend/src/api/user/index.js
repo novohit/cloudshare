@@ -79,6 +79,13 @@ let userService = {
             params: {},
             method: 'get'
         }).then(res => resolve(res))
+    },
+    pay:function(data,resolve, reject) {
+        http({
+            url: '/product-order/v1/place',
+            data: data,
+            method: 'post'
+        }).then(res => resolve(res)).catch(res => reject(res))
     }
 }
 

@@ -44,7 +44,7 @@
 import {onMounted, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import panUtil from '@/utils/common'
-import {ElMessage,ElCard,ElForm,ElInput,ElButton} from 'element-plus'
+import {ElMeElMessage,ElCard,ElForm,ElInput,ElButton,ElFormItemssage} from 'element-plus'
 import userService from '@/api/user'
 import {setToken} from '@/utils/cookie'
 import {useFileStore} from '@/stores/file'
