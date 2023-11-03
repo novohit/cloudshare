@@ -152,7 +152,7 @@ const doCancelShares = (shareIds) => {
         type: 'warning'
     }).then(() => {
         shareService.cancelShare({
-            ids: shareIds
+            shareIds: shareIds
         }, () => {
             ElMessage.success('取消分享成功')
             loadTableData()
@@ -176,7 +176,9 @@ const cancelShares = () => {
 
 
 const cancelShare = (row) => {
-    doCancelShares(row.shareId)
+    let shardIds = new Array();
+    shardIds.push(row.shareId)
+    doCancelShares(shardIds)
 }
 
 const handleSelectionChange = (newMultipleSelection) => {

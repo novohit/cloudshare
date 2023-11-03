@@ -99,7 +99,7 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public void cancel(ShareCancelReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        List<Share> shareList = shareRepository.findByShareIdInAndUserId(reqDTO.ids(), userId);
+        List<Share> shareList = shareRepository.findByShareIdInAndUserId(reqDTO.shareIds(), userId);
         List<Long> ids = shareList.stream()
                 .map(Share::getId)
                 .toList();

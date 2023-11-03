@@ -17,10 +17,10 @@
                     <el-link :underline=false type="primary" class="pan-share-login-button" @click="login">
                         登录
                     </el-link>
-                    <el-link :underline=false type="primary" class="pan-share-register-button" href="/register"
+                    <!-- <el-link :underline=false type="primary" class="pan-share-register-button" href="/register"
                              target="_blank">
                         注册
-                    </el-link>
+                    </el-link> -->
                 </div>
             </div>
         </div>
@@ -320,7 +320,7 @@ const pageLoading = ref(true)
 const shareDate = ref('')
 const shareExpireDate = ref('')
 const breadCrumbs = ref([{
-    fileId: '-1',
+    fileId: '',
     name: '全部文件'
 }])
 const treeData = ref([])
@@ -648,6 +648,7 @@ const getFileFontElement = (type) => {
     return panUtil.getFileFontElement(type)
 }
 
+// TODO 每次触发路由都会清除 ShareToken
 onMounted(() => {
     clearShareToken()
     loadShareInfo()

@@ -8,6 +8,6 @@ import java.util.List;
  * @since 2023/10/30
  */
 public record ShareCancelReqDTO(
-        @NotNull List<Long> ids
+        @NotNull List<Long> shareIds
 ) {
 }
