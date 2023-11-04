@@ -17,6 +17,7 @@
 
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <spring.boot.version>2.7.5</spring.boot.version>
     </properties>
 
     <dependencies>
@@ -105,6 +106,7 @@
     </dependencies>
 
     <build>
+        <finalName>cloudshare-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -128,6 +130,19 @@
                         <!-- other annotation processors -->
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <!--需要加这个，不然打包镜像找不到启动文件-->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

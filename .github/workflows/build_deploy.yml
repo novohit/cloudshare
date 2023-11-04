@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  notify:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build with Maven
+        run: mvn clean install
+      - name: build_id
+        id: build_id
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          TS=$(date +%s)
+          REVISION=${GITHUB_SHA::8}
+          BUILD_ID="${TS}-${BRANCH}-${REVISION}"
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            BUILD_ID=${GITHUB_REF/refs\/tags\//}
+          fi
+          echo "BUILD_ID=${BUILD_ID}" >> $GITHUB_OUTPUT
+      - name: Upload to Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GIT_TOKEN }}"
+          automatic_release_tag: "${{ steps.build_id.outputs.BUILD_ID }}"
+          prerelease: false
+          files: |
+            server/target/*.jar

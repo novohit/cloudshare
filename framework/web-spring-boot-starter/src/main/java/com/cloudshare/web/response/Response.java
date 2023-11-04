@@ -4,6 +4,8 @@ import com.cloudshare.web.enums.BizCodeEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -12,7 +14,10 @@ import java.util.UUID;
  */
 @Getter
 @JsonInclude(value = JsonInclude.Include.NON_NULL) // 如果json的data为null 不返回给前端
-public class Response<T> {
+public class Response<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -6606268589712484106L;
 
     private final Integer code;
 
