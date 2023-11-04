@@ -1,7 +1,7 @@
 'use strict'
 
 import axios from 'axios'
-import {clearToken, getToken} from '@/utils/cookie'
+import {clearToken, getToken, getShareToken} from '@/utils/cookie'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import panUtil from '@/utils/common'
 import {useBreadcrumbStore} from '@/stores/breadcrumb'
@@ -40,9 +40,13 @@ http.interceptors.request.use(config => {
     if (config.data) {
         config.data = JSON.stringify(config.data)
     }
-    let token = getToken()
+    let token = getToken(),
+        shareToken = getShareToken()
     if (token) {
         config.headers['Authorization'] = token
+    }
+    if (shareToken) {
+        config.headers['Share-Token'] = shareToken
     }
     return config
 }, error => {
@@ -61,7 +65,11 @@ http.interceptors.response.use(res => {
     }
     return res.data
 }, error => {
-    ElMessage.error(error.response.data.message)
+    if (error.response.data.message === 'Share-Token不存在') {
+
+    } else {
+        ElMessage.error(error.response.data.message)
+    }
     return Promise.reject(error)
 })
 

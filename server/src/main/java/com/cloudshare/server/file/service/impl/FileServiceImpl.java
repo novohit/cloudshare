@@ -350,8 +350,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void download(Long fileId, HttpServletResponse response) {
-        Long userId = UserContextThreadHolder.getUserId();
+    public void download(Long fileId, Long userId, HttpServletResponse response) {
         // 1. 校验下载权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {

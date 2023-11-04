@@ -65,6 +65,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                         "/pay/callback/**",
                         "/share/check-code",
                         "/share/access",
+                        "/share/download/**",
                         "/share/sharer",
                         "/**/test*"
                 )

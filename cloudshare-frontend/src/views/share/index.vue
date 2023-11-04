@@ -369,8 +369,9 @@ const loadShareInfo = () => {
         console.log(res)
         if (res.code === 0) {
             refreshShareInfo(res.data)
-        } else if (res.message === 'Share-Token不存在') {
-            console.log("=========")
+        }
+    }, error => {
+        if (error.response.data.message === 'Share-Token不存在') {
             openShareCodePage()
         } else {
             openShareExpirePage()
@@ -447,6 +448,7 @@ const doCheckShareCode = async () => {
                     loading.value = false
                     ElMessage.error("提取码错误")
                 } else {
+                    console.log("提取码正确")
                     loading.value = false
                     setShareToken(res.data)
                     shareCodeDialogVisible.value = false
@@ -549,30 +551,17 @@ const doDownload = (item) => {
         ElMessage.error('文件夹暂不支持下载')
         return
     }
-    userService.infoWithoutPageJump(res => {
-        if (res.code === 0) {
-            shareService.getSharer({
-                shareId: getShareId()
-            }, res => {
-                if (res.code === 0) {
-                    let url = panUtil.getUrlPrefix() + '/share/file/download/' + item.fileId + '?shareToken=' + getShareToken() + '&authorization=' + getToken(),
-                        fileName = item.fileName,
-                        link = document.createElement('a')
-                    link.style.display = 'none'
-                    link.href = url
-                    link.setAttribute('download', fileName)
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                } else {
-                    window.location.reload()
-                }
-            })
-        } else {
-            loadUserInfo()
-            login()
-        }
-    })
+
+    let url = panUtil.getUrlPrefix() + '/share/download/' + item.fileId + '?SHARE-TOKEN=' + getShareToken(),
+        fileName = item.fileName,
+        link = document.createElement('a')
+    console.log(url)
+    link.style.display = 'none'
+    link.href = url
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 }
 
 const resetTreeData = () => {

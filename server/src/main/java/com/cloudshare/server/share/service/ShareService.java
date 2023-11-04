@@ -10,6 +10,7 @@ import com.cloudshare.server.share.controller.response.ShareVO;
 import com.cloudshare.server.share.controller.response.SharerRespVO;
 import com.cloudshare.server.share.model.Share;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -32,4 +33,6 @@ public interface ShareService {
     SharerRespVO sharer(Long shareId);
 
     void save(ShareSaveReqDTO reqDTO);
+
+    void download(Long fileId, Long userId, HttpServletResponse response);
 }

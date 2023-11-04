@@ -4,12 +4,12 @@ import http from '@/utils/http'
 import simpleHttp from '@/utils/simple-http'
 
 let shareService = {
-    getShareDetail: function (params, resolve) {
-        simpleHttp({
+    getShareDetail: function (params, resolve, reject) {
+        http({
             url: '/share/access',
             params: params,
             method: 'get'
-        }).then(res => resolve(res))
+        }).then(res => resolve(res)).catch(err => reject(err))
     },
     createShare: function (data, resolve, reject) {
         http({

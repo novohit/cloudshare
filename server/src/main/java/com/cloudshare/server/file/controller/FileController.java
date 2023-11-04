@@ -114,7 +114,8 @@ public class FileController {
 
     @GetMapping("/download/{fileId}")
     public void download(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
-        fileService.download(fileId, response);
+        Long userId = UserContextThreadHolder.getUserId();
+        fileService.download(fileId, userId, response);
     }
 
     @GetMapping("/preview/{fileId}")

@@ -30,6 +30,7 @@ import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -185,5 +186,10 @@ public class ShareServiceImpl implements ShareService {
                 ),
                 sourceUser,
                 targetUser);
+    }
+
+    @Override
+    public void download(Long fileId, Long userId, HttpServletResponse response) {
+        fileService.download(fileId, userId, response);
     }
 }

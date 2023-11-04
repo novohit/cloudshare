@@ -1,5 +1,6 @@
 package com.cloudshare.server.share.controller;
 
+import com.cloudshare.server.auth.ShareContextThreadHolder;
 import com.cloudshare.server.common.annotation.ShareTokenRequired;
 import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
@@ -14,12 +15,14 @@ import com.cloudshare.web.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -98,5 +101,12 @@ public class ShareController {
     public Response<Void> save(@Validated @RequestBody ShareSaveReqDTO reqDTO) {
         shareService.save(reqDTO);
         return Response.success();
+    }
+
+    @GetMapping("/download/{fileId}")
+    @ShareTokenRequired
+    public void download(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
+        Long userId = ShareContextThreadHolder.getShareUserId();
+        shareService.download(fileId, userId, response);
     }
 }

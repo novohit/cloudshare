@@ -73,12 +73,12 @@ let userService = {
             method: 'get'
         }).then(res => resolve(res)).catch(res => reject(res))
     },
-    infoWithoutPageJump(resolve) {
-        simpleHttp({
+    infoWithoutPageJump(resolve, reject) {
+        http({
             url: '/user',
             params: {},
             method: 'get'
-        }).then(res => resolve(res))
+        }).then(res => resolve(res)).catch(res => reject(res))
     },
     pay:function(data,resolve, reject) {
         http({
