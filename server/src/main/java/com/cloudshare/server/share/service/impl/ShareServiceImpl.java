@@ -6,6 +6,7 @@ import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.server.auth.ShareContextThreadHolder;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
+import com.cloudshare.server.file.controller.requset.FileMoveOrCopyReqDTO;
 import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.file.converter.FileConverter;
 import com.cloudshare.server.file.enums.FileType;
@@ -15,6 +16,7 @@ import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
+import com.cloudshare.server.share.controller.request.ShareSaveReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
 import com.cloudshare.server.share.controller.response.ShareVO;
 import com.cloudshare.server.share.controller.response.SharerRespVO;
@@ -169,5 +171,19 @@ public class ShareServiceImpl implements ShareService {
                 share.getUserId(),
                 share.getUser().getUsername()
         );
+    }
+
+    @Override
+    public void save(ShareSaveReqDTO reqDTO) {
+        Long sourceUser = ShareContextThreadHolder.getShareUserId();
+        Long targetUser = UserContextThreadHolder.getUserId();
+        fileService.copy(
+                new FileMoveOrCopyReqDTO(
+                        reqDTO.parentId(),
+                        reqDTO.fileIds(),
+                        reqDTO.target()
+                ),
+                sourceUser,
+                targetUser);
     }
 }

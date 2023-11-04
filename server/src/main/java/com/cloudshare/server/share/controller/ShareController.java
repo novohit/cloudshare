@@ -5,6 +5,7 @@ import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
+import com.cloudshare.server.share.controller.request.ShareSaveReqDTO;
 import com.cloudshare.server.share.controller.response.ShareCreateRespVO;
 import com.cloudshare.server.share.controller.response.ShareVO;
 import com.cloudshare.server.share.controller.response.SharerRespVO;
@@ -90,5 +91,12 @@ public class ShareController {
     public Response<String> checkCode(@Validated @RequestBody ShareCheckCodeReqDTO reqDTO) {
         String token = shareService.checkCode(reqDTO);
         return Response.success(token);
+    }
+
+    @PostMapping("/save")
+    @ShareTokenRequired
+    public Response<Void> save(@Validated @RequestBody ShareSaveReqDTO reqDTO) {
+        shareService.save(reqDTO);
+        return Response.success();
     }
 }

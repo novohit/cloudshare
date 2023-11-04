@@ -19,7 +19,11 @@ public class ShareContextThreadHolder {
     }
 
     public static Long getShareId() {
-        return ShareContextThreadHolder.threadLocal.get().getId();
+        return ShareContextThreadHolder.threadLocal.get().getShareId();
+    }
+
+    public static Long getShareUserId() {
+        return ShareContextThreadHolder.threadLocal.get().getUserId();
     }
 
     public static void clear() {

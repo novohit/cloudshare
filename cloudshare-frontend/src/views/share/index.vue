@@ -283,12 +283,12 @@ const checkUsername = (rule, value, callback) => {
     }
 
 const loginRules = reactive({
-    username: [
-        {validator: checkUsername, trigger: 'blur'}
-    ],
-    password: [
-        {validator: checkPassword, trigger: 'blur'}
-    ]
+    // username: [
+    //     {validator: checkUsername, trigger: 'blur'}
+    // ],
+    // password: [
+    //     {validator: checkPassword, trigger: 'blur'}
+    // ]
 })
 
 const shareCodeFormRules = reactive({
@@ -596,7 +596,7 @@ const doChoseTreeNodeCallBack = () => {
         loading.value = false
         return
     }
-    doSaveFiles(checkNode.fileId)
+    doSaveFiles(checkNode.fileId, checkNode.path)
 }
 
 const saveFiles = (newItem) => {
@@ -615,20 +615,19 @@ const saveFiles = (newItem) => {
     })
 }
 
-const doSaveFiles = (targetParentId) => {
-    let ids = ''
+const doSaveFiles = (parentId, target) => {
+    let fileIds = new Array()
     if (item.value) {
-        ids = item.value.id
+        fileIds.push(item.value.fileId)
     } else {
-        let idArr = new Array()
         multipleSelection.value.forEach(item => {
-            idArr.push(item.id)
+            fileIds.push(item.fileId)
         })
-        ids = idArr.join('__,__')
     }
     shareService.saveShareFiles({
-        ids: ids,
-        targetParentId: targetParentId
+        fileIds: fileIds,
+        parentId: parentId,
+        target: target
     }, res => {
         if (res.code === 0) {
             ElMessage.success('保存成功')
