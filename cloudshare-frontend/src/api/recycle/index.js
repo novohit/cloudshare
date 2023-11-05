@@ -5,7 +5,7 @@ import http from '@/utils/http'
 let recycleService = {
     recycles: function (resolve, reject) {
         http({
-            url: '/recycles',
+            url: '/recycle',
             params: {},
             method: 'get'
         }).then(res => resolve(res)).catch(err => reject(err))

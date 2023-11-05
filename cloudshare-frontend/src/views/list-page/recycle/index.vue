@@ -101,7 +101,6 @@ const loadTableData = () => {
         tableData.value = res.data
     }, res => {
         tableLoading.value = false
-        ElMessage.error(res.message)
     })
 }
 
