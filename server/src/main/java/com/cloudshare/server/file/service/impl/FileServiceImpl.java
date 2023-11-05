@@ -597,7 +597,14 @@ public class FileServiceImpl implements FileService {
         String curDirectory = reqDTO.curDirectory();
         List<FileType> fileTypes = reqDTO.fileTypeList();
         // 一级文件列表
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, curDirectory);
+        List<FileDocument> fileList = new ArrayList<>();
+        if (StringUtils.hasText(reqDTO.curDirectory())) {
+            // 搜当前目录
+            fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, curDirectory);
+        } else {
+            // 全局搜索
+            fileList = fileRepository.findByUserIdAndDeletedAtIsNull(userId);
+        }
         if (!CollectionUtils.isEmpty(fileTypes)) {
             fileList = fileList.stream()
                     .filter(fileDocument -> fileTypes.contains(fileDocument.getType()))

@@ -22,7 +22,8 @@ const buttonArray = ref(['upload', 'download', 'delete', 'rename', 'share', 'cop
 
 onMounted(() => {
     fileStore.setSearchFlag(false)
-    fileStore.setCurDirectory('/')
+    fileStore.setParentId('')
+    fileStore.setCurDirectory('')
     fileStore.setFileTypeList(['AUDIO'])
     fileStore.loadFileList()
 })

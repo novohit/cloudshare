@@ -11,7 +11,7 @@ import java.util.List;
  */
 public record FileListReqDTO(
         Long parentId,
-        @NotBlank String curDirectory,
+        String curDirectory,
         List<FileType> fileTypeList
 ) {
 }

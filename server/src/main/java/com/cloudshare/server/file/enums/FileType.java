@@ -1,16 +1,16 @@
 package com.cloudshare.server.file.enums;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
  * @author novo
  * @since 2023/10/7
  */
-public enum FileType {
+public enum FileType implements Serializable {
 
     DIR(suffix -> false),
 
