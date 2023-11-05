@@ -26,6 +26,10 @@ public class CaffeineCacheAutoConfiguration {
     @Bean("caffeineCacheManager")
     public CacheManager cacheManager() {
         log.info("Caffeine Cache init");
+        // TODO 配置多个不同过期时间的实例
+        // https://mp.weixin.qq.com/s/8PRz8BxFaiW55EZLaG_4LQ
+        // https://www.duidaima.com/Group/Topic/JAVA/17064
+        // https://www.bilibili.com/video/BV1G3411Q74k/
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 // 设置最后一次写入或访问后经过固定时间过期
