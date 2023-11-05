@@ -15,7 +15,13 @@ public class LocalStorageEngineProperties {
 
     public static final String PREFIX = "storage.local";
 
+    /**
+     * 文件存储基础目录
+     */
     private String basePath = System.getProperty("user.dir") + File.separator + "temp";
 
+    /**
+     * 分片临时存储目录
+     */
     private String chunkPath = System.getProperty("user.dir") + File.separator + "temp" + File.separator + "chunk";
 }

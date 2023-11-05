@@ -1,10 +1,7 @@
 package com.cloudshare.storage.aliyun.config;
 
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author novo

@@ -1,0 +1,22 @@
+{
+  "properties": [
+    {
+      "name": "cache.caffeine.initial-capacity",
+      "type": "java.lang.Integer",
+      "description": "Caffeine缓存的初始容量.",
+      "defaultValue": 256
+    },
+    {
+      "name": "cache.caffeine.maximum-size",
+      "type": "java.lang.Long",
+      "description": "Caffeine缓存的最大容量.",
+      "defaultValue": "10000L"
+    },
+    {
+      "name": "cache.caffeine.allow-null-value",
+      "type": "java.lang.Boolean",
+      "description": "Caffeine缓存是否允许null作为value的属性.",
+      "defaultValue": "true"
+    }
+  ]
+}

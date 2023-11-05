@@ -6,6 +6,8 @@ import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.core.util.UUIDUtil;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -19,6 +21,12 @@ import java.time.LocalDate;
  * @since 2023/10/10
  */
 public abstract class AbstractStorageEngine implements StorageEngine {
+
+    private final CacheManager cacheManager;
+
+    protected AbstractStorageEngine(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Override
     public void store(StoreContext context) throws IOException {
@@ -67,6 +75,11 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     protected abstract void doMergeChunk(MergeChunkContext context) throws IOException;
 
     protected abstract void doRead(ReadContext context) throws IOException;
+
+    protected Cache getCache() {
+        Assert.notNull(cacheManager, "分片功能需要配置缓存");
+        return cacheManager.getCache("");
+    }
 
     protected String getSuffix(String fileName) {
         Assert.isTrue(StringUtils.hasText(fileName), "fileName must be not null or empty");

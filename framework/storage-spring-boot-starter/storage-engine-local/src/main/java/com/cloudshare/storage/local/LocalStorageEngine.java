@@ -10,13 +10,12 @@ import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.storage.local.config.LocalStorageEngineProperties;
 import com.cloudshare.storage.local.util.LocalStorageUtil;
+import org.springframework.cache.CacheManager;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author novo
@@ -24,12 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LocalStorageEngine extends AbstractStorageEngine {
 
-    // TODO 改分布式
-    private final Map<String, String> chunkNameMap = new ConcurrentHashMap<>();
-
     private final LocalStorageEngineProperties localStorageEngineProperties;
 
-    public LocalStorageEngine(LocalStorageEngineProperties localStorageEngineProperties) {
+    public LocalStorageEngine(LocalStorageEngineProperties localStorageEngineProperties, CacheManager cacheManager) {
+        super(cacheManager);
         this.localStorageEngineProperties = localStorageEngineProperties;
     }
 
@@ -56,11 +53,11 @@ public class LocalStorageEngine extends AbstractStorageEngine {
 
     protected void doStoreChunk(StoreChunkContext context) throws IOException {
         String chunkPath = localStorageEngineProperties.getChunkPath();
-        String prefixPath = chunkNameMap.get(context.getMd5());
+        String prefixPath = getCache().get(context.getMd5(), String.class);
         if (!StringUtils.hasText(prefixPath)) {
             String fileName = context.getFileName();
             prefixPath = generateFilePath(chunkPath, fileName);
-            chunkNameMap.put(context.getMd5(), prefixPath);
+            getCache().put(context.getMd5(), prefixPath);
         }
         File file = new File(prefixPath + ".bak." + context.getChunkNum());
         LocalStorageUtil.writeStream2File(context.getInputStream(), file, context.getTotalSize());

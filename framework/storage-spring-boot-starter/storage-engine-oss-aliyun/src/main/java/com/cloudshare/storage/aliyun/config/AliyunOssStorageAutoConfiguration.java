@@ -4,9 +4,11 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.cloudshare.storage.aliyun.AliyunOssStorageEngine;
 import com.cloudshare.storage.core.StorageEngine;
+import com.cloudshare.storage.core.constant.Storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -24,13 +26,13 @@ public class AliyunOssStorageAutoConfiguration {
     }
 
     @Bean(destroyMethod = "shutdown")
-    @ConditionalOnProperty(value = "storage.engine", havingValue = "aliyun")
-    public StorageEngine storageEngine() {
+    @ConditionalOnProperty(value = "storage.engine", havingValue = Storage.ALI_YUN)
+    public StorageEngine storageEngine(CacheManager cacheManager) {
         log.info("启用阿里云对象存储");
         OSS ossClient = new OSSClientBuilder()
                 .build(properties.getEndpoint(),
                         properties.getAccessKeyId(),
                         properties.getAccessKeySecret());
-        return new AliyunOssStorageEngine(properties, ossClient);
+        return new AliyunOssStorageEngine(properties, ossClient, cacheManager);
     }
 }

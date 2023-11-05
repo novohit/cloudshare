@@ -29,6 +29,12 @@
 
         <dependency>
             <groupId>com.cloudshare</groupId>
+            <artifactId>cache-caffeine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudshare</groupId>
             <artifactId>lock-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>

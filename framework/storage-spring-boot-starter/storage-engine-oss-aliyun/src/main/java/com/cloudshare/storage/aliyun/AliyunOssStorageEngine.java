@@ -29,14 +29,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.CacheManager;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author novo
@@ -45,14 +44,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class AliyunOssStorageEngine extends AbstractStorageEngine {
 
-    // TODO 改分布式
-    private final Map<String, ChunkUploadEntity> uploadEntityMap = new ConcurrentHashMap<>();
-
     private final AliyunOssStorageProperties properties;
 
     private final OSS ossClient;
 
-    public AliyunOssStorageEngine(AliyunOssStorageProperties properties, OSS ossClient) {
+    public AliyunOssStorageEngine(AliyunOssStorageProperties properties, OSS ossClient, CacheManager cacheManager) {
+        super(cacheManager);
         this.properties = properties;
         this.ossClient = ossClient;
     }
@@ -96,7 +93,7 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
      */
     @Override
     protected synchronized void doStoreChunk(StoreChunkContext context) throws IOException {
-        ChunkUploadEntity entity = uploadEntityMap.get(context.getMd5());
+        ChunkUploadEntity entity = getCache().get(context.getMd5(), ChunkUploadEntity.class);
         if (entity == null) {
             // 分片上传初始化
             entity = initChunkUpload(context);
@@ -199,7 +196,7 @@ public class AliyunOssStorageEngine extends AbstractStorageEngine {
         InitiateMultipartUploadResult result = ossClient.initiateMultipartUpload(request);
         String uploadId = result.getUploadId();
         ChunkUploadEntity entity = new ChunkUploadEntity(uploadId, path);
-        uploadEntityMap.put(context.getMd5(), entity);
+        getCache().put(context.getMd5(), entity);
         return entity;
     }
 

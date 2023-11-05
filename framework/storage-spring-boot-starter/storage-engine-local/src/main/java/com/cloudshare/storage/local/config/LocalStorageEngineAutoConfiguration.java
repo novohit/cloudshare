@@ -1,10 +1,12 @@
 package com.cloudshare.storage.local.config;
 
 import com.cloudshare.storage.core.StorageEngine;
+import com.cloudshare.storage.core.constant.Storage;
 import com.cloudshare.storage.local.LocalStorageEngine;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -23,9 +25,9 @@ public class LocalStorageEngineAutoConfiguration {
 
 
     @Bean
-    @ConditionalOnMissingBean
-    public StorageEngine storageEngine() {
+    @ConditionalOnProperty(value = "storage.engine", havingValue = Storage.LOCAL, matchIfMissing = true)
+    public StorageEngine storageEngine(CacheManager cacheManager) {
         log.info("启动本地存储");
-        return new LocalStorageEngine(localStorageEngineProperties);
+        return new LocalStorageEngine(localStorageEngineProperties, cacheManager);
     }
 }

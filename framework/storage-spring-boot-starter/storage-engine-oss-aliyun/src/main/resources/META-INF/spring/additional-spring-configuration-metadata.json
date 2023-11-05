@@ -1,6 +1,11 @@
 {
   "properties": [
     {
+      "name": "storage.engine",
+      "defaultValue": "local",
+      "description": "storage engine."
+    },
+    {
       "name": "storage.aliyun.oss.endpoint",
       "defaultValue": "not null",
       "description": "endpoint."
