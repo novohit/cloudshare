@@ -6,11 +6,14 @@ import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.lock.lock.ILock;
 import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
-import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
+import com.cloudshare.server.common.constant.BizConstant;
+import com.cloudshare.server.user.controller.request.UserInfoRepVO;
 import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
 import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.controller.request.UserUpdateReqDTO;
+import com.cloudshare.server.user.convert.UserConverter;
 import com.cloudshare.server.user.enums.LoginType;
+import com.cloudshare.server.user.enums.PlanLevel;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.model.UserAuth;
 import com.cloudshare.server.user.repository.UserAuthRepository;
@@ -23,7 +26,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -39,10 +41,14 @@ public class UserServiceImpl implements UserService {
 
     private final ILock lock;
 
-    public UserServiceImpl(UserRepository userRepository, UserAuthRepository userAuthRepository, ILock lock) {
+    private final UserConverter userConverter;
+
+    public UserServiceImpl(UserRepository userRepository, UserAuthRepository userAuthRepository, ILock lock,
+                           UserConverter userConverter) {
         this.userRepository = userRepository;
         this.userAuthRepository = userAuthRepository;
         this.lock = lock;
+        this.userConverter = userConverter;
     }
 
     @Override
@@ -60,6 +66,9 @@ public class UserServiceImpl implements UserService {
             String cryptPassword = SecureUtil.md5(salt + reqDTO.password());
             user.setSalt(salt);
             user.setPassword(cryptPassword);
+            user.setPlan(PlanLevel.FREE);
+            user.setTotalQuota(BizConstant.FREE_PLAN_QUOTA);
+            user.setUsedQuota(0L);
             userRepository.save(user);
             return user.getId();
         } finally {
@@ -99,16 +108,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoRepDTO getUserInfo() {
+    public UserInfoRepVO getUserInfo() {
         UserContext userContext = UserContextThreadHolder.getUserContext();
-        UserInfoRepDTO repDTO = new UserInfoRepDTO(
-                userContext.id(),
-                userContext.username(),
-                userContext.phone(),
-                userContext.avatar(),
-                0L,
-                "/");
-        return repDTO;
+        UserInfoRepVO resp = userConverter.Context2VO(userContext);
+        return resp;
     }
 
     @Override

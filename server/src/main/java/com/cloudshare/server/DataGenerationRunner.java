@@ -2,6 +2,8 @@ package com.cloudshare.server;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.cloudshare.server.common.constant.BizConstant;
+import com.cloudshare.server.user.enums.PlanLevel;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -40,6 +42,9 @@ public class DataGenerationRunner implements CommandLineRunner {
         user.setSalt(salt);
         user.setPassword(cryptPassword);
         user.setAvatar("https://zwx-images-1305338888.cos.ap-guangzhou.myqcloud.com/common/avatar-2023.jpg");
+        user.setPlan(PlanLevel.FREE);
+        user.setTotalQuota(BizConstant.FREE_PLAN_QUOTA);
+        user.setUsedQuota(0L);
         return user;
     }
 }

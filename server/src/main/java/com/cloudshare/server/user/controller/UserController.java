@@ -1,6 +1,6 @@
 package com.cloudshare.server.user.controller;
 
-import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
+import com.cloudshare.server.user.controller.request.UserInfoRepVO;
 import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
 import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.controller.request.UserUpdateReqDTO;
@@ -40,8 +40,8 @@ public class UserController {
     }
 
     @GetMapping
-    public Response<UserInfoRepDTO> getUserInfo() {
-        UserInfoRepDTO repDTO = userService.getUserInfo();
+    public Response<UserInfoRepVO> getUserInfo() {
+        UserInfoRepVO repDTO = userService.getUserInfo();
         return Response.success(repDTO);
     }
 

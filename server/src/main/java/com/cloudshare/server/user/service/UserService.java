@@ -1,6 +1,6 @@
 package com.cloudshare.server.user.service;
 
-import com.cloudshare.server.user.controller.request.UserInfoRepDTO;
+import com.cloudshare.server.user.controller.request.UserInfoRepVO;
 import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
 import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
 import com.cloudshare.server.user.controller.request.UserUpdateReqDTO;
@@ -21,7 +21,7 @@ public interface UserService {
 
     User findById(Long userId);
 
-    UserInfoRepDTO getUserInfo();
+    UserInfoRepVO getUserInfo();
 
     String login(LoginType loginType, AuthUser authUser);
 

@@ -1,12 +1,15 @@
 package com.cloudshare.server.user.model;
 
 import com.cloudshare.server.common.BaseModel;
+import com.cloudshare.server.user.enums.PlanLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,4 +51,14 @@ public class User extends BaseModel {
     @Column(length = 255)
     @Comment("头像")
     private String avatar;
+
+    @Comment("会员等级")
+    @Enumerated(value = EnumType.STRING)
+    private PlanLevel plan;
+
+    @Comment("总空间")
+    private Long totalQuota;
+
+    @Comment("已使用空间")
+    private Long usedQuota;
 }

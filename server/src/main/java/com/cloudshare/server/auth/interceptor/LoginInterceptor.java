@@ -74,7 +74,9 @@ public class LoginInterceptor implements HandlerInterceptor {
                 user.getUsername(),
                 user.getPhone(),
                 user.getAvatar(),
-                1
+                1,
+                user.getTotalQuota(),
+                user.getUsedQuota()
         );
         BeanUtils.copyProperties(user, userContext);
         log.info("登录用户 user:[{}]", userContext);

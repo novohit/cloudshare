@@ -9,6 +9,8 @@ public record UserContext(
         String username,
         String phone,
         String avatar,
-        Integer scope
+        Integer scope,
+        Long totalQuota,
+        Long usedQuota
 ) {
 }
