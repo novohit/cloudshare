@@ -86,6 +86,13 @@ let userService = {
             data: data,
             method: 'post'
         }).then(res => resolve(res)).catch(res => reject(res))
+    },
+    list: function (resolve, reject) {
+        http({
+            url: '/product/list',
+            params: {},
+            method: 'get'
+        }).then(res => resolve(res)).catch(res => reject(res))
     }
 }
 
