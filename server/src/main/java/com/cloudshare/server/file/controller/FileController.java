@@ -1,5 +1,6 @@
 package com.cloudshare.server.file.controller;
 
+import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
@@ -132,7 +133,8 @@ public class FileController {
     @PostMapping("/copy")
     public Response<Void> copy(@Validated @RequestBody FileMoveOrCopyReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        fileService.copy(reqDTO, userId, userId);
+        UserContext userContext = UserContextThreadHolder.getUserContext();
+        fileService.copy(reqDTO, userId, userContext);
         return Response.success();
     }
 }

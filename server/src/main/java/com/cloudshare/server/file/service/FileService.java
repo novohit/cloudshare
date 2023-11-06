@@ -1,5 +1,6 @@
 package com.cloudshare.server.file.service;
 
+import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
@@ -53,5 +54,5 @@ public interface FileService {
 
     void move(FileMoveOrCopyReqDTO reqDTO);
 
-    void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceUser, Long targetUser);
+    void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceId, UserContext targetUser);
 }

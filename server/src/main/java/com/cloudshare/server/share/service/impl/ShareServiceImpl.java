@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.server.auth.ShareContextThreadHolder;
+import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.file.controller.requset.FileListReqDTO;
 import com.cloudshare.server.file.controller.requset.FileMoveOrCopyReqDTO;
@@ -176,15 +177,15 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public void save(ShareSaveReqDTO reqDTO) {
-        Long sourceUser = ShareContextThreadHolder.getShareUserId();
-        Long targetUser = UserContextThreadHolder.getUserId();
+        Long sourceId = ShareContextThreadHolder.getShareUserId();
+        UserContext targetUser = UserContextThreadHolder.getUserContext();
         fileService.copy(
                 new FileMoveOrCopyReqDTO(
                         reqDTO.parentId(),
                         reqDTO.fileIds(),
                         reqDTO.target()
                 ),
-                sourceUser,
+                sourceId,
                 targetUser);
     }
 

@@ -2,6 +2,7 @@ package com.cloudshare.server.file.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import com.cloudshare.common.util.SnowflakeUtil;
+import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
@@ -23,6 +24,7 @@ import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileChunkRepository;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
+import com.cloudshare.server.user.service.UserService;
 import com.cloudshare.storage.core.StorageEngine;
 import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.ReadContext;
@@ -76,14 +78,17 @@ public class FileServiceImpl implements FileService {
 
     private final TransactionTemplate transactionTemplate;
 
+    private final UserService userService;
+
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
-                           TransactionTemplate transactionTemplate) {
+                           TransactionTemplate transactionTemplate, UserService userService) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
         this.fileChunkRepository = fileChunkRepository;
         this.transactionTemplate = transactionTemplate;
+        this.userService = userService;
     }
 
     @Override
@@ -175,13 +180,15 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void singleUpload(FileSingleUploadReqDTO reqDTO) {
-        Long userId = UserContextThreadHolder.getUserId();
+        UserContext userContext = UserContextThreadHolder.getUserContext();
+        MultipartFile multipartFile = reqDTO.file();
+        long size = multipartFile.getSize();
+        checkQuota(userContext, size);
         // 保存实体
         // 上传文件
         try {
-            MultipartFile multipartFile = reqDTO.file();
             StoreContext context = new StoreContext();
-            context.setTotalSize(multipartFile.getSize());
+            context.setTotalSize(size);
             context.setInputStream(multipartFile.getInputStream());
             context.setFileName(multipartFile.getOriginalFilename());
             storageEngine.store(context);
@@ -189,7 +196,7 @@ public class FileServiceImpl implements FileService {
             // hutool return suffix have no dot
             suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(
-                    userId,
+                    userContext.id(),
                     reqDTO.parentId(),
                     reqDTO.md5(),
                     context.getFileName(),
@@ -202,6 +209,7 @@ public class FileServiceImpl implements FileService {
                     suffix
             );
             saveFile2DB(fileDocument, true);
+            userService.refreshQuota(fileDocument.getSize());
         } catch (IOException e) {
             log.error("文件上传异常", e);
             throw new BizException("文件上传异常");
@@ -215,18 +223,21 @@ public class FileServiceImpl implements FileService {
      * @return
      */
     @Override
+    @Transactional
     public Boolean secUpload(FileSecUploadReqDTO reqDTO) {
-        Long userId = UserContextThreadHolder.getUserId();
+        UserContext userContext = UserContextThreadHolder.getUserContext();
         List<FileDocument> fileList = fileRepository.findByMd5AndDeletedAtIsNull(reqDTO.md5());
         if (CollectionUtils.isEmpty(fileList)) {
             return false;
         }
         FileDocument same = fileList.get(0);
+        checkQuota(userContext, same.getSize());
+
         String suffix = FileUtil.getSuffix(reqDTO.fileName());
         suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
         // fileType suffix 以用户新给的文件名为主
         FileDocument fileDocument = assembleFileDocument(
-                userId,
+                userContext.id(),
                 reqDTO.parentId(),
                 reqDTO.md5(),
                 reqDTO.fileName(),
@@ -239,6 +250,7 @@ public class FileServiceImpl implements FileService {
                 suffix
         );
         saveFile2DB(fileDocument, true);
+        userService.refreshQuota(fileDocument.getSize());
         return true;
     }
 
@@ -251,7 +263,9 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public synchronized boolean chunkUpload(FileChunkUploadReqDTO reqDTO) {
-        Long userId = UserContextThreadHolder.getUserId();
+        UserContext userContext = UserContextThreadHolder.getUserContext();
+        Long userId = userContext.id();
+        checkQuota(userContext, reqDTO.totalSize());
         try {
             // 上传分片
             MultipartFile multipartFile = reqDTO.file();
@@ -343,6 +357,7 @@ public class FileServiceImpl implements FileService {
                     suffix
             );
             saveFile2DB(fileDocument, true);
+            userService.refreshQuota(fileDocument.getSize());
         } catch (IOException e) {
             log.error("文件合并异常", e);
             throw new BizException("文件合并异常");
@@ -408,6 +423,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
     public void delete(FileDeleteReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         if (CollectionUtils.isEmpty(reqDTO.fileIds())) {
@@ -415,6 +431,7 @@ public class FileServiceImpl implements FileService {
         }
         List<FileDocument> list = fileRepository.findByFileIdInAndUserId(reqDTO.fileIds(), userId);
         List<FileDocument> delete = new ArrayList<>(list);
+        Long totalSize = 0L;
         for (FileDocument file : list) {
             // 文件直接设置删除时间
             file.setDeletedAt(LocalDateTime.now());
@@ -422,18 +439,23 @@ public class FileServiceImpl implements FileService {
                 // 查询文件夹下的所有文件
                 List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(file.getPath(), userId);
                 for (FileDocument subFile : subList) {
+                    if (!FileType.DIR.equals(subFile.getType())) {
+                        totalSize += file.getSize();
+                    }
                     subFile.setDeletedAt(LocalDateTime.now());
                 }
                 delete.addAll(subList);
+            } else {
+                totalSize += file.getSize();
             }
             // TODO 定时任务执行物理删除
         }
         fileRepository.saveAll(delete);
+        userService.refreshQuota(-totalSize);
     }
 
     /**
      * 唯一一个用了 parentId 的方法
-     * TODO 根 parentId 魔法值
      *
      * @return
      */
@@ -452,7 +474,7 @@ public class FileServiceImpl implements FileService {
         for (DirTreeNode node : nodes) {
             Long parentId = node.getParentId();
             // 根目录
-            if (parentId == BizConstant.ROOT_PARENT_ID || !map.containsKey(parentId)) {
+            if (BizConstant.ROOT_PARENT_ID.equals(parentId) || !map.containsKey(parentId)) {
                 tree.add(node);
             } else {
                 DirTreeNode parentNode = map.get(parentId);
@@ -522,23 +544,28 @@ public class FileServiceImpl implements FileService {
                     } catch (DataIntegrityViolationException e) {
                         throw new BizException(BizConstant.REPEAT_NAME);
                     }
-
                 }
             }
         }
     }
 
     @Override
-    public void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceUser, Long targetUser) {
+    public void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceId, UserContext targetUser) {
         List<Long> fileIds = reqDTO.fileIds();
         String target = reqDTO.target();
+        Long targetId = targetUser.id();
+
+        // TODO 空间检测并发问题
+        Long totalSize = dirsSize(fileIds, targetId);
+        checkQuota(targetUser, totalSize);
+
         for (Long fileId : fileIds) {
-            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceUser);
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceId);
             if (optional.isPresent()) {
                 FileDocument file = optional.get();
                 // copy
                 FileDocument copyFile = assembleFileDocument(
-                        targetUser,
+                        targetId,
                         reqDTO.parentId(), // parentId
                         file.getMd5(),
                         file.getName(),
@@ -553,17 +580,18 @@ public class FileServiceImpl implements FileService {
 
                 String originalPath = file.getPath();
                 String originalCurDirectory = file.getCurDirectory();
-                if (!FileType.DIR.equals(copyFile.getType())) {
-                    copyFile.setPath(target + copyFile.getName());
-                    saveFile2DB(copyFile, true);
-                } else {
-                    transactionTemplate.execute(status -> {
+                transactionTemplate.execute(status -> {
+                    if (!FileType.DIR.equals(copyFile.getType())) {
+                        copyFile.setPath(target + copyFile.getName());
+                        saveFile2DB(copyFile, true);
+                        userService.refreshQuota(copyFile.getSize());
+                    } else {
                         copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
                         String newName = saveFile2DB(copyFile, true);
-                        List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceUser);
+                        List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceId);
                         for (FileDocument sub : subList) {
                             FileDocument copySub = assembleFileDocument(
-                                    targetUser,
+                                    targetId,
                                     sub.getParentId(), // 子文件的 parentId 不会变
                                     sub.getMd5(),
                                     sub.getName(),
@@ -584,10 +612,13 @@ public class FileServiceImpl implements FileService {
                             copySub.setCurDirectory(curDirectory);
                             copySub.setPath(path);
                             saveFile2DB(copySub, true);
+                            if (!FileType.DIR.equals(copySub.getType())) {
+                                userService.refreshQuota(copySub.getSize());
+                            }
                         }
-                        return null;
-                    });
-                }
+                    }
+                    return null;
+                });
             }
         }
     }
@@ -652,6 +683,31 @@ public class FileServiceImpl implements FileService {
         fileDocument.setType(fileType);
         fileDocument.setSuffix(suffix);
         return fileDocument;
+    }
+
+    private Long dirsSize(List<Long> fileIds, Long userId) {
+        long totalSize = 0L;
+        for (Long fileId : fileIds) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+            if (optional.isEmpty()) {
+                throw new BizException("文件不存在");
+            }
+            FileDocument dir = optional.get();
+            String path = dir.getPath();
+            List<FileDocument> subFileList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(path, dir.getUserId());
+            long temp = subFileList.stream()
+                    .filter(file -> !FileType.DIR.equals(file.getType()))
+                    .mapToLong(FileDocument::getSize)
+                    .sum();
+            totalSize += temp;
+        }
+        return totalSize;
+    }
+
+    private void checkQuota(UserContext userContext, Long fileSize) {
+        if (userContext.usedQuota() + fileSize > userContext.totalQuota()) {
+            throw new BizException(BizConstant.SPACE_LIMIT);
+        }
     }
 
     /**

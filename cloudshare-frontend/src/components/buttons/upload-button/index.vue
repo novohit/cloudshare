@@ -179,13 +179,19 @@ const filesAdded = (files, fileList, event) => {
                             statusText: panUtil.fileStatus.WAITING.text
                         })
                     }
-                }, res => {
-                    f.resume()
-                    taskStore.updateStatus({
-                        fileName: f.name,
-                        status: panUtil.fileStatus.WAITING.code,
-                        statusText: panUtil.fileStatus.WAITING.text
-                    })
+                }, error => {
+                    if (error.response.data.message !== '空间不足') {
+                        f.resume()
+                        taskStore.updateStatus({
+                            fileName: f.name,
+                            status: panUtil.fileStatus.WAITING.code,
+                            statusText: panUtil.fileStatus.WAITING.text
+                        })
+                    } else {
+                        f.cancel()
+                        taskStore.remove(f.name)
+                        taskStore.updateViewFlag(false)
+                    }
                 })
             })
         })

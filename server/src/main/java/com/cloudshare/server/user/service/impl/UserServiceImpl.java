@@ -141,4 +141,15 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
     }
+
+    @Override
+    public void refreshQuota(Long fileSize) {
+        Long userId = UserContextThreadHolder.getUserId();
+        Optional<User> optional = userRepository.findById(userId);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setUsedQuota(user.getUsedQuota() + fileSize);
+            userRepository.save(user);
+        }
+    }
 }

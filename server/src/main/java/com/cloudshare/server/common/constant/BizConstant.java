@@ -12,6 +12,8 @@ public final class BizConstant {
 
     public static final String REPEAT_NAME = "重名冲突";
 
+    public static final String SPACE_LIMIT = "空间不足";
+
     public static final Long ROOT_PARENT_ID = 0L;
 
     /**

@@ -3,6 +3,7 @@ package com.cloudshare.server.file.converter;
 import cn.hutool.core.io.FileUtil;
 import com.cloudshare.server.file.controller.response.DirTreeNode;
 import com.cloudshare.server.file.controller.response.FileVO;
+import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +19,7 @@ public interface FileConverter {
 
     @Mapping(source = "type", target = "fileType")
     @Mapping(source = "name", target = "fileName")
-    @Mapping(target = "size", expression = "java(readableFileSize(fileDocument.getSize()))")
+    @Mapping(target = "size", expression = "java(readableFileSize(fileDocument))")
     FileVO DO2VO(FileDocument fileDocument);
 
 
@@ -29,7 +30,10 @@ public interface FileConverter {
 
     List<DirTreeNode> DOList2TreeNodeList(List<FileDocument> fileList);
 
-    default String readableFileSize(Long size) {
-        return FileUtil.readableFileSize(size);
+    default String readableFileSize(FileDocument file) {
+        if (FileType.DIR.equals(file.getType())) {
+            return "-";
+        }
+        return FileUtil.readableFileSize(file.getSize());
     }
 }

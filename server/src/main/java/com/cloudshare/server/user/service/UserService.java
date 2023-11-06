@@ -26,4 +26,6 @@ public interface UserService {
     String login(LoginType loginType, AuthUser authUser);
 
     void update(Long userId, UserUpdateReqDTO reqDTO);
+
+    void refreshQuota(Long fileSize);
 }
