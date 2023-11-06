@@ -69,7 +69,7 @@
             </ul>
             <div class="pan-nav-progress">
                 <h3>套餐：{{userStore.plan}}</h3>
-                <el-progress :percentage="30" :show-text="false" :stroke-width="7" color="#16904f"></el-progress>
+                <el-progress :percentage="userStore.used/userStore.total" :show-text="false" :stroke-width="7" color="#16904f"></el-progress>
                 <div>{{filesize(userStore.used,{base:2})}}/{{filesize(userStore.total,{base:2})}}</div>
             </div>
         </div>
