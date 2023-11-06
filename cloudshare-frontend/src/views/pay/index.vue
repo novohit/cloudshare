@@ -21,18 +21,15 @@ import {ref} from 'vue'
 
 const data = ref('')
 const alipay = ()=>{
+    const productId = 1;
+    const buyNum = 1;
+    const actualPayAmount = 1;
+
     userService.pay({
-        "token": "test_f334d0d47a83",
-        "product_id": 1,
-        "buy_num": 1,
-        "total_amount": 27.69,
-        "actual_pay_amount": 19,
-        "pay_type": "ALI_PAY_PC",
-        "bill_type": "test_ea304456dffc",
-        "bill_header": "test_02f56667b032",
-        "bill_content": "test_951a4562e602",
-        "bill_receiver_phone": "test_71398c1e670e",
-        "bill_receiver_email": "test_17b07498eadd"
+        productId: productId,
+        buyNum: buyNum,
+        actualPayAmount: actualPayAmount,
+        payType: "ALI_PAY_PC",
     }, res => {
         // 处理掉script标签的内容
         const fragment = document.createElement('divform');

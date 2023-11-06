@@ -3,11 +3,16 @@ package com.cloudshare.server;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.cloudshare.server.common.constant.BizConstant;
+import com.cloudshare.server.order.model.Product;
+import com.cloudshare.server.order.repository.ProductRepository;
 import com.cloudshare.server.user.enums.PlanLevel;
 import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
 
 /**
  * @author novo
@@ -18,8 +23,11 @@ public class DataGenerationRunner implements CommandLineRunner {
 
     private final UserRepository userRepository;
 
-    public DataGenerationRunner(UserRepository userRepository) {
+    private final ProductRepository productRepository;
+
+    public DataGenerationRunner(UserRepository userRepository, ProductRepository productRepository) {
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -31,6 +39,10 @@ public class DataGenerationRunner implements CommandLineRunner {
         User guest = genUser("guest", "guest");
         if (userRepository.findByUsername(guest.getUsername()).isEmpty()) {
             userRepository.save(guest);
+        }
+        Product product = genProduct();
+        if (CollectionUtils.isEmpty(productRepository.findAll())) {
+            productRepository.save(product);
         }
     }
 
@@ -46,5 +58,14 @@ public class DataGenerationRunner implements CommandLineRunner {
         user.setTotalQuota(BizConstant.FREE_PLAN_QUOTA);
         user.setUsedQuota(0L);
         return user;
+    }
+
+    private Product genProduct() {
+        Product product = new Product();
+        product.setTitle("Plus会员");
+        product.setDetail("Plus会员");
+        product.setPlan(PlanLevel.PLUS);
+        product.setAmount(BigDecimal.valueOf(9.9));
+        return product;
     }
 }

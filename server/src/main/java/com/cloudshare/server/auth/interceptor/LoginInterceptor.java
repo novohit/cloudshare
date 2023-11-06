@@ -75,6 +75,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 user.getPhone(),
                 user.getAvatar(),
                 1,
+                user.getPlan(),
                 user.getTotalQuota(),
                 user.getUsedQuota()
         );
