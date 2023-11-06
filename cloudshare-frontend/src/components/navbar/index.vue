@@ -67,7 +67,13 @@
                     </a>
                 </li>
             </ul>
+            <div class="pan-nav-progress">
+                <h3>套餐：{{userStore.plan}}</h3>
+                <el-progress :percentage="30" :show-text="false" :stroke-width="7" color="#16904f"></el-progress>
+                <div>{{filesize(userStore.used,{base:2})}}/{{filesize(userStore.total,{base:2})}}</div>
+            </div>
         </div>
+        
     </div>
 </template>
 
@@ -76,12 +82,17 @@ import {storeToRefs} from 'pinia'
 import {useNavbarStore} from '@/stores/navbar'
 import {useRoute} from 'vue-router'
 import {onMounted} from 'vue'
+import {useUserStore} from '@/stores/user'
+
+import {filesize} from "filesize";
 
 const store = useNavbarStore()
 const route = useRoute()
 
 const {active} = storeToRefs(store)
 const {change} = store
+
+const userStore = useUserStore()
 
 onMounted(() => {
     let name = route.name
@@ -113,6 +124,13 @@ li {
     display: list-item;
     text-align: -webkit-match-parent;
     list-style: none;
+}
+
+.pan-nav-progress {
+    position: relative;
+    top:300px;
+    width:180px;
+    left:7px;
 }
 
 .pan-content .pan-nav-content-wrapper {
