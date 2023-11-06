@@ -119,8 +119,7 @@ public class ShareServiceImpl implements ShareService {
         }
         Share share = optional.get();
         if (!share.getCode().equals(reqDTO.code())) {
-//            throw new BizException("提取码错误");
-            return "";
+            throw new BizException("提取码错误");
         }
         return TokenUtil.generateAccessToken(shareId);
     }

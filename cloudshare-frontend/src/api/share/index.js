@@ -25,12 +25,12 @@ let shareService = {
             method: 'delete'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    checkShareCode: function (data, resolve) {
-        simpleHttp({
+    checkShareCode: function (data, resolve, reject) {
+        http({
             url: '/share/check-code',
             data: data,
             method: 'post'
-        }).then(res => resolve(res))
+        }).then(res => resolve(res)).catch(err => reject(err))
     },
     getShareFiles: function (params, resolve) {
         simpleHttp({

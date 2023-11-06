@@ -444,16 +444,13 @@ const doCheckShareCode = async () => {
                 shareId: getShareId(),
                 code: shareCodeForm.code
             }, res => {
-                if (res.data === "") {
-                    loading.value = false
-                    ElMessage.error("提取码错误")
-                } else {
-                    console.log("提取码正确")
-                    loading.value = false
-                    setShareToken(res.data)
-                    shareCodeDialogVisible.value = false
-                    loadShareInfo()
-                }
+                console.log("提取码正确")
+                loading.value = false
+                setShareToken(res.data)
+                shareCodeDialogVisible.value = false
+                loadShareInfo()
+            }, error => {
+                loading.value = false
             })
         }
     })
