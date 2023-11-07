@@ -6,7 +6,6 @@ import com.cloudshare.common.util.TokenUtil;
 import com.cloudshare.lock.lock.ILock;
 import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
-import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.user.controller.request.UserInfoRepVO;
 import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
 import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
             user.setSalt(salt);
             user.setPassword(cryptPassword);
             user.setPlan(PlanLevel.FREE);
-            user.setTotalQuota(BizConstant.FREE_PLAN_QUOTA);
+            user.setTotalQuota(PlanLevel.FREE.getQuota());
             user.setUsedQuota(0L);
             userRepository.save(user);
             return user.getId();
@@ -143,12 +142,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void refreshQuota(Long fileSize) {
-        Long userId = UserContextThreadHolder.getUserId();
+    public void incrementQuota(Long fileSize, Long userId) {
         Optional<User> optional = userRepository.findById(userId);
         if (optional.isPresent()) {
             User user = optional.get();
             user.setUsedQuota(user.getUsedQuota() + fileSize);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void incrementTotalQuota(Long fileSize, Long userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setTotalQuota(user.getTotalQuota() + fileSize);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void updatePlan(PlanLevel planLevel, Long userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setPlan(planLevel);
             userRepository.save(user);
         }
     }

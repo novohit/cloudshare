@@ -181,6 +181,7 @@ public class FileServiceImpl implements FileService {
     @Transactional
     public void singleUpload(FileSingleUploadReqDTO reqDTO) {
         UserContext userContext = UserContextThreadHolder.getUserContext();
+        Long userId = userContext.id();
         MultipartFile multipartFile = reqDTO.file();
         long size = multipartFile.getSize();
         checkQuota(userContext, size);
@@ -196,7 +197,7 @@ public class FileServiceImpl implements FileService {
             // hutool return suffix have no dot
             suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(
-                    userContext.id(),
+                    userId,
                     reqDTO.parentId(),
                     reqDTO.md5(),
                     context.getFileName(),
@@ -209,7 +210,7 @@ public class FileServiceImpl implements FileService {
                     suffix
             );
             saveFile2DB(fileDocument, true);
-            userService.refreshQuota(fileDocument.getSize());
+            userService.incrementQuota(fileDocument.getSize(), userId);
         } catch (IOException e) {
             log.error("文件上传异常", e);
             throw new BizException("文件上传异常");
@@ -226,6 +227,7 @@ public class FileServiceImpl implements FileService {
     @Transactional
     public Boolean secUpload(FileSecUploadReqDTO reqDTO) {
         UserContext userContext = UserContextThreadHolder.getUserContext();
+        Long userId = userContext.id();
         List<FileDocument> fileList = fileRepository.findByMd5AndDeletedAtIsNull(reqDTO.md5());
         if (CollectionUtils.isEmpty(fileList)) {
             return false;
@@ -237,7 +239,7 @@ public class FileServiceImpl implements FileService {
         suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
         // fileType suffix 以用户新给的文件名为主
         FileDocument fileDocument = assembleFileDocument(
-                userContext.id(),
+                userId,
                 reqDTO.parentId(),
                 reqDTO.md5(),
                 reqDTO.fileName(),
@@ -250,7 +252,7 @@ public class FileServiceImpl implements FileService {
                 suffix
         );
         saveFile2DB(fileDocument, true);
-        userService.refreshQuota(fileDocument.getSize());
+        userService.incrementQuota(fileDocument.getSize(), userId);
         return true;
     }
 
@@ -357,7 +359,7 @@ public class FileServiceImpl implements FileService {
                     suffix
             );
             saveFile2DB(fileDocument, true);
-            userService.refreshQuota(fileDocument.getSize());
+            userService.incrementQuota(fileDocument.getSize(), userId);
         } catch (IOException e) {
             log.error("文件合并异常", e);
             throw new BizException("文件合并异常");
@@ -451,7 +453,7 @@ public class FileServiceImpl implements FileService {
             // TODO 定时任务执行物理删除
         }
         fileRepository.saveAll(delete);
-        userService.refreshQuota(-totalSize);
+        userService.incrementQuota(-totalSize, userId);
     }
 
     /**
@@ -584,7 +586,7 @@ public class FileServiceImpl implements FileService {
                     if (!FileType.DIR.equals(copyFile.getType())) {
                         copyFile.setPath(target + copyFile.getName());
                         saveFile2DB(copyFile, true);
-                        userService.refreshQuota(copyFile.getSize());
+                        userService.incrementQuota(copyFile.getSize(), targetId);
                     } else {
                         copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
                         String newName = saveFile2DB(copyFile, true);
@@ -613,7 +615,7 @@ public class FileServiceImpl implements FileService {
                             copySub.setPath(path);
                             saveFile2DB(copySub, true);
                             if (!FileType.DIR.equals(copySub.getType())) {
-                                userService.refreshQuota(copySub.getSize());
+                                userService.incrementQuota(copySub.getSize(), targetId);
                             }
                         }
                     }

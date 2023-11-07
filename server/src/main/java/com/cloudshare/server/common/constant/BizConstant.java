@@ -17,11 +17,6 @@ public final class BizConstant {
     public static final Long ROOT_PARENT_ID = 0L;
 
     /**
-     * 默认空间 1GB
-     */
-    public static final Long FREE_PLAN_QUOTA = 1024 * 1024 * 1024L;
-
-    /**
      * 订单超时 30min
      * 单位 ms
      */

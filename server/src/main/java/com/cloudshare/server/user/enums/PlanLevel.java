@@ -1,17 +1,25 @@
 package com.cloudshare.server.user.enums;
 
+import lombok.Getter;
+
 /**
  * @author novo
  * @since 2023/11/5
  */
+@Getter
 public enum PlanLevel {
 
-    FREE,
+    FREE(1024 * 1024 * 1024L),
 
-    BASE,
+    BASE(10 * 1024 * 1024 * 1024L),
 
-    PLUS,
+    PLUS(100 * 1024 * 1024 * 1024L),
 
     ;
 
+    private final Long quota;
+
+    PlanLevel(Long quota) {
+        this.quota = quota;
+    }
 }

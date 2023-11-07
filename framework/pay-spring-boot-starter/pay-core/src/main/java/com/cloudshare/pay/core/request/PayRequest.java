@@ -29,9 +29,12 @@ public class PayRequest {
     private String description;
 
     /**
+     * 业务参数 json格式
+     */
+    private String bizContent;
+
+    /**
      * 订单超时时间 s
      */
     private Long timeOut;
-
-    private Long accountNo;
 }

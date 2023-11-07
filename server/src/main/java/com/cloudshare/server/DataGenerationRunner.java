@@ -58,7 +58,7 @@ public class DataGenerationRunner implements CommandLineRunner {
         user.setPassword(cryptPassword);
         user.setAvatar("https://zwx-images-1305338888.cos.ap-guangzhou.myqcloud.com/common/avatar-2023.jpg");
         user.setPlan(PlanLevel.FREE);
-        user.setTotalQuota(BizConstant.FREE_PLAN_QUOTA);
+        user.setTotalQuota(PlanLevel.FREE.getQuota());
         user.setUsedQuota(0L);
         return user;
     }
@@ -77,7 +77,7 @@ public class DataGenerationRunner implements CommandLineRunner {
         product.setTitle("Plus Plan");
         product.setDetail("100GB空间");
         product.setPlan(PlanLevel.PLUS);
-        product.setAmount(BigDecimal.valueOf(19.9));
+        product.setAmount(BigDecimal.valueOf(79.9));
         return product;
     }
 }

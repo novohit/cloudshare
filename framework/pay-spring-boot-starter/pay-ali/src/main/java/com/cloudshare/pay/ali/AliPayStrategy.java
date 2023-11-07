@@ -53,19 +53,19 @@ public class AliPayStrategy implements PayStrategy {
             model.setOutTradeNo(payRequest.getOrderOutTradeNo());
             model.setTotalAmount(payRequest.getActualPayAmount().toString());
             model.setProductCode("FAST_INSTANT_TRADE_PAY");
-            model.setPassbackParams(String.valueOf(payRequest.getAccountNo()));
+            model.setPassbackParams(payRequest.getBizContent());
             request.setNotifyUrl(properties.getNotifyUrl());
             if (StringUtils.hasText(properties.getReturnUrl())) {
                 request.setReturnUrl(properties.getReturnUrl());
             }
             request.setBizModel(model);
             AlipayTradePagePayResponse response = alipayClient.pageExecute(request);
-            log.debug("发起订单支付，订单号：{}，支付方式：{}，账号：{}，订单详情：{}，订单金额：{} \n调用支付返回：\n\n{}\n",
+            log.debug("发起订单支付，订单号：{}，支付方式：{}，订单详情：{}，订单金额：{}， 业务参数：{}，\n调用支付返回：\n\n{}\n",
                     payRequest.getOrderOutTradeNo(),
                     PayType.ALI_PAY_PC,
-                    payRequest.getAccountNo(),
                     payRequest.getDescription(),
                     payRequest.getActualPayAmount(),
+                    payRequest.getBizContent(),
                     JSON.toJSONString(response));
             if (!response.isSuccess()) {
                 throw new RuntimeException("调用支付宝发起支付异常");

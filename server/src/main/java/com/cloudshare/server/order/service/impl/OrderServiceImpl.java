@@ -19,7 +19,6 @@ import com.cloudshare.server.order.model.Product;
 import com.cloudshare.server.order.repository.OrderRepository;
 import com.cloudshare.server.order.service.OrderService;
 import com.cloudshare.server.order.service.ProductService;
-import com.cloudshare.server.user.enums.PlanLevel;
 import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -66,9 +65,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public String placeOrder(PlaceOrderReqDTO reqDTO) {
         UserContext user = UserContextThreadHolder.getUserContext();
-        if (user.plan().equals(PlanLevel.PLUS)) {
-            throw new BizException("您已经是会员了");
-        }
         Product product = productService.detail(reqDTO.productId());
         // 计算价格
         checkPrice(reqDTO, product);
@@ -76,13 +72,16 @@ public class OrderServiceImpl implements OrderService {
         String orderOutTradeNo = RandomUtil.randomString(32);
         Long orderId = saveOrder2DB(orderOutTradeNo, reqDTO, product);
         // 调起支付
+        JSONObject bizContent = new JSONObject();
+        bizContent.put("accountNo", user.id());
+        bizContent.put("plan", product.getPlan());
         PayRequest payRequest = PayRequest.builder()
                 .orderOutTradeNo(orderOutTradeNo)
-                .accountNo(user.id())
                 .actualPayAmount(reqDTO.actualPayAmount())
                 .payType(reqDTO.payType().name())
                 .title(product.getTitle())
                 .description(product.getDetail())
+                .bizContent(bizContent.toJSONString())
                 .timeOut(BizConstant.PLACE_ORDER_TIME_OUT)
                 .build();
         // 发送关单延迟消息
@@ -99,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("发起订单支付，订单号：{}，支付方式：{}，账号：{}，订单详情：{}，订单金额：{}",
                 payRequest.getOrderOutTradeNo(),
                 PayType.ALI_PAY_PC,
-                payRequest.getAccountNo(),
+                user.id(),
                 payRequest.getDescription(),
                 payRequest.getActualPayAmount());
         return payStrategyFactory.chooseStrategy(reqDTO.payType().name())
