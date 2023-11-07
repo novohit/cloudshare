@@ -1,0 +1,36 @@
+{
+  "properties": [
+    {
+      "name": "pay.alipay.app-id",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.private-key",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.alipay-public-key",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.server-url",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.notify-url",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.sign-type",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.charset",
+      "defaultValue": ""
+    },
+    {
+      "name": "pay.alipay.format",
+      "defaultValue": ""
+    }
+  ]
+}

@@ -41,6 +41,12 @@
 
         <dependency>
             <groupId>com.cloudshare</groupId>
+            <artifactId>pay-ali</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudshare</groupId>
             <artifactId>storage-engine-local</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -108,6 +114,11 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
         </dependency>
     </dependencies>
 

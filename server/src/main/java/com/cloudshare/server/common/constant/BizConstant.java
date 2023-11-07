@@ -20,4 +20,9 @@ public final class BizConstant {
      * 默认空间 1GB
      */
     public static final Long FREE_PLAN_QUOTA = 1024 * 1024 * 1024L;
+
+    /**
+     * 订单超时 30min
+     */
+    public static final long PLACE_ORDER_TIME_OUT = 60 * 30;
 }

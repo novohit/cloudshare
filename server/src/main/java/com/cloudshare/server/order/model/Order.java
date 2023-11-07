@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,6 +47,7 @@ public class Order extends BaseModel {
     private String outTradeNo;
 
     @Comment("NEW未支付订单,PAY已经支付订单,CANCEL超时取消订单")
+    @Enumerated(value = EnumType.STRING)
     private PayStateEnum state;
 
     @Comment("订单完成时间")
@@ -57,35 +60,11 @@ public class Order extends BaseModel {
     private BigDecimal actualPayAmount;
 
     @Comment("支付类型，微信-银行卡-支付宝")
+    @Enumerated(value = EnumType.STRING)
     private PayType payType;
 
     @Comment("账户名")
     private String username;
 
-    private Long accountNo;
-
-    /**
-     * 发票类型：0->不开发票；1->电子发票；2->纸质发票
-     */
-    private String billType;
-
-    /**
-     * 发票抬头
-     */
-    private String billHeader;
-
-    /**
-     * 发票内容
-     */
-    private String billContent;
-
-    /**
-     * 发票收票人电话
-     */
-    private String billReceiverPhone;
-
-    /**
-     * 发票收票人邮箱
-     */
-    private String billReceiverEmail;
+    private Long userId;
 }
