@@ -1,11 +1,12 @@
 <template>
     <div class="pay-content">
         <el-card class="content">
-            <h1>套餐选择</h1>
+            <h1>订阅计划</h1>
             <div>
-                <div class="list" v-for="item in listData" :key="item.id" @click="pay(item.amount)">
+                <div class="list" v-for="item in listData" :key="item.id" @click="pay(item)">
                     <h2>{{item.title}}</h2>
-                    <h2>{{item.amount}}</h2>
+                    <h2>{{item.detail}}</h2>
+                    <h2>{{item.amount}} RMB</h2>
                 </div>
             </div>
 
@@ -15,12 +16,12 @@
                 width="30%"
             >
                 <div>
-                    <h2 style="text-align: center">{{payPrice}}RMB</h2>
-                    <div class="pay-button" @click="alipay">
+                    <h2 style="text-align: center">{{productItem.amount}} RMB</h2>
+                    <div class="pay-button" @click="alipay(productItem)">
                         <i class="iconfont icon-alipay"></i>
                         <span>支付宝支付</span>
                     </div>
-                    <div class="pay-button" @click="wechat">
+                    <div class="pay-button" @click="wechat(productItem)">
                         <i class="iconfont icon-wechat-pay"></i>
                         <span>微信支付</span>
                     </div>
@@ -43,7 +44,7 @@ import {ref, onBeforeMount} from 'vue'
 
 const listData = ref([])
 const paylog = ref(false)
-const payPrice = ref(0)
+const productItem = ref()
 
 onBeforeMount(()=>{
     userService.list(res=>{
@@ -51,6 +52,7 @@ onBeforeMount(()=>{
             const temp = {
                 id:res.data[i].id,
                 title:res.data[i].title,
+                detail:res.data[i].detail,
                 amount:res.data[i].amount
             }
             listData.value.push(temp)
@@ -61,15 +63,15 @@ onBeforeMount(()=>{
 
 })
 
-const pay = (price)=>{
+const pay = (item)=>{
     paylog.value = true
-    payPrice.value = price
+    productItem.value = item
 } 
 
-const alipay = ()=>{
-    const productId = 1;
+const alipay = (item)=>{
+    const productId = item.id;
     const buyNum = 1;
-    const actualPayAmount = 1;
+    const actualPayAmount = item.amount * buyNum;
 
     userService.pay({
         productId: productId,
@@ -86,7 +88,7 @@ const alipay = ()=>{
     })
     
 }
-const wechat = ()=>{
+const wechat = (item)=>{
     console.log('wechat');
 }
 </script>

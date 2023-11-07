@@ -308,19 +308,25 @@ const fileUploaded = (rootFile, file, message, chunk) => {
 const uploadComplete = () => {
 }
 
-const uploadError = (rootFile, file, message, chunk) => {
-    taskStore.updateStatus({
-        fileName: file.name,
-        status: panUtil.fileStatus.FAIL.code,
-        statusText: panUtil.fileStatus.FAIL.text
-    })
-    taskStore.updateProcess({
-        fileName: file.name,
-        speed: panUtil.translateSpeed(0),
-        percentage: 0,
-        uploadedSize: panUtil.translateFileSize(0),
-        timeRemaining: panUtil.translateTime(Number.POSITIVE_INFINITY)
-    })
+const uploadError = (rootFile, file, data, chunk) => {
+    if (data.indexOf('空间不足')) {
+        ElMessage.error("空间不足")
+        taskStore.remove(file.name)
+        taskStore.updateViewFlag(false)
+    } else {
+        taskStore.updateStatus({
+            fileName: file.name,
+            status: panUtil.fileStatus.FAIL.code,
+            statusText: panUtil.fileStatus.FAIL.text
+        })
+        taskStore.updateProcess({
+            fileName: file.name,
+            speed: panUtil.translateSpeed(0),
+            percentage: 0,
+            uploadedSize: panUtil.translateFileSize(0),
+            timeRemaining: panUtil.translateTime(Number.POSITIVE_INFINITY)
+        })
+    }
 }
 
 const initUploader = () => {

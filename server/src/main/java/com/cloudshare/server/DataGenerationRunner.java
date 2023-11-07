@@ -10,7 +10,6 @@ import com.cloudshare.server.user.model.User;
 import com.cloudshare.server.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 
@@ -40,9 +39,13 @@ public class DataGenerationRunner implements CommandLineRunner {
         if (userRepository.findByUsername(guest.getUsername()).isEmpty()) {
             userRepository.save(guest);
         }
-        Product product = genProduct();
-        if (CollectionUtils.isEmpty(productRepository.findAll())) {
-            productRepository.save(product);
+        if (productRepository.findByPlanAndDeletedAtIsNull(PlanLevel.BASE)
+                .isEmpty()) {
+            productRepository.save(basePlan());
+        }
+        if (productRepository.findByPlanAndDeletedAtIsNull(PlanLevel.PLUS)
+                .isEmpty()) {
+            productRepository.save(plusPlan());
         }
     }
 
@@ -60,12 +63,21 @@ public class DataGenerationRunner implements CommandLineRunner {
         return user;
     }
 
-    private Product genProduct() {
+    private Product basePlan() {
         Product product = new Product();
-        product.setTitle("Plus会员");
-        product.setDetail("Plus会员");
-        product.setPlan(PlanLevel.PLUS);
+        product.setTitle("Base Plan");
+        product.setDetail("10GB空间");
+        product.setPlan(PlanLevel.BASE);
         product.setAmount(BigDecimal.valueOf(9.9));
+        return product;
+    }
+
+    private Product plusPlan() {
+        Product product = new Product();
+        product.setTitle("Plus Plan");
+        product.setDetail("100GB空间");
+        product.setPlan(PlanLevel.PLUS);
+        product.setAmount(BigDecimal.valueOf(19.9));
         return product;
     }
 }

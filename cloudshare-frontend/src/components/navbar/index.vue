@@ -68,9 +68,9 @@
                 </li>
             </ul>
             <div class="pan-nav-progress">
-                <h3>套餐：{{userStore.plan}}</h3>
-                <el-progress :percentage="userStore.used/userStore.total" :show-text="false" :stroke-width="7" color="#16904f"></el-progress>
-                <div>{{filesize(userStore.used,{base:2})}}/{{filesize(userStore.total,{base:2})}}</div>
+                <h3>当前订阅：{{userStore.plan}}</h3>
+                <el-progress :percentage="(userStore.used/userStore.total) * 100" :show-text="false" :stroke-width="7" :color="customColorMethod"></el-progress>
+                <div>{{filesize(userStore.used, {standard: "jedec"})}} / {{filesize(userStore.total, {standard: "jedec"})}}</div>
             </div>
         </div>
         
@@ -93,6 +93,22 @@ const {active} = storeToRefs(store)
 const {change} = store
 
 const userStore = useUserStore()
+
+const customColorMethod = (percentage) => {
+  if (percentage < 20) {
+    return '#16904f'
+  }
+  if (percentage < 40) {
+    return '#4a8c4b'
+  }
+  if (percentage < 60) {
+    return '#7e8846'
+  }
+  if (percentage < 80) {
+    return '#b28442'
+  }
+  return '#e6803d'
+}
 
 onMounted(() => {
     let name = route.name
@@ -128,9 +144,9 @@ li {
 
 .pan-nav-progress {
     position: relative;
-    top:300px;
-    width:180px;
-    left:7px;
+    top:70px;
+    width:150px;
+    left:20px;
 }
 
 .pan-content .pan-nav-content-wrapper {

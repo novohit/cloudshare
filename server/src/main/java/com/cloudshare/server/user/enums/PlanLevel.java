@@ -8,6 +8,8 @@ public enum PlanLevel {
 
     FREE,
 
+    BASE,
+
     PLUS,
 
     ;
