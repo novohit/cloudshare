@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity(name = "`order`")
+@Entity(name = "product_order")
 public class Order extends BaseModel {
 
     @Id

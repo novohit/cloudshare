@@ -2,12 +2,16 @@ package com.cloudshare.server.order.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.pay.core.PayStrategyFactory;
+import com.cloudshare.pay.core.PayType;
 import com.cloudshare.pay.core.request.PayRequest;
 import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
+import com.cloudshare.server.common.delay.DelayingMsg;
+import com.cloudshare.server.common.delay.DelayingQueue;
 import com.cloudshare.server.order.controller.request.PlaceOrderReqDTO;
 import com.cloudshare.server.order.enums.PayStateEnum;
 import com.cloudshare.server.order.model.Order;
@@ -17,17 +21,20 @@ import com.cloudshare.server.order.service.OrderService;
 import com.cloudshare.server.order.service.ProductService;
 import com.cloudshare.server.user.enums.PlanLevel;
 import com.cloudshare.web.exception.BizException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * @author novo
  * @since 2023/11/6
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -36,10 +43,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final PayStrategyFactory payStrategyFactory;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ProductService productService, PayStrategyFactory payStrategyFactory) {
+    private final DelayingQueue delayingQueue;
+
+    public OrderServiceImpl(OrderRepository orderRepository, ProductService productService, PayStrategyFactory payStrategyFactory, DelayingQueue delayingQueue) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.payStrategyFactory = payStrategyFactory;
+        this.delayingQueue = delayingQueue;
     }
 
 
@@ -64,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         checkPrice(reqDTO, product);
         // 订单入库
         String orderOutTradeNo = RandomUtil.randomString(32);
-        saveOrder2DB(orderOutTradeNo, reqDTO, product);
+        Long orderId = saveOrder2DB(orderOutTradeNo, reqDTO, product);
         // 调起支付
         PayRequest payRequest = PayRequest.builder()
                 .orderOutTradeNo(orderOutTradeNo)
@@ -75,19 +85,43 @@ public class OrderServiceImpl implements OrderService {
                 .description(product.getDetail())
                 .timeOut(BizConstant.PLACE_ORDER_TIME_OUT)
                 .build();
-        // TODO 发送延迟消息
+        // 发送关单延迟消息
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userId", user.id());
+        jsonObject.put("orderId", orderId);
+        DelayingMsg message = new DelayingMsg(
+                SnowflakeUtil.nextId(),
+                jsonObject.toJSONString(),
+                System.currentTimeMillis() + BizConstant.PLACE_ORDER_TIME_OUT,
+                LocalDateTime.now()
+        );
+        delayingQueue.send(BizConstant.ORDER_DELAY_QUEUE, message);
+        log.info("发起订单支付，订单号：{}，支付方式：{}，账号：{}，订单详情：{}，订单金额：{}",
+                payRequest.getOrderOutTradeNo(),
+                PayType.ALI_PAY_PC,
+                payRequest.getAccountNo(),
+                payRequest.getDescription(),
+                payRequest.getActualPayAmount());
         return payStrategyFactory.chooseStrategy(reqDTO.payType().name())
                 .pay(payRequest)
                 .getBody();
     }
 
+    @Override
+    @Transactional
+    public void cancel(Long orderId, Long userId) {
+        log.info("未支付订单关闭 orderId:{} userId:{}", orderId, userId);
+        orderRepository.cancel(orderId, userId, PayStateEnum.NEW, PayStateEnum.CANCEL);
+    }
 
-    private void saveOrder2DB(String orderOutTradeNo, PlaceOrderReqDTO reqDTO, Product product) {
+
+    private Long saveOrder2DB(String orderOutTradeNo, PlaceOrderReqDTO reqDTO, Product product) {
         UserContext user = UserContextThreadHolder.getUserContext();
+        Long orderId = SnowflakeUtil.nextId();
         Order order = new Order();
         BeanUtils.copyProperties(reqDTO, order);
         order.setUserId(user.id());
-        order.setOrderId(SnowflakeUtil.nextId());
+        order.setOrderId(orderId);
         order.setUsername(user.username());
         order.setProductSnapshot(JSON.toJSONString(product));
         order.setOutTradeNo(orderOutTradeNo);
@@ -97,6 +131,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(reqDTO.actualPayAmount());
         order.setState(PayStateEnum.NEW);
         orderRepository.save(order);
+        return orderId;
     }
 
     private void checkPrice(PlaceOrderReqDTO reqDTO, Product product) {

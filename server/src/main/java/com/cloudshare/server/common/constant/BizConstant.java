@@ -23,6 +23,9 @@ public final class BizConstant {
 
     /**
      * 订单超时 30min
+     * 单位 ms
      */
-    public static final long PLACE_ORDER_TIME_OUT = 60 * 30;
+    public static final long PLACE_ORDER_TIME_OUT = 30 * 60 * 1000;
+
+    public static final String ORDER_DELAY_QUEUE = "cloudshare.order";
 }

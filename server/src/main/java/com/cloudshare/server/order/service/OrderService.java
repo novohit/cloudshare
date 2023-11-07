@@ -7,5 +7,8 @@ import com.cloudshare.server.order.controller.request.PlaceOrderReqDTO;
  * @since 2023/11/6
  */
 public interface OrderService {
+
     String placeOrder(PlaceOrderReqDTO reqDTO);
+
+    void cancel(Long orderId, Long userId);
 }
