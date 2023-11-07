@@ -21,6 +21,10 @@
       "defaultValue": ""
     },
     {
+      "name": "pay.alipay.return-url",
+      "defaultValue": ""
+    },
+    {
       "name": "pay.alipay.sign-type",
       "defaultValue": ""
     },

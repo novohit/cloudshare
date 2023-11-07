@@ -110,8 +110,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void cancel(Long orderId, Long userId) {
-        log.info("未支付订单关闭 orderId:{} userId:{}", orderId, userId);
-        orderRepository.cancel(orderId, userId, PayStateEnum.NEW, PayStateEnum.CANCEL);
+        int rows = orderRepository.cancel(orderId, userId, PayStateEnum.NEW, PayStateEnum.CANCEL);
+        if (rows > 0) {
+            log.info("未支付订单关闭 orderId:{} userId:{}", orderId, userId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void changeOrderState(String outTradeNo, LocalDateTime payTime, Long userId) {
+        int rows = orderRepository.changeState(outTradeNo, payTime, userId, PayStateEnum.NEW, PayStateEnum.PAID);
+        if (rows > 0) {
+            log.info("订单状态更新成功 NEW->PAID，订单号：{}", outTradeNo);
+        } else {
+            log.error("订单状态更新失败 NEW->PAID，订单号：{}", outTradeNo);
+        }
     }
 
 

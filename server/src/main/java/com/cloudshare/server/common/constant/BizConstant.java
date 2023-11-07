@@ -27,5 +27,9 @@ public final class BizConstant {
      */
     public static final long PLACE_ORDER_TIME_OUT = 30 * 60 * 1000;
 
-    public static final String ORDER_DELAY_QUEUE = "cloudshare.order";
+    public static final String ORDER_DELAY_QUEUE = "cloudshare:order:delay_cancel";
+
+    public static final String ORDER_PAID_HANDLER_PREFIX = "cloudshare:order:paid:";
+
+    public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 }

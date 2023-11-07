@@ -17,6 +17,7 @@ import com.cloudshare.pay.core.response.PayCallBackResponse;
 import com.cloudshare.pay.core.response.PayResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
@@ -48,12 +49,15 @@ public class AliPayStrategy implements PayStrategy {
             AlipayTradePagePayModel model = new AlipayTradePagePayModel();
             model.setSubject(payRequest.getTitle());
             model.setBody(payRequest.getDescription());
-            model.setTimeoutExpress("60m");
+            model.setTimeoutExpress("30m");
             model.setOutTradeNo(payRequest.getOrderOutTradeNo());
             model.setTotalAmount(payRequest.getActualPayAmount().toString());
             model.setProductCode("FAST_INSTANT_TRADE_PAY");
-            model.setPassbackParams("LocalUserThreadHolder.getLocalUserNo().toString()");
+            model.setPassbackParams(String.valueOf(payRequest.getAccountNo()));
             request.setNotifyUrl(properties.getNotifyUrl());
+            if (StringUtils.hasText(properties.getReturnUrl())) {
+                request.setReturnUrl(properties.getReturnUrl());
+            }
             request.setBizModel(model);
             AlipayTradePagePayResponse response = alipayClient.pageExecute(request);
             log.debug("发起订单支付，订单号：{}，支付方式：{}，账号：{}，订单详情：{}，订单金额：{} \n调用支付返回：\n\n{}\n",

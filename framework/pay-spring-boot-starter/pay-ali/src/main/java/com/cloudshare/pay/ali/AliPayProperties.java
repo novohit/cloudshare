@@ -37,6 +37,11 @@ public class AliPayProperties {
     private String notifyUrl;
 
     /**
+     * 支付成功跳转地址（非必填）
+     */
+    private String returnUrl;
+
+    /**
      * 报文格式，推荐：json
      */
     private String format;
