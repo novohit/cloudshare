@@ -56,7 +56,9 @@ const doSearch = () => {
     fileStore.setSearchKey(searchKey.value)
     fileService.search({
         keyword: searchKey.value,
-        fileTypeList: []
+        fileTypeList: [],
+        curDirectory: fileStore.curDirectory,
+        parentId: fileStore.parentId
     }, res => {
         breadcrumbStore.clear()
         breadcrumbStore.addItem({

@@ -52,11 +52,11 @@ let fileService = {
             method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
-    search: function (params, resolve, reject) {
+    search: function (data, resolve, reject) {
         http({
             url: '/file/search',
-            params: params,
-            method: 'get'
+            data: data,
+            method: 'post'
         }).then(res => resolve(res)).catch(err => reject(err))
     },
     secUpload: function (data, resolve, reject) {

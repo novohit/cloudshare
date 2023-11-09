@@ -26,5 +26,7 @@ public final class BizConstant {
 
     public static final String ORDER_PAID_HANDLER_PREFIX = "cloudshare:order:paid:";
 
+    public static final String SEARCH_HISTORY_PREFIX = "cloudshare:search_history:";
+
     public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 }

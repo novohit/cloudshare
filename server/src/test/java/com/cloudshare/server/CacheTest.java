@@ -23,12 +23,12 @@ public class CacheTest {
     @Test
     void cacheTest() {
         Cache cache = cacheManager.getCache("");
-        cache.put("key", 1);
-        Integer value = cache.get("key", Integer.class);
+        cache.put("keyword", 1);
+        Integer value = cache.get("keyword", Integer.class);
         log.info("value:{}", value);
         try {
             Thread.sleep(6000L);
-            log.info("value:{}", cache.get("key", Integer.class));
+            log.info("value:{}", cache.get("keyword", Integer.class));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

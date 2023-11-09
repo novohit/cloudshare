@@ -80,7 +80,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 user.getUsedQuota()
         );
         BeanUtils.copyProperties(user, userContext);
-        log.info("登录用户 user:[{}]", userContext);
+        log.debug("登录用户 user:[{}]", userContext);
         // 用户信息传递：
         // 方式一：Request Attribute 传递
         // 方式二：ThreadLocal 传递

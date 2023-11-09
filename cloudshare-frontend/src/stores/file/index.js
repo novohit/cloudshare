@@ -85,7 +85,9 @@ export const useFileStore = defineStore('file', () => {
         if (searchFlag.value) {
             fileService.search({
                 keyword: searchKey.value,
-                fileTypeList: []
+                fileTypeList: [],
+                curDirectory: fileStore.curDirectory,
+                parentId: fileStore.parentId
             }, res => {
                 setFileList(res.data)
                 setTableLoading(false)

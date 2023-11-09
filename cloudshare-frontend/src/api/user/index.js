@@ -61,8 +61,8 @@ let userService = {
     },
     searchHistories: function (resolve, reject) {
         http({
-            url: '/user/search/histories',
-            params: {},
+            url: '/search/history',
+            params: { size: 5},
             method: 'get'
         }).then(res => resolve(res)).catch(res => reject(res))
     },

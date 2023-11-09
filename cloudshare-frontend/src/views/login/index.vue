@@ -68,7 +68,7 @@ const fileStore = useFileStore()
 const userStore = useUserStore()
 
 const {setParentId, setDefaultParentId, setCurDirectory, setDefaultCurDirectory} = fileStore
-const {setUsername, setAvatar} = userStore
+const {setUsername, setAvatar, setPlan} = userStore
 
 const usernameEl = ref(null)
 onMounted(() => {
@@ -87,6 +87,7 @@ const doLogin = () => {
                 setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 setAvatar(res.data.avatar)
+                setPlan(res.data.plan,res.data.totalQuota,res.data.usedQuota)
                 router.push({name: 'Index'})
             }, res => {
                 ElMessage.error(res.message)
@@ -109,6 +110,7 @@ const visitor = ()=>{
                 setDefaultCurDirectory(res.data.rootName)
                 setUsername(res.data.username)
                 setAvatar(res.data.avatar)
+                setPlan(res.data.plan,res.data.totalQuota,res.data.usedQuota)
                 router.push({name: 'Index'})
             }, res => {
                 ElMessage.error(res.message)
