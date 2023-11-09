@@ -13,6 +13,7 @@
         <module>framework</module>
         <module>dependencies</module>
         <module>server</module>
+        <module>data-sync</module>
     </modules>
 
     <properties>

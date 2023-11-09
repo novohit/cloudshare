@@ -138,7 +138,7 @@ const filesAdded = (files, fileList, event) => {
         files.forEach((f) => {
             f.pause()
             if (f.size > panUtil.getMaxFileSize()) {
-                throw new Error('文件：' + f.name + '大小超过了最大上传文件的限制（' + panUtil.translateFileSize(panUtil.getMaxFileSize()) + '）')
+                throw new Error('测试环境最大上传文件限制（' + panUtil.translateFileSize(panUtil.getMaxFileSize()) + '）')
             }
             let taskItem = {
                 target: f,
