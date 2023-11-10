@@ -2,6 +2,7 @@ package com.cloudshare.server.share.model;
 
 import com.cloudshare.server.common.BaseModel;
 import com.cloudshare.server.file.model.FileDocument;
+import com.cloudshare.server.link.model.ShortLink;
 import com.cloudshare.server.share.enums.ShareStatus;
 import com.cloudshare.server.share.enums.VisibleType;
 import com.cloudshare.server.user.model.User;
@@ -23,6 +24,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 /**
@@ -75,4 +77,8 @@ public class Share extends BaseModel {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(insertable = false, updatable = false, name = "userId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private User user;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "shareId", referencedColumnName = "shareId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private ShortLink shortLink;
 }

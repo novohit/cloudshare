@@ -14,6 +14,7 @@ import com.cloudshare.server.file.enums.FileType;
 import com.cloudshare.server.file.model.FileDocument;
 import com.cloudshare.server.file.repository.FileRepository;
 import com.cloudshare.server.file.service.FileService;
+import com.cloudshare.server.link.service.ShortLinkService;
 import com.cloudshare.server.share.controller.request.ShareCancelReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCheckCodeReqDTO;
 import com.cloudshare.server.share.controller.request.ShareCreateReqDTO;
@@ -29,6 +30,7 @@ import com.cloudshare.server.share.repository.ShareRepository;
 import com.cloudshare.server.share.service.ShareService;
 import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -54,14 +56,20 @@ public class ShareServiceImpl implements ShareService {
 
     private final FileConverter fileConverter;
 
+    private final ShortLinkService shortLinkService;
+
+    @Value("${cloudshare.share.front-end.url}")
+    private String shareFrontendUrl;
+
     public ShareServiceImpl(ShareRepository shareRepository, FileRepository fileRepository,
                             ShareConverter shareConverter, FileService fileService,
-                            FileConverter fileConverter) {
+                            FileConverter fileConverter, ShortLinkService shortLinkService) {
         this.shareRepository = shareRepository;
         this.fileRepository = fileRepository;
         this.shareConverter = shareConverter;
         this.fileService = fileService;
         this.fileConverter = fileConverter;
+        this.shortLinkService = shortLinkService;
     }
 
 
@@ -80,7 +88,8 @@ public class ShareServiceImpl implements ShareService {
         share.setFileId(fileId);
         share.setExpiredAt(reqDTO.expiredAt());
         share.setShareStatus(ShareStatus.ACTIVE);
-        share.setUrl("http://127.0.0.1:5173/share/" + shareId);
+        share.setUrl(shareFrontendUrl + shareId);
+        String shortUrl = shortLinkService.create(shareId, share.getUrl());
         if (VisibleType.PUBLIC.equals(reqDTO.visibleType())) {
             share.setVisibleType(VisibleType.PUBLIC);
         } else {
@@ -89,7 +98,7 @@ public class ShareServiceImpl implements ShareService {
             share.setCode(code);
         }
         shareRepository.save(share);
-        return new ShareCreateRespVO(share.getId(), share.getUrl(), share.getCode());
+        return new ShareCreateRespVO(share.getId(), shortUrl, share.getCode());
     }
 
     @Override

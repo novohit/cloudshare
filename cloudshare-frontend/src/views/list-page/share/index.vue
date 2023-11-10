@@ -31,7 +31,7 @@
                     prop="fileName"
                     sortable
                     show-overflow-tooltip
-                    min-width="200">
+                    min-width="230">
                     <template #default="scope">
                         <div class="share-name-content">
                             <i class="fa fa-share-alt"
@@ -56,10 +56,10 @@
                     sortable
                     align="center"
                     label="分享链接"
-                    min-width="250">
+                    min-width="230">
                     <template #default="scope">
                         <el-link type="primary" :href="scope.row.url" target="_blank">
-                            {{ scope.row.url.substring(0, 30) + '...' }}
+                            {{ scope.row.url }}
                         </el-link>
                     </template>
                 </el-table-column>
