@@ -54,6 +54,7 @@ public class ShortLinkController {
         if (CheckUtil.isLetterOrDigit(code)) {
             ShortLink shortLink = shortLinkService.findOneByCode(code);
             if (shortLink != null) {
+                shortLinkService.incrementPV(code);
                 response.setHeader("Location", shortLink.getOriginalUrl());
                 // 302跳转
                 response.setStatus(HttpStatus.FOUND.value());

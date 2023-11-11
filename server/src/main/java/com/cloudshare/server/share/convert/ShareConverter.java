@@ -14,11 +14,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ShareConverter {
 
-    @Mapping(target = "pv", constant = "0")
-    @Mapping(target = "download", constant = "0")
+    @Mapping(target = "pv", expression = "java(pv)")
     @Mapping(target = "fileName", expression = "java(share.getFileDocument().getName())")
     @Mapping(target = "url", expression = "java(share.getShortLink().getShortUrl())")
-    ShareVO DO2VO(Share share);
+    ShareVO DO2VO(Share share, Long pv);
 
 
     List<ShareVO> DOList2VOList(List<Share> shareList);

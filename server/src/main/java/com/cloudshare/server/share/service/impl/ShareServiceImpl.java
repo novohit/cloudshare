@@ -105,7 +105,11 @@ public class ShareServiceImpl implements ShareService {
     public List<ShareVO> list() {
         Long userId = UserContextThreadHolder.getUserId();
         List<Share> shareList = shareRepository.findByUserId(userId);
-        List<ShareVO> resp = shareConverter.DOList2VOList(shareList);
+        List<ShareVO> resp = new ArrayList<>();
+        for (Share share : shareList) {
+            resp.add(shareConverter.DO2VO(share, shortLinkService.getPV(share.getShortLink().getCode())));
+        }
+//        List<ShareVO> resp = shareConverter.DOList2VOList(shareList);
         return resp;
     }
 

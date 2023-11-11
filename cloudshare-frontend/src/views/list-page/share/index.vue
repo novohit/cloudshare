@@ -91,13 +91,13 @@
                     min-width="100"
                     align="center">
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     prop="download"
                     sortable
                     label="下载量"
                     min-width="100"
                     align="center">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                     prop="shareStatus"
                     sortable

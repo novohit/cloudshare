@@ -1,10 +1,13 @@
 package com.cloudshare.server.link.service;
 
+import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.link.model.ShortLink;
 import com.cloudshare.server.link.repository.ShortLinkRepository;
 import com.google.common.hash.Hashing;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * @author novo
@@ -15,13 +18,16 @@ public class ShortLinkService {
 
     private final ShortLinkRepository shortLinkRepository;
 
+    private final StringRedisTemplate stringRedisTemplate;
+
     private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Value("${cloudshare.short-link.url}")
     private String domain;
 
-    public ShortLinkService(ShortLinkRepository shortLinkRepository) {
+    public ShortLinkService(ShortLinkRepository shortLinkRepository, StringRedisTemplate stringRedisTemplate) {
         this.shortLinkRepository = shortLinkRepository;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
 
@@ -39,9 +45,34 @@ public class ShortLinkService {
         shortLink.setShortUrl(domain + code62);
         shortLink.setOriginalUrl(url);
         shortLink.setShareId(shareId);
+        shortLink.setPv(0L);
+        shortLink.setUv(0L);
         shortLinkRepository.save(shortLink);
         return shortLink.getShortUrl();
     }
+
+
+    public void incrementPV(String code) {
+        stringRedisTemplate.opsForValue().increment(BizConstant.LINK_PV_PREFIX + code);
+    }
+
+    public Long getPV(String code) {
+        String pv = stringRedisTemplate.opsForValue().get(BizConstant.LINK_PV_PREFIX + code);
+        if (!StringUtils.hasText(pv)) {
+            ShortLink shortLink = shortLinkRepository.findOneByCode(code);
+            return shortLink.getPv();
+        }
+        return Long.parseLong(pv);
+    }
+
+
+    public void savePV(String code, Long pv) {
+        ShortLink shortLink = shortLinkRepository.findOneByCode(code);
+        shortLink.setPv(pv);
+        shortLinkRepository.save(shortLink);
+    }
+
+    // =================================================================================================================
 
     /**
      * google murmurhash算法
@@ -50,7 +81,7 @@ public class ShortLinkService {
      * @return
      */
     @SuppressWarnings(value = {"all"})
-    public static long murmurHash32(String value) {
+    private long murmurHash32(String value) {
         long murmurHash32 = Hashing.murmur3_32().hashUnencodedChars(value).padToLong();
         return murmurHash32;
     }
