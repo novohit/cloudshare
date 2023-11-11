@@ -21,9 +21,9 @@ public class UserDoc {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text, searchAnalyzer = "ik_max_word")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String username;
 
-    @Field(type = FieldType.Text, searchAnalyzer = "ik_max_word")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String password;
 }
