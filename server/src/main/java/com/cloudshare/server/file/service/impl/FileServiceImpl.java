@@ -34,6 +34,7 @@ import com.cloudshare.web.exception.BadRequestException;
 import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -80,15 +83,19 @@ public class FileServiceImpl implements FileService {
 
     private final UserService userService;
 
+    private final ExecutorService baseExecutor;
+
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
-                           TransactionTemplate transactionTemplate, UserService userService) {
+                           TransactionTemplate transactionTemplate, UserService userService,
+                           @Qualifier("baseExecutor") ExecutorService baseExecutor) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
         this.fileChunkRepository = fileChunkRepository;
         this.transactionTemplate = transactionTemplate;
         this.userService = userService;
+        this.baseExecutor = baseExecutor;
     }
 
     @Override
@@ -106,7 +113,8 @@ public class FileServiceImpl implements FileService {
                 null,
                 0L,
                 FileType.DIR,
-                null
+                null,
+                ""
         );
         saveFile2DB(dir, true);
     }
@@ -185,6 +193,9 @@ public class FileServiceImpl implements FileService {
         MultipartFile multipartFile = reqDTO.file();
         long size = multipartFile.getSize();
         checkQuota(userContext, size);
+        CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> {
+            return "file content";
+        }, baseExecutor);
         // 保存实体
         // 上传文件
         try {
@@ -207,7 +218,8 @@ public class FileServiceImpl implements FileService {
                     context.getRealPath(),
                     context.getTotalSize(),
                     FileType.suffix2Type(suffix),
-                    suffix
+                    suffix,
+                    task.join()
             );
             saveFile2DB(fileDocument, true);
             userService.incrementQuota(fileDocument.getSize(), userId);
@@ -249,7 +261,8 @@ public class FileServiceImpl implements FileService {
                 same.getRealPath(),
                 same.getSize(),
                 FileType.suffix2Type(suffix),
-                suffix
+                suffix,
+                ""
         );
         saveFile2DB(fileDocument, true);
         userService.incrementQuota(fileDocument.getSize(), userId);
@@ -356,7 +369,8 @@ public class FileServiceImpl implements FileService {
                     context.getRealPath(),
                     totalSize.get(),
                     FileType.suffix2Type(suffix),
-                    suffix
+                    suffix,
+                    ""
             );
             saveFile2DB(fileDocument, true);
             userService.incrementQuota(fileDocument.getSize(), userId);
@@ -577,7 +591,8 @@ public class FileServiceImpl implements FileService {
                         file.getRealPath(),
                         file.getSize(),
                         file.getType(),
-                        file.getSuffix()
+                        file.getSuffix(),
+                        ""
                 );
 
                 String originalPath = file.getPath();
@@ -603,7 +618,8 @@ public class FileServiceImpl implements FileService {
                                     sub.getRealPath(),
                                     sub.getSize(),
                                     sub.getType(),
-                                    sub.getSuffix()
+                                    sub.getSuffix(),
+                                    ""
                             );
                             String curDirectory = sub.getCurDirectory().replaceFirst(originalCurDirectory, target);
                             String path = sub.getPath().replaceFirst(originalCurDirectory, target);
@@ -670,7 +686,8 @@ public class FileServiceImpl implements FileService {
             String realPath,
             Long size,
             FileType fileType,
-            String suffix
+            String suffix,
+            String content
     ) {
         FileDocument fileDocument = new FileDocument();
         fileDocument.setFileId(SnowflakeUtil.nextId());
@@ -684,6 +701,7 @@ public class FileServiceImpl implements FileService {
         fileDocument.setSize(size);
         fileDocument.setType(fileType);
         fileDocument.setSuffix(suffix);
+        fileDocument.setContent(content);
         return fileDocument;
     }
 

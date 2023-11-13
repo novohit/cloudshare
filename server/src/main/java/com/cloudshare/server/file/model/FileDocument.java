@@ -92,4 +92,8 @@ public class FileDocument extends BaseModel implements Serializable {
     @Column(length = 256)
     @Comment("MD5")
     private String md5;
+
+    @Column(columnDefinition = "text")
+    @Comment("文档内容")
+    private String content;
 }
