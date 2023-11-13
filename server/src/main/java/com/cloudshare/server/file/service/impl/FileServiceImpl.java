@@ -5,6 +5,7 @@ import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
+import com.cloudshare.server.common.parser.TextParserStrategyFactory;
 import com.cloudshare.server.file.controller.requset.DirCreateReqDTO;
 import com.cloudshare.server.file.controller.requset.DirUpdateReqDTO;
 import com.cloudshare.server.file.controller.requset.FileChunkMergeReqDTO;
@@ -85,10 +86,13 @@ public class FileServiceImpl implements FileService {
 
     private final ExecutorService baseExecutor;
 
+    private final TextParserStrategyFactory strategyFactory;
+
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
                            TransactionTemplate transactionTemplate, UserService userService,
-                           @Qualifier("baseExecutor") ExecutorService baseExecutor) {
+                           @Qualifier("baseExecutor") ExecutorService baseExecutor,
+                           TextParserStrategyFactory strategyFactory) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
@@ -96,6 +100,7 @@ public class FileServiceImpl implements FileService {
         this.transactionTemplate = transactionTemplate;
         this.userService = userService;
         this.baseExecutor = baseExecutor;
+        this.strategyFactory = strategyFactory;
     }
 
     @Override
@@ -192,21 +197,32 @@ public class FileServiceImpl implements FileService {
         Long userId = userContext.id();
         MultipartFile multipartFile = reqDTO.file();
         long size = multipartFile.getSize();
+
         checkQuota(userContext, size);
+
+        String filename = multipartFile.getOriginalFilename();
+        String temp = FileUtil.getSuffix(filename);
+        // hutool return suffix have no dot
+        final String suffix = StringUtils.hasText(temp) ? BizConstant.DOT + temp : "";
+
+        // 文档类型文件解析
         CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> {
-            return "file content";
+            try {
+                return strategyFactory.chooseStrategy(FileType.suffix2Type(suffix))
+                        .toText(multipartFile.getInputStream());
+            } catch (IOException e) {
+                throw new BizException("文本解析异常");
+            }
         }, baseExecutor);
+
         // 保存实体
         // 上传文件
         try {
             StoreContext context = new StoreContext();
             context.setTotalSize(size);
             context.setInputStream(multipartFile.getInputStream());
-            context.setFileName(multipartFile.getOriginalFilename());
+            context.setFileName(filename);
             storageEngine.store(context);
-            String suffix = FileUtil.getSuffix(context.getFileName());
-            // hutool return suffix have no dot
-            suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
             FileDocument fileDocument = assembleFileDocument(
                     userId,
                     reqDTO.parentId(),

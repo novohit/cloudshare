@@ -1,6 +1,6 @@
 package com.cloudshare.server.link.controller;
 
-import com.cloudshare.server.common.CheckUtil;
+import com.cloudshare.server.common.util.CheckUtil;
 import com.cloudshare.server.link.model.ShortLink;
 import com.cloudshare.server.link.service.ShortLinkService;
 import lombok.extern.slf4j.Slf4j;

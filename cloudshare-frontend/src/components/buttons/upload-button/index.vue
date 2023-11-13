@@ -84,8 +84,11 @@ const fileOptions = {
             md5: params.identifier,
             fileName: params.filename,
             relativePath: params.relativePath,
+            parentId: parentId.value,
+            curDirectory: curDirectory.value
         }
     },
+    // TODO query 无效
     query: function (file, chunk) {
         return {
             parentId: parentId.value,

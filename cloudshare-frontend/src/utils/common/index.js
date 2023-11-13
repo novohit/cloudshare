@@ -143,7 +143,7 @@ let panUtil = {
         return 1024 * 1024 * 1024 * 1
     },
     getChunkUploadSwitch() {
-        return true
+        return false
     },
     goHome() {
         window.location.href = '/'

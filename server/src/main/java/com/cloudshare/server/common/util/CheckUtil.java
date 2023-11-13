@@ -1,4 +1,4 @@
-package com.cloudshare.server.common;
+package com.cloudshare.server.common.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
