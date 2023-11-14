@@ -27,7 +27,9 @@ public class FileDataSyncHandler {
 
     public void syncData(CanalBinlogEvent message) {
         List<Map<String, Object>> data = message.getData();
-
+        if (!message.getDatabase().equals("cloudshare")) {
+            return;
+        }
         for (Map<String, Object> obj : data) {
             String jsonString = JSON.toJSONString(obj);
             // TODO fastjson2 升级 https://github.com/alibaba/fastjson2/issues/1615
