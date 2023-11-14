@@ -15,6 +15,8 @@ import com.cloudshare.server.file.controller.response.DirTreeNode;
 import com.cloudshare.server.file.controller.response.FileVO;
 import com.cloudshare.server.file.service.FileService;
 import com.cloudshare.web.response.Response;
+import org.novo.limit.annotation.RateLimit;
+import org.novo.limit.enums.LimitType;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -113,6 +115,7 @@ public class FileController {
         return Response.success();
     }
 
+    @RateLimit(time = 5, count = 3, limitType = LimitType.IP)
     @GetMapping("/download/{fileId}")
     public void download(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();

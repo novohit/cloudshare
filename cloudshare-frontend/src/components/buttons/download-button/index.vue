@@ -32,16 +32,37 @@ const {multipleSelection} = storeToRefs(fileStore)
 const loading = ref(false)
 
 const doDownload = (item) => {
-    let url = panUtil.getUrlPrefix() + '/file/download/' + item.fileId + '?Authorization=' + getToken(),
-        fileName = item.fileName,
-        link = document.createElement('a')
-    console.log(url)
-    link.style.display = 'none'
-    link.href = url
-    link.setAttribute('download', fileName)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    let url = panUtil.getUrlPrefix() + '/file/download/' + item.fileId,
+        fileName = item.fileName;
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': getToken(),
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            ElMessage.error("操作频繁")
+            return;
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        // 创建一个虚拟链接并模拟点击以触发下载
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        const objectUrl = window.URL.createObjectURL(blob);
+        link.href = objectUrl;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(objectUrl);
+    })
+    .catch(error => {
+        // 在这里处理错误，可以弹出提示信息或执行其他操作
+    });
 }
 
 const doDownLoads = (items, i) => {

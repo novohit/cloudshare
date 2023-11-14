@@ -52,8 +52,10 @@ public class GlobalExceptionHandler {
             log.error("[接口请求方式错误] url:[{}] message:[{}]", requestUrl, exception.getMessage());
             return Response.error(exception.getMessage());
         }
-        log.error("[系统异常] url:[{}]", requestUrl, e);
-        return Response.build(BizCodeEnum.SERVER_ERROR);
+        // TODO 限流异常
+//        log.error("[系统异常] url:[{}]", requestUrl, e);
+//        return Response.build(BizCodeEnum.SERVER_ERROR);
+        return Response.error(e.getMessage());
     }
 
     /**
