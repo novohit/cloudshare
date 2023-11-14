@@ -11,6 +11,9 @@
                     <el-dropdown-item command="payment">会员订阅</el-dropdown-item>
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                    <el-dropdown-item command="about">
+                        <a href="https://github.com/novohit/cloudshare">&nbsp;&nbsp;Github</a>
+                    </el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -130,6 +133,8 @@ const handleCommand = (command) => {
         doLogout()
     } else if (command === 'payment') {
         doPayment()
+    } else if (command === 'about') {
+
     }
 }
 
