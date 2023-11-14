@@ -24,15 +24,16 @@
                              @submit.native.prevent>
                         <el-form-item label="分享类型">
                             <el-radio-group v-model="shareFileForm.visibleType">
-                                <el-radio disabled label="0">有提取码</el-radio>
+                                <el-radio disabled label="PRIVATE">有提取码</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="分享有效期">
-                            <el-select v-model="shareFileForm.expiredAt">
-                                <el-option label="永久有效" value="PUBLIC"></el-option>
-                                <el-option label="7天有效" value="PUBLIC"></el-option>
-                                <el-option label="30天有效" value="PUBLIC"></el-option>
-                            </el-select>
+                            <el-date-picker
+                                v-model="shareFileForm.expiredAt"
+                                type="datetime"
+                                value-format="YYYY-MM-DD HH:mm:ss"
+                                placeholder="选择日期"
+                            ></el-date-picker>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -96,9 +97,16 @@ const shareFormRef = ref(null)
 const step = ref(1)
 
 const shareFileForm = reactive({
-    visibleType: 'PRIVATE',
-    expiredAt: '2035-11-11 00:00:00'
-})
+  visibleType: 'PRIVATE',
+  expiredAt: ''
+});
+
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 2);
+tomorrow.setHours(0, 0, 0, 0);
+
+shareFileForm.expiredAt = tomorrow.toISOString();
 
 const shareResultForm = reactive({
     url: '',
