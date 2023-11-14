@@ -150,6 +150,10 @@ let panUtil = {
     },
     handleId(id) {
         return id.replace(/\+/g, '%2B').replace(/\//g, '%2F')
+    },
+    getEnv() {
+        // return "prod"
+        return "dev"
     }
 }
 

@@ -122,6 +122,10 @@ const visitor = ()=>{
 }
 
 const google = ()=>{
+    if (panUtil.getEnv() === 'prod') {
+        ElMessage.error("线上环境未开启Google登录")
+        return
+    }
     window.location.href ="/api/oauth/render/google";
     console.log(window.location.href);
 }

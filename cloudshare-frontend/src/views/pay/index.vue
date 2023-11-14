@@ -41,6 +41,7 @@
 import PanHeader from '@/components/header/index.vue'
 import userService from '@/api/user'
 import {ref, onBeforeMount} from 'vue'
+import panUtil from '@/utils/common'
 
 const listData = ref([])
 const paylog = ref(false)
@@ -69,6 +70,10 @@ const pay = (item)=>{
 } 
 
 const alipay = (item)=>{
+    if (panUtil.getEnv() === 'prod') {
+        ElMessage.error("线上环境未开启支付")
+        return
+    }
     const productId = item.id;
     const buyNum = 1;
     const actualPayAmount = item.amount * buyNum;
@@ -89,6 +94,11 @@ const alipay = (item)=>{
     
 }
 const wechat = (item)=>{
+    if (panUtil.getEnv() === 'prod') {
+        ElMessage.error("线上环境未开启支付")
+        return
+    }
+    ElMessage.error("敬请期待")
     console.log('wechat');
 }
 </script>
