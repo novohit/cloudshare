@@ -19,7 +19,8 @@ const route = useRoute()
 
 const init = () => {
     let id = route.params.fileId
-    showPath.value = 'https://view.officeapps.live.com/op/view.aspx?src=' + escape(panUtil.getPreviewUrl(id))
+    // 这里用 preview url 会预览不了 The URL of the original file is not valid or the document is not publicly accessible.
+    showPath.value = 'https://view.officeapps.live.com/op/view.aspx?src=http://cloud.novohit.top' + escape(panUtil.getDownloadUrl(id))
 }
 
 onMounted(() => {

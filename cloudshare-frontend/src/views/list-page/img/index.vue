@@ -22,8 +22,8 @@ const buttonArray = ref(['upload', 'download', 'delete', 'rename', 'share', 'cop
 
 onMounted(() => {
     fileStore.setSearchFlag(false)
-    fileStore.setParentId('')
-    fileStore.setCurDirectory('')
+    fileStore.refreshParentId()
+    fileStore.refreshCurDirectory()
     fileStore.setFileTypeList(['IMAGE'])
     fileStore.loadFileList()
 })

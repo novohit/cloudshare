@@ -130,6 +130,9 @@ let panUtil = {
     getPreviewUrl(id) {
         return panUtil.getUrlPrefix() + '/file/preview/' + id + '?Authorization=' + getToken()
     },
+    getDownloadUrl(id) {
+        return panUtil.getUrlPrefix() + '/file/download/' + id + '?Authorization=' + getToken()
+    },
     getUrlPrefix() {
         return '/api'
     },
