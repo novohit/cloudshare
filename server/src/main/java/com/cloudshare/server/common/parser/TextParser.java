@@ -2,6 +2,7 @@ package com.cloudshare.server.common.parser;
 
 import com.cloudshare.server.file.enums.FileType;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -17,5 +18,5 @@ public interface TextParser {
         return null;
     }
 
-    String toText(InputStream inputStream);
+    String toText(InputStream inputStream) throws IOException;
 }

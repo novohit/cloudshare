@@ -3,6 +3,7 @@ package com.cloudshare.server.common.parser;
 import com.cloudshare.server.file.enums.FileType;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -17,7 +18,7 @@ public class NotTextParser implements TextParser {
     }
 
     @Override
-    public String toText(InputStream inputStream) {
+    public String toText(InputStream inputStream) throws IOException {
         return "";
     }
 }

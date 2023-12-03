@@ -4,6 +4,7 @@ import com.cloudshare.server.common.util.PDFUtil;
 import com.cloudshare.server.file.enums.FileType;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -11,7 +12,7 @@ import java.io.InputStream;
  * @since 2023/11/13
  */
 @Component
-public class PDFTextParser implements TextParser {
+public class PDFParser implements TextParser {
 
     @Override
     public FileType mark() {
@@ -19,7 +20,7 @@ public class PDFTextParser implements TextParser {
     }
 
     @Override
-    public String toText(InputStream inputStream) {
+    public String toText(InputStream inputStream) throws IOException {
         return PDFUtil.PDF2Text(inputStream);
     }
 }

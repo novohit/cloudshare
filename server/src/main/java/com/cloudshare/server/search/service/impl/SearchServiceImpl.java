@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,13 +47,15 @@ public class SearchServiceImpl implements SearchService {
         Long userId = UserContextThreadHolder.getUserId();
         String curDirectory = reqDTO.curDirectory();
         String keyword = reqDTO.keyword();
-        List<FileDocument> searchResp = new ArrayList<>();
+        Set<FileDocument> searchResp = new HashSet<>();
 
         saveSearchHistory(userId, keyword);
-        List<FileDocument> list = fileRepository.findByNameContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
-        searchResp.addAll(list);
+        List<FileDocument> namesLike = fileRepository.findByNameContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
+        List<FileDocument> contentLike = fileRepository.findByContentContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
+        searchResp.addAll(namesLike);
+        searchResp.addAll(contentLike);
 
-        List<FileVO> resp = fileConverter.DOList2VOList(searchResp);
+        List<FileVO> resp = fileConverter.DOList2VOList(searchResp.stream().toList());
         return resp;
     }
 

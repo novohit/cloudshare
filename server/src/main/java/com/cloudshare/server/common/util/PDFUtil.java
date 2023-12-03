@@ -14,14 +14,12 @@ import java.io.InputStream;
 @Slf4j
 public class PDFUtil {
 
-    public static String PDF2Text(InputStream inputStream) {
+    public static String PDF2Text(InputStream inputStream) throws IOException {
         try (PDDocument doc = PDDocument.load(inputStream)) {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(doc);
             log.info("Text size: {}, characters: \n{}", text.length(), text);
             return text;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
