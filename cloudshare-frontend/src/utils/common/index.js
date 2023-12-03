@@ -92,16 +92,16 @@ let panUtil = {
             case 'DIR':
                 tagStr = 'fa fa-folder-o'
                 break
-            case 2:
+            case 'ARCHIVE':
                 tagStr = 'fa fa-file-archive-o'
                 break
-            case 3:
+            case 'EXCEL':
                 tagStr = 'fa fa-file-excel-o'
                 break
-            case 4:
+            case 'WORD':
                 tagStr = 'fa fa-file-word-o'
                 break
-            case 5:
+            case 'PDF':
                 tagStr = 'fa fa-file-pdf-o'
                 break
             case 'TXT':
@@ -116,7 +116,7 @@ let panUtil = {
             case 'VIDEO':
                 tagStr = 'fa fa-file-video-o'
                 break
-            case 10:
+            case 'PPT':
                 tagStr = 'fa fa-file-powerpoint-o'
                 break
             case 'SOURCE_CODE':
@@ -143,7 +143,7 @@ let panUtil = {
         return 1024 * 1024 * 1024 * 1
     },
     getChunkUploadSwitch() {
-        return false
+        return true
     },
     goHome() {
         window.location.href = '/'

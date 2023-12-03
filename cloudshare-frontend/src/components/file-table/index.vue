@@ -212,12 +212,12 @@ const clickFilename = (row) => {
             // goInFolder(panUtil.handleId(row.fileId))
             goInFolder(row.fileId, row.curDirectory, row.fileName)
             break
-        case 3:
-        case 4:
-        case 10:
+        case 'EXCEL':
+        case 'WORD':
+        case 'PPT':
             showOffice(row)
             break
-        case 5:
+        case 'PDF':
         case 'TXT':
             showIframe(row)
             break
