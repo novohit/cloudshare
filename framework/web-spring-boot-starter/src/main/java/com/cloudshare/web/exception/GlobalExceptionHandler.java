@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
             return Response.error(exception.getMessage());
         }
         // TODO 限流异常
-//        log.error("[系统异常] url:[{}]", requestUrl, e);
+        log.error("[系统异常] url:[{}]", requestUrl, e);
 //        return Response.build(BizCodeEnum.SERVER_ERROR);
         return Response.error(e.getMessage());
     }

@@ -15,7 +15,7 @@ public interface UserConverter {
 
     UserInfoRepVO DO2VO(User user);
 
-    @Mapping(target = "rootName", constant = "/")
+    @Mapping(target = "rootName", constant = "")
     @Mapping(target = "rootId", constant = "0L")
     UserInfoRepVO Context2VO(UserContext user);
 }

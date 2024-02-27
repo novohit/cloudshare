@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  */
 public record DirCreateReqDTO(
         @NotNull Long parentId,
-        @NotBlank String dirName,
-        @NotBlank String curDirectory
+        @NotBlank String fileName,
+        @NotNull String curDirectory
 ) {
 }

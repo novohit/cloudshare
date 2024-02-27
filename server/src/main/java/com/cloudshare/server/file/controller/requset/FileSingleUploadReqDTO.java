@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 public record FileSingleUploadReqDTO(
         String md5,
         @NotNull Long parentId,
-        @NotBlank String curDirectory,
+        @NotNull String curDirectory,
         @NotNull MultipartFile file
 ) {
 }

@@ -9,8 +9,8 @@ import java.util.List;
  * @since 2023/11/1
  */
 public record FileMoveOrCopyReqDTO(
-        @NotNull Long parentId,
+        @NotNull Long parentId, // 目标
         @NotNull List<Long> fileIds,
-        @NotBlank String target // 目标目录
+        @NotNull String target // 目标目录
 ) {
 }

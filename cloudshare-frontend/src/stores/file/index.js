@@ -8,7 +8,7 @@ export const useFileStore = defineStore('file', () => {
     const parentId = ref('')
     const curDirectory = ref('')
     const defaultParentId = ref('0')
-    const defaultCurDirectory = ref('/')
+    const defaultCurDirectory = ref('')
     const fileList = ref([])
     const multipleSelection = ref([])
     const fileTypeList = ref([])

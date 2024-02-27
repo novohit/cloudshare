@@ -39,7 +39,7 @@ public class UserController {
         return Response.success(valid);
     }
 
-    @GetMapping
+    @GetMapping("/info")
     public Response<UserInfoRepVO> getUserInfo() {
         UserInfoRepVO repDTO = userService.getUserInfo();
         return Response.success(repDTO);

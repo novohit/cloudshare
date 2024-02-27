@@ -81,7 +81,7 @@ const doAddDir = async () => {
             fileService.addDir({
                 parentId: parentId.value,
                 curDirectory: curDirectory.value,
-                dirName: addDirForm.dirName
+                fileName: addDirForm.dirName
             }, res => {
                 loading.value = false
                 addDirDialogVisible.value = false

@@ -11,6 +11,6 @@ public record FileSecUploadReqDTO(
         @NotBlank String fileName,
         @NotBlank String md5,
         @NotNull Long parentId,
-        @NotBlank String curDirectory
+        @NotNull String curDirectory
 ) {
 }

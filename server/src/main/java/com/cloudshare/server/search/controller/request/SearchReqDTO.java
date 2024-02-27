@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  */
 public record SearchReqDTO(
         @NotNull Long parentId,
-        @NotBlank String curDirectory,
+        @NotNull String curDirectory,
         String keyword
 ) {
 }

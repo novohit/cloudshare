@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -97,16 +99,21 @@ public class FileController {
      * @param md5
      * @return
      */
-    @GetMapping("/chunk-upload")
+    @GetMapping("/already-uploaded")
     public Response<List<Integer>> chunkUpload(@NotBlank @RequestParam String md5) {
         List<Integer> received = fileService.chunkUpload(md5);
         return Response.success(received);
     }
 
-    @RateLimit(time = 10, count = 50, limitType = LimitType.IP)
+    //    @RateLimit(time = 10, count = 50, limitType = LimitType.IP)
     @PostMapping(path = "/chunk-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Boolean> chunkUpload(@Validated FileChunkUploadReqDTO reqDTO) {
         boolean merge = fileService.chunkUpload(reqDTO);
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return Response.success(merge);
     }
 
@@ -126,6 +133,11 @@ public class FileController {
     @GetMapping("/preview/{fileId}")
     public void preview(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         fileService.preview(fileId, response);
+    }
+
+    @GetMapping("/media/{fileId}")
+    public void mediaPreview(@PathVariable("fileId") Long fileId, @RequestHeader(required = false, defaultValue = "bytes=0-") String range, HttpServletResponse response) {
+        fileService.mediaPreview(fileId, range, response);
     }
 
     @PostMapping("/move")

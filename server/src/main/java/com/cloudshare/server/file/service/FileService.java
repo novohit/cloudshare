@@ -14,6 +14,7 @@ import com.cloudshare.server.file.controller.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.file.controller.response.DirTreeNode;
 import com.cloudshare.server.file.controller.response.FileVO;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -43,6 +44,8 @@ public interface FileService {
     void download(Long fileId, Long userId, HttpServletResponse response);
 
     void preview(Long fileId, HttpServletResponse response);
+
+    void mediaPreview(Long fileId, String range, HttpServletResponse response);
 
     void delete(FileDeleteReqDTO reqDTO);
 

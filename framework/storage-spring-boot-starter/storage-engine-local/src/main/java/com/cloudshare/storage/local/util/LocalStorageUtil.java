@@ -51,12 +51,12 @@ public class LocalStorageUtil {
         }
     }
 
-    public static void readStreamFromFile(OutputStream outputStream, File source, long totalSize) throws IOException {
+    public static void readStreamFromFile(OutputStream outputStream, File source, long position, long size) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(source);
              FileChannel inputChannel = fileInputStream.getChannel();
              WritableByteChannel targetChannel = Channels.newChannel(outputStream)
         ) {
-            inputChannel.transferTo(0, totalSize, targetChannel);
+            inputChannel.transferTo(position, size, targetChannel);
         }
     }
 }

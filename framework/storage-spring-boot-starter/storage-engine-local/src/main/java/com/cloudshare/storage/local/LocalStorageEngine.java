@@ -79,7 +79,11 @@ public class LocalStorageEngine extends AbstractStorageEngine {
 
     protected void doRead(ReadContext context) throws IOException {
         File file = new File(context.getRealPath());
-        LocalStorageUtil.readStreamFromFile(context.getOutputStream(), file, file.length());
+        long position = 0L;
+        long size = file.length();
+        if (context.getPosition() != 0) position = context.getPosition();
+        if (context.getSize() != 0) size = context.getSize();
+        LocalStorageUtil.readStreamFromFile(context.getOutputStream(), file, position, size);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.cloudshare.server.file.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.server.auth.UserContext;
@@ -34,9 +35,11 @@ import com.cloudshare.storage.core.model.StoreContext;
 import com.cloudshare.web.exception.BadRequestException;
 import com.cloudshare.web.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -44,10 +47,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,7 +111,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void createDir(DirCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        String name = reqDTO.dirName();
+        String name = reqDTO.fileName();
         FileDocument dir = assembleFileDocument(
                 userId,
                 reqDTO.parentId(),
@@ -114,7 +119,7 @@ public class FileServiceImpl implements FileService {
                 name,
                 null,
                 reqDTO.curDirectory(),
-                reqDTO.curDirectory() + name + BizConstant.LINUX_SEPARATOR,
+                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + name,
                 null,
                 0L,
                 FileType.DIR,
@@ -163,12 +168,12 @@ public class FileServiceImpl implements FileService {
             String originalCurDirectory = file.getCurDirectory();
             file.setName(newName);
             if (!FileType.DIR.equals(file.getType())) {
-                file.setPath(originalCurDirectory + newName);
+                file.setPath(originalCurDirectory + BizConstant.LINUX_SEPARATOR + newName);
                 saveFile2DB(file, false);
             } else {
                 try {
                     transactionTemplate.execute(status -> {
-                        file.setPath(originalCurDirectory + newName + BizConstant.LINUX_SEPARATOR);
+                        file.setPath(originalCurDirectory + BizConstant.LINUX_SEPARATOR + newName);
                         saveFile2DB(file, false);
                         List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
                         for (FileDocument sub : subList) {
@@ -455,6 +460,54 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public void mediaPreview(Long fileId, String range, HttpServletResponse response) {
+        Long userId = UserContextThreadHolder.getUserId();
+        // TODO 视频流防盗
+        // 1. 校验权限
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        if (optional.isEmpty()) {
+            throw new BizException("文件不存在");
+        }
+        FileDocument fileDocument = optional.get();
+        if (!FileType.VIDEO.equals(fileDocument.getType()) && !FileType.AUDIO.equals(fileDocument.getType())) {
+            throw new BizException("非法多媒体类型");
+        }
+
+        long start = Long.parseLong(range.substring(range.indexOf("=") + 1, range.indexOf("-")));
+        long end = fileDocument.getSize() - 1;
+        if (range.indexOf("-") != range.length() - 1) {
+            end = Long.parseLong(range.substring(range.indexOf("-") + 1));
+        }
+        long rangeLength = end + 1 - start;
+
+        // 2. 返回文件流
+        try {
+            // TODO set content-type
+            response.setContentType("application/octet-stream");
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            //设置此次相应返回的数据长度
+            response.setContentLength(Math.toIntExact(rangeLength));
+            //设置此次相应返回的数据范围
+            response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + fileDocument.getSize());
+            response.setHeader("Accept-Ranges", "bytes");
+
+            ReadContext context = new ReadContext();
+            context.setPosition(start);
+            context.setSize(fileDocument.getSize());
+            context.setRealPath(fileDocument.getRealPath());
+            context.setOutputStream(response.getOutputStream());
+            storageEngine.read(context);
+        } catch (IOException e) {
+            if (e instanceof ClientAbortException) {
+                // 忽略 客户端主动取消的连接
+            } else {
+                log.error("文件读取异常", e);
+                throw new BizException("网络错误");
+            }
+        }
+    }
+
+    @Override
     @Transactional
     public void delete(FileDeleteReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
@@ -467,6 +520,7 @@ public class FileServiceImpl implements FileService {
         for (FileDocument file : list) {
             // 文件直接设置删除时间
             file.setDeletedAt(LocalDateTime.now());
+            file.setName(file.getName() + "_" + DateUtil.now());
             if (FileType.DIR.equals(file.getType())) {
                 // 查询文件夹下的所有文件
                 List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(file.getPath(), userId);
@@ -475,6 +529,7 @@ public class FileServiceImpl implements FileService {
                         totalSize += file.getSize();
                     }
                     subFile.setDeletedAt(LocalDateTime.now());
+                    subFile.setName(subFile.getName() + "_" + LocalDateTime.now());
                 }
                 delete.addAll(subList);
             } else {
@@ -558,12 +613,12 @@ public class FileServiceImpl implements FileService {
                 file.setCurDirectory(reqDTO.target());
                 file.setParentId(reqDTO.parentId());
                 if (!FileType.DIR.equals(file.getType())) {
-                    file.setPath(reqDTO.target() + file.getName());
+                    file.setPath(reqDTO.target() + BizConstant.LINUX_SEPARATOR + file.getName());
                     saveFile2DB(file, false);
                 } else {
                     try {
                         transactionTemplate.execute(status -> {
-                            file.setPath(reqDTO.target() + file.getName() + BizConstant.LINUX_SEPARATOR);
+                            file.setPath(reqDTO.target() + BizConstant.LINUX_SEPARATOR + file.getName());
                             saveFile2DB(file, false);
                             List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
                             for (FileDocument sub : subList) {
@@ -615,17 +670,17 @@ public class FileServiceImpl implements FileService {
                 String originalCurDirectory = file.getCurDirectory();
                 transactionTemplate.execute(status -> {
                     if (!FileType.DIR.equals(copyFile.getType())) {
-                        copyFile.setPath(target + copyFile.getName());
+                        copyFile.setPath(target + BizConstant.LINUX_SEPARATOR + copyFile.getName());
                         saveFile2DB(copyFile, true);
                         userService.incrementQuota(copyFile.getSize(), targetId);
                     } else {
-                        copyFile.setPath(target + copyFile.getName() + BizConstant.LINUX_SEPARATOR);
+                        copyFile.setPath(target + BizConstant.LINUX_SEPARATOR + copyFile.getName());
                         String newName = saveFile2DB(copyFile, true);
                         List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, sourceId);
                         for (FileDocument sub : subList) {
                             FileDocument copySub = assembleFileDocument(
                                     targetId,
-                                    sub.getParentId(), // 子文件的 parentId 不会变
+                                    sub.getParentId(), // TODO 子文件的 parentId 重新赋值
                                     sub.getMd5(),
                                     sub.getName(),
                                     sub.getRealName(),
@@ -663,13 +718,11 @@ public class FileServiceImpl implements FileService {
         List<FileType> fileTypes = reqDTO.fileTypeList();
         // 一级文件列表
         List<FileDocument> fileList = new ArrayList<>();
-        if (StringUtils.hasText(reqDTO.curDirectory())) {
-            // 搜当前目录
-            fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, curDirectory);
-        } else {
-            // 全局搜索
-            fileList = fileRepository.findByUserIdAndDeletedAtIsNull(userId);
+        if ("/".equals(curDirectory)) {
+            curDirectory = "";
         }
+        fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNull(userId, curDirectory);
+
         if (!CollectionUtils.isEmpty(fileTypes)) {
             fileList = fileList.stream()
                     .filter(fileDocument -> fileTypes.contains(fileDocument.getType()))
@@ -788,10 +841,7 @@ public class FileServiceImpl implements FileService {
         }
         if (!newName.equals(fileDocument.getName())) {
             fileDocument.setName(newName);
-            String newPath = fileDocument.getType() == FileType.DIR
-                    ? fileDocument.getCurDirectory() + newName + BizConstant.LINUX_SEPARATOR
-                    : fileDocument.getCurDirectory() + newName;
-            fileDocument.setPath(newPath);
+            fileDocument.setPath(fileDocument.getCurDirectory() + BizConstant.LINUX_SEPARATOR + newName);
         }
 
         fileRepository.save(fileDocument);

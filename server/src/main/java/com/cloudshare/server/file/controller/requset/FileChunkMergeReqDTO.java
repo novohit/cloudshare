@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public record FileChunkMergeReqDTO(
         @NotBlank String md5,
         @NotNull Long parentId,
-        @NotBlank String curDirectory,
+        @NotNull String curDirectory,
         @NotBlank String fileName
 ) {
 }

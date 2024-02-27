@@ -20,7 +20,7 @@ let userService = {
     },
     info: function (resolve, reject) {
         http({
-            url: '/user/',
+            url: '/user/info',
             params: {},
             method: 'get'
         }).then(res => resolve(res)).catch(res => reject(res))
