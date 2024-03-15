@@ -510,6 +510,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void delete(FileDeleteReqDTO reqDTO) {
+        // TODO path 设置时间
         Long userId = UserContextThreadHolder.getUserId();
         if (CollectionUtils.isEmpty(reqDTO.fileIds())) {
             return;

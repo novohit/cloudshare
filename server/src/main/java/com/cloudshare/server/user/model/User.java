@@ -2,6 +2,7 @@ package com.cloudshare.server.user.model;
 
 import com.cloudshare.server.common.BaseModel;
 import com.cloudshare.server.user.enums.PlanLevel;
+import com.cloudshare.server.user.enums.RoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;
@@ -61,4 +62,8 @@ public class User extends BaseModel {
 
     @Comment("已使用空间")
     private Long usedQuota;
+
+    @Comment("角色")
+    @Enumerated(value = EnumType.STRING)
+    private RoleEnum role;
 }

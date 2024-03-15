@@ -44,6 +44,11 @@ public enum FileType implements Serializable {
         return suffixes.contains(suffix);
     }),
 
+    MD(suffix -> {
+        List<String> suffixes = Arrays.asList(".md");
+        return suffixes.contains(suffix);
+    }),
+
 
     CSV(suffix -> {
         List<String> suffixes = Arrays.asList(".csv");

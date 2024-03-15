@@ -19,7 +19,7 @@ public interface FileConverter {
 
     @Mapping(source = "type", target = "fileType")
     @Mapping(source = "name", target = "fileName")
-    @Mapping(target = "size", expression = "java(readableFileSize(fileDocument))")
+    @Mapping(target = "readableSize", expression = "java(readableFileSize(fileDocument))")
     FileVO DO2VO(FileDocument fileDocument);
 
 

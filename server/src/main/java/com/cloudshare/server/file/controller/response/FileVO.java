@@ -15,7 +15,8 @@ public record FileVO(
         String curDirectory,
         FileType fileType,
         String fileName,
-        String size,
+        Long size,
+        String readableSize,
         String suffix,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createdAt,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime updatedAt

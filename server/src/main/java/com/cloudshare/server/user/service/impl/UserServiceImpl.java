@@ -1,5 +1,7 @@
 package com.cloudshare.server.user.service.impl;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.cloudshare.common.util.TokenUtil;
@@ -92,7 +94,9 @@ public class UserServiceImpl implements UserService {
             if (!cryptPassword.equals(user.getPassword())) {
                 throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
             }
-            return TokenUtil.generateAccessToken(user.getId());
+            StpUtil.login(user.getId());
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            return tokenInfo.tokenValue;
         }
         throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
     }
@@ -118,13 +122,17 @@ public class UserServiceImpl implements UserService {
     public String login(LoginType loginType, AuthUser authUser) {
         Optional<UserAuth> optional = userAuthRepository.findByLoginTypeAndIdentify(loginType, authUser.getUuid());
         if (optional.isPresent()) {
-            return TokenUtil.generateAccessToken(optional.get().getUserId());
+            StpUtil.login(optional.get().getUserId());
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            return tokenInfo.tokenValue;
         } else {
             UserRegisterReqDTO reqDTO = new UserRegisterReqDTO(authUser.getUsername(), "123456", authUser.getAvatar());
             Long userId = register(reqDTO);
             UserAuth userAuth = new UserAuth(null, userId, LoginType.GOOGLE, authUser.getUuid());
             userAuthRepository.save(userAuth);
-            return TokenUtil.generateAccessToken(userId);
+            StpUtil.login(userId);
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            return tokenInfo.tokenValue;
         }
     }
 
