@@ -1,6 +1,6 @@
 package com.cloudshare.server.common.parser;
 
-import com.cloudshare.server.file.enums.FileType;
+import com.cloudshare.server.enums.FileType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

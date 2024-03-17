@@ -1,6 +1,6 @@
 package com.cloudshare.server.auth;
 
-import com.cloudshare.server.user.enums.PlanLevel;
+import com.cloudshare.server.enums.PlanLevel;
 
 /**
  * @author novo

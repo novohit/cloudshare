@@ -2,12 +2,11 @@ package com.cloudshare.server;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
-import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.order.model.Product;
 import com.cloudshare.server.order.repository.ProductRepository;
-import com.cloudshare.server.user.enums.PlanLevel;
-import com.cloudshare.server.user.model.User;
-import com.cloudshare.server.user.repository.UserRepository;
+import com.cloudshare.server.enums.PlanLevel;
+import com.cloudshare.server.model.User;
+import com.cloudshare.server.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

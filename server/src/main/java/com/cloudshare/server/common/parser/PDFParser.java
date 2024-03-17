@@ -1,7 +1,7 @@
 package com.cloudshare.server.common.parser;
 
 import com.cloudshare.server.common.util.PDFUtil;
-import com.cloudshare.server.file.enums.FileType;
+import com.cloudshare.server.enums.FileType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

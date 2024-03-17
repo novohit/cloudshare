@@ -1,8 +1,8 @@
 package com.cloudshare.server.user;
 
-import com.cloudshare.server.user.controller.request.UserLoginReqDTO;
-import com.cloudshare.server.user.controller.request.UserRegisterReqDTO;
-import com.cloudshare.server.user.service.UserService;
+import com.cloudshare.server.dto.requset.UserLoginReqDTO;
+import com.cloudshare.server.dto.requset.UserRegisterReqDTO;
+import com.cloudshare.server.service.UserService;
 import com.cloudshare.web.exception.BizException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

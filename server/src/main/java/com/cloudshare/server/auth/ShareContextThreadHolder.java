@@ -1,7 +1,7 @@
 package com.cloudshare.server.auth;
 
 
-import com.cloudshare.server.share.model.Share;
+import com.cloudshare.server.model.Share;
 
 /**
  * @author novo

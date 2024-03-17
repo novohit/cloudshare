@@ -1,7 +1,7 @@
 package com.cloudshare.server.order.repository;
 
 import com.cloudshare.server.order.model.Product;
-import com.cloudshare.server.user.enums.PlanLevel;
+import com.cloudshare.server.enums.PlanLevel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

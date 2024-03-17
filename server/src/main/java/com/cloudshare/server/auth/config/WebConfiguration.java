@@ -2,8 +2,8 @@ package com.cloudshare.server.auth.config;
 
 import com.cloudshare.server.auth.interceptor.LoginInterceptor;
 import com.cloudshare.server.auth.interceptor.ShareInterceptor;
-import com.cloudshare.server.share.service.ShareService;
-import com.cloudshare.server.user.service.UserService;
+import com.cloudshare.server.service.ShareService;
+import com.cloudshare.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;

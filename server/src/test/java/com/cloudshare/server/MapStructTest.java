@@ -1,9 +1,9 @@
 package com.cloudshare.server;
 
-import com.cloudshare.server.file.controller.response.FileVO;
-import com.cloudshare.server.file.converter.FileConverter;
-import com.cloudshare.server.file.enums.FileType;
-import com.cloudshare.server.file.model.FileDocument;
+import com.cloudshare.server.dto.response.FileVO;
+import com.cloudshare.server.converter.FileConverter;
+import com.cloudshare.server.enums.FileType;
+import com.cloudshare.server.model.FileDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

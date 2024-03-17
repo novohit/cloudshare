@@ -1,7 +1,7 @@
 package com.cloudshare.server.order.model;
 
 import com.cloudshare.server.common.BaseModel;
-import com.cloudshare.server.user.enums.PlanLevel;
+import com.cloudshare.server.enums.PlanLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Comment;

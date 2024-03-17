@@ -1,6 +1,6 @@
 package com.cloudshare.server.search.controller;
 
-import com.cloudshare.server.file.controller.response.FileVO;
+import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.search.controller.request.SearchReqDTO;
 import com.cloudshare.server.search.controller.response.SearchHistoryResp;
 import com.cloudshare.server.search.service.SearchService;

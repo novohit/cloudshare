@@ -2,10 +2,10 @@ package com.cloudshare.server.search.service.impl;
 
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.common.constant.BizConstant;
-import com.cloudshare.server.file.controller.response.FileVO;
-import com.cloudshare.server.file.converter.FileConverter;
-import com.cloudshare.server.file.model.FileDocument;
-import com.cloudshare.server.file.repository.FileRepository;
+import com.cloudshare.server.dto.response.FileVO;
+import com.cloudshare.server.converter.FileConverter;
+import com.cloudshare.server.model.FileDocument;
+import com.cloudshare.server.repository.FileRepository;
 import com.cloudshare.server.search.controller.request.SearchReqDTO;
 import com.cloudshare.server.search.controller.response.SearchHistoryResp;
 import com.cloudshare.server.search.service.SearchService;
