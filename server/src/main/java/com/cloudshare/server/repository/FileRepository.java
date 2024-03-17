@@ -57,5 +57,5 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
                   @Param("newName") String newName,
                   @Param("newPath") String newPath);
 
-    List<FileDocument> findByUserIdAndDeletedAtIsNull(Long userId);
+    List<FileDocument> findByUserIdAndCurDirectoryAndDeletedAtIsNotNull(Long userId, String curDirectory);
 }

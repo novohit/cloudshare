@@ -67,9 +67,15 @@ public class FileController {
         return Response.success();
     }
 
+    /**
+     * 移入回收站
+     *
+     * @param reqDTO
+     * @return
+     */
     @DeleteMapping
-    public Response<Void> delete(@RequestBody FileDeleteReqDTO reqDTO) {
-        fileService.delete(reqDTO);
+    public Response<Void> logicallyDelete(@RequestBody FileDeleteReqDTO reqDTO) {
+        fileService.logicallyDelete(reqDTO);
         return Response.success();
     }
 

@@ -1,6 +1,5 @@
 package com.cloudshare.server.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.server.auth.UserContext;
@@ -232,7 +231,7 @@ public class FileServiceImpl implements FileService {
                     context.getFileName(),
                     null,
                     reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + context.getFileName(),
+                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileName(),
                     context.getRealPath(),
                     context.getTotalSize(),
                     FileType.suffix2Type(suffix),
@@ -275,7 +274,7 @@ public class FileServiceImpl implements FileService {
                 reqDTO.fileName(),
                 null,
                 reqDTO.curDirectory(),
-                reqDTO.curDirectory() + reqDTO.fileName(),
+                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
                 same.getRealPath(),
                 same.getSize(),
                 FileType.suffix2Type(suffix),
@@ -383,7 +382,7 @@ public class FileServiceImpl implements FileService {
                     reqDTO.fileName(),
                     null,
                     reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + reqDTO.fileName(),
+                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
                     context.getRealPath(),
                     totalSize.get(),
                     FileType.suffix2Type(suffix),
@@ -506,8 +505,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public void delete(FileDeleteReqDTO reqDTO) {
-        // TODO path 设置时间
+    public void logicallyDelete(FileDeleteReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         if (CollectionUtils.isEmpty(reqDTO.fileIds())) {
             return;
@@ -517,23 +515,27 @@ public class FileServiceImpl implements FileService {
         Long totalSize = 0L;
         for (FileDocument file : list) {
             // 文件直接设置删除时间
-            file.setDeletedAt(LocalDateTime.now());
-            file.setName(file.getName() + "_" + DateUtil.now());
+            LocalDateTime deleteTime = LocalDateTime.now();
+            file.setDeletedAt(deleteTime);
+            long ts = System.currentTimeMillis();
+            String originalPath = file.getPath();
+            file.setName(file.getName() + "_" + ts);
+            file.setPath(originalPath + "_" + ts);
             if (FileType.DIR.equals(file.getType())) {
                 // 查询文件夹下的所有文件
-                List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(file.getPath(), userId);
+                List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(originalPath, userId);
                 for (FileDocument subFile : subList) {
                     if (!FileType.DIR.equals(subFile.getType())) {
                         totalSize += file.getSize();
                     }
-                    subFile.setDeletedAt(LocalDateTime.now());
-                    subFile.setName(subFile.getName() + "_" + LocalDateTime.now());
+                    subFile.setDeletedAt(deleteTime);
+                    subFile.setCurDirectory(subFile.getCurDirectory().replaceFirst(originalPath, file.getPath()));
+                    subFile.setPath(subFile.getPath().replaceFirst(originalPath, file.getPath()));
                 }
                 delete.addAll(subList);
             } else {
                 totalSize += file.getSize();
             }
-            // TODO 定时任务执行物理删除
         }
         fileRepository.saveAll(delete);
         userService.incrementQuota(-totalSize, userId);

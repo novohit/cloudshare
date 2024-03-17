@@ -46,7 +46,7 @@ public interface FileService {
 
     void mediaPreview(Long fileId, String range, HttpServletResponse response);
 
-    void delete(FileDeleteReqDTO reqDTO);
+    void logicallyDelete(FileDeleteReqDTO reqDTO);
 
     List<DirTreeNode> dirTree();
 
