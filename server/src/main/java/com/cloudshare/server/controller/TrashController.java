@@ -1,6 +1,7 @@
 package com.cloudshare.server.controller;
 
 import com.cloudshare.server.dto.requset.FileDeleteReqDTO;
+import com.cloudshare.server.dto.requset.TrashDeleteReqDTO;
 import com.cloudshare.server.dto.requset.TrashListReqDTO;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.service.TrashService;
@@ -33,8 +34,15 @@ public class TrashController {
         return Response.success(trashService.list(reqDTO));
     }
 
-    @DeleteMapping
-    public Response<Void> physicallyDelete() {
+    @DeleteMapping("/delete")
+    public Response<Void> physicallyDelete(@Validated @RequestBody List<Long> fileIds) {
+        trashService.physicallyDelete(fileIds);
+        return Response.success();
+    }
+
+    @PostMapping("/recover")
+    public Response<Void> recover(@Validated @RequestBody List<Long> fileIds) {
+        trashService.recover(fileIds);
         return Response.success();
     }
 }

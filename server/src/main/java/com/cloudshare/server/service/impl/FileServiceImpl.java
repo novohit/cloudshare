@@ -16,6 +16,7 @@ import com.cloudshare.server.dto.requset.FileMoveOrCopyReqDTO;
 import com.cloudshare.server.dto.requset.FileRenameReqDTO;
 import com.cloudshare.server.dto.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.dto.requset.FileSingleUploadReqDTO;
+import com.cloudshare.server.dto.requset.UserInfoRepVO;
 import com.cloudshare.server.dto.response.DirTreeNode;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.converter.FileConverter;
@@ -199,7 +200,7 @@ public class FileServiceImpl implements FileService {
         MultipartFile multipartFile = reqDTO.file();
         long size = multipartFile.getSize();
 
-        checkQuota(userContext, size);
+        checkQuota(size);
 
         String filename = multipartFile.getOriginalFilename();
         String temp = FileUtil.getSuffix(filename);
@@ -262,7 +263,7 @@ public class FileServiceImpl implements FileService {
             return false;
         }
         FileDocument same = fileList.get(0);
-        checkQuota(userContext, same.getSize());
+        checkQuota(same.getSize());
 
         String suffix = FileUtil.getSuffix(reqDTO.fileName());
         suffix = suffix.isEmpty() ? "" : BizConstant.DOT + suffix;
@@ -297,7 +298,7 @@ public class FileServiceImpl implements FileService {
     public synchronized boolean chunkUpload(FileChunkUploadReqDTO reqDTO) {
         UserContext userContext = UserContextThreadHolder.getUserContext();
         Long userId = userContext.id();
-        checkQuota(userContext, reqDTO.totalSize());
+        checkQuota(reqDTO.totalSize());
         try {
             // 上传分片
             MultipartFile multipartFile = reqDTO.file();
@@ -644,7 +645,7 @@ public class FileServiceImpl implements FileService {
 
         // TODO 空间检测并发问题
         Long totalSize = dirsSize(fileIds, targetId);
-        checkQuota(targetUser, totalSize);
+        checkQuota(totalSize);
 
         for (Long fileId : fileIds) {
             Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceId);
@@ -710,6 +711,36 @@ public class FileServiceImpl implements FileService {
                 });
             }
         }
+    }
+
+    @Override
+    public long calculateSize(List<Long> fileIds) {
+        long size = 0L;
+        Long userId = UserContextThreadHolder.getUserId();
+        for (Long fileId : fileIds) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+            if (optional.isPresent()) {
+                FileDocument fileDocument = optional.get();
+                if (FileType.DIR.equals(fileDocument.getType())) {
+                    List<FileDocument> subList = fileRepository.findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(fileDocument.getPath(), userId);
+                    for (FileDocument sub : subList) {
+                        if (!FileType.DIR.equals(sub.getType())) size += sub.getSize();
+                    }
+                } else {
+                    size += fileDocument.getSize();
+                }
+            }
+        }
+        return size;
+    }
+
+    @Override
+    public void checkQuota(Long fileSize) {
+        UserInfoRepVO userInfo = userService.getUserInfo();
+        if (userInfo.usedQuota() + fileSize > userInfo.totalQuota()) {
+            throw new BizException(BizConstant.SPACE_LIMIT);
+        }
+
     }
 
     @Override
@@ -791,12 +822,6 @@ public class FileServiceImpl implements FileService {
             totalSize += temp;
         }
         return totalSize;
-    }
-
-    private void checkQuota(UserContext userContext, Long fileSize) {
-        if (userContext.usedQuota() + fileSize > userContext.totalQuota()) {
-            throw new BizException(BizConstant.SPACE_LIMIT);
-        }
     }
 
     /**

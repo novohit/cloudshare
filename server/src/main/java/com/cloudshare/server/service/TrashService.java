@@ -1,5 +1,6 @@
 package com.cloudshare.server.service;
 
+import com.cloudshare.server.dto.requset.TrashDeleteReqDTO;
 import com.cloudshare.server.dto.requset.TrashListReqDTO;
 import com.cloudshare.server.dto.response.FileVO;
 
@@ -12,4 +13,8 @@ import java.util.List;
 public interface TrashService {
 
     List<FileVO> list(TrashListReqDTO reqDTO);
+
+    void physicallyDelete(List<Long> fileIds);
+
+    void recover(List<Long> fileIds);
 }

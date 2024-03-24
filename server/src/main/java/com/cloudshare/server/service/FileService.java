@@ -1,6 +1,7 @@
 package com.cloudshare.server.service;
 
 import com.cloudshare.server.auth.UserContext;
+import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.dto.requset.DirCreateReqDTO;
 import com.cloudshare.server.dto.requset.DirUpdateReqDTO;
 import com.cloudshare.server.dto.requset.FileChunkMergeReqDTO;
@@ -13,6 +14,7 @@ import com.cloudshare.server.dto.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.dto.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.dto.response.DirTreeNode;
 import com.cloudshare.server.dto.response.FileVO;
+import com.cloudshare.web.exception.BizException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -57,4 +59,8 @@ public interface FileService {
     void move(FileMoveOrCopyReqDTO reqDTO);
 
     void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceId, UserContext targetUser);
+
+    long calculateSize(List<Long> fileIds);
+
+    void checkQuota(Long fileSize);
 }

@@ -24,6 +24,8 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     List<FileDocument> findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNull(String curDirectory, Long userId);
 
+    List<FileDocument> findByCurDirectoryStartsWithAndUserIdAndDeletedAtIsNotNull(String curDirectory, Long userId);
+
     List<FileDocument> findByUserIdAndCurDirectoryAndNameStartsWithAndDeletedAtIsNull(Long userId, String curDirectory, String key);
 
     Optional<FileDocument> findByUserIdAndCurDirectoryAndNameAndDeletedAtIsNull(Long userId, String curDirectory, String name);
