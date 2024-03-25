@@ -1,7 +1,5 @@
 package com.cloudshare.server.controller;
 
-import com.cloudshare.server.dto.requset.FileDeleteReqDTO;
-import com.cloudshare.server.dto.requset.TrashDeleteReqDTO;
 import com.cloudshare.server.dto.requset.TrashListReqDTO;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.service.TrashService;

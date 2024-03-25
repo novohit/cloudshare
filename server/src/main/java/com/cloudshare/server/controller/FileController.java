@@ -13,6 +13,7 @@ import com.cloudshare.server.dto.requset.FileSecUploadReqDTO;
 import com.cloudshare.server.dto.requset.FileSingleUploadReqDTO;
 import com.cloudshare.server.dto.response.DirTreeNode;
 import com.cloudshare.server.dto.response.FileVO;
+import com.cloudshare.server.dto.response.StatsKeyValue;
 import com.cloudshare.server.service.FileService;
 import com.cloudshare.web.response.Response;
 import org.novo.limit.annotation.RateLimit;
@@ -157,5 +158,15 @@ public class FileController {
         UserContext userContext = UserContextThreadHolder.getUserContext();
         fileService.copy(reqDTO, userId, userContext);
         return Response.success();
+    }
+
+    @GetMapping("/stats/count")
+    public Response<List<StatsKeyValue>> statsCount() {
+        return Response.success(fileService.statsCount());
+    }
+
+    @GetMapping("/stats/size")
+    public Response<List<StatsKeyValue>> statsSize() {
+        return Response.success(fileService.statsSize());
     }
 }

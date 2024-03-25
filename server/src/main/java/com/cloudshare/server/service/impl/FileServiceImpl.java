@@ -20,6 +20,7 @@ import com.cloudshare.server.dto.requset.UserInfoRepVO;
 import com.cloudshare.server.dto.response.DirTreeNode;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.converter.FileConverter;
+import com.cloudshare.server.dto.response.StatsKeyValue;
 import com.cloudshare.server.enums.FileType;
 import com.cloudshare.server.model.FileChunk;
 import com.cloudshare.server.model.FileDocument;
@@ -52,11 +53,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -741,6 +745,43 @@ public class FileServiceImpl implements FileService {
             throw new BizException(BizConstant.SPACE_LIMIT);
         }
 
+    }
+
+    @Override
+    public List<StatsKeyValue> statsCount() {
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileRepository.StatsProjection> projection = fileRepository.statsCount(userId);
+        List<StatsKeyValue> statsData = projection.stream()
+                .filter(item -> !"DIR".equals(item.getType()))
+                .map(temp -> new StatsKeyValue(temp.getType(), temp.getValue())).toList();
+        return statsData;
+    }
+
+    @Override
+    public List<StatsKeyValue> statsSize() {
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileRepository.StatsProjection> projection = fileRepository.statsSize(userId);
+        List<StatsKeyValue> statsData = projection.stream()
+                .map(temp -> new StatsKeyValue(temp.getType(), temp.getValue())).toList();
+
+        Set<String> documentTypeSet = new HashSet<>(List.of("PDF", "PPT", "EXCEL", "WORD", "TXT", "CSV", "SOURCE_CODE", "MD"));
+
+        Map<String, Long> aggregatedMap = statsData.stream()
+                .filter(item -> !"DIR".equals(item.type()))
+                .collect(Collectors.groupingBy(
+                        item -> {
+                            if (documentTypeSet.contains(item.type())) {
+                                return "DOCUMENT";
+                            } else {
+                                return item.type();
+                            }
+                        },
+                        Collectors.summingLong(StatsKeyValue::value)
+                ));
+
+        List<StatsKeyValue> aggregatedData = aggregatedMap.entrySet().stream()
+                .map(entry -> new StatsKeyValue(entry.getKey(), entry.getValue())).toList();
+        return aggregatedData;
     }
 
     @Override
