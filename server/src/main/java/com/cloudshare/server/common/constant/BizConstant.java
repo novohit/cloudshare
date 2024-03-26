@@ -32,6 +32,8 @@ public final class BizConstant {
 
     public static final String SEARCH_HISTORY_PREFIX = "cloudshare:search_history:";
 
+    public static final String ACCESS_HISTORY_PREFIX = "cloudshare:access_history:";
+
     public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public static final String LINK_PV_PREFIX = "cloudshare:pv:";

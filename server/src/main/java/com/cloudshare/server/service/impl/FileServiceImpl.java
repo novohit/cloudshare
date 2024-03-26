@@ -22,6 +22,7 @@ import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.converter.FileConverter;
 import com.cloudshare.server.dto.response.StatsKeyValue;
 import com.cloudshare.server.enums.FileType;
+import com.cloudshare.server.manager.redis.RedisManager;
 import com.cloudshare.server.model.FileChunk;
 import com.cloudshare.server.model.FileDocument;
 import com.cloudshare.server.repository.FileChunkRepository;
@@ -53,7 +54,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -94,11 +94,14 @@ public class FileServiceImpl implements FileService {
 
     private final TextParserStrategyFactory strategyFactory;
 
+    private final RedisManager redisManager;
+
+
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
                            TransactionTemplate transactionTemplate, UserService userService,
                            @Qualifier("baseExecutor") ExecutorService baseExecutor,
-                           TextParserStrategyFactory strategyFactory) {
+                           TextParserStrategyFactory strategyFactory, RedisManager redisManager) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
@@ -107,6 +110,7 @@ public class FileServiceImpl implements FileService {
         this.userService = userService;
         this.baseExecutor = baseExecutor;
         this.strategyFactory = strategyFactory;
+        this.redisManager = redisManager;
     }
 
     @Override
@@ -463,6 +467,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public void mediaPreview(Long fileId, String range, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
+        redisManager.saveHistory(BizConstant.ACCESS_HISTORY_PREFIX + userId, String.valueOf(fileId));
+
         // TODO 视频流防盗
         // 1. 校验权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
@@ -785,6 +791,19 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public List<FileVO> accessHistory() {
+        Long userId = UserContextThreadHolder.getUserId();
+        String key = BizConstant.ACCESS_HISTORY_PREFIX + userId;
+        List<String> history = redisManager.getRecentHistory(key, 10);
+        List<Long> fileIds = history.stream()
+                .map(Long::parseLong).toList();
+        List<FileDocument> historyAccessFiles = fileRepository.findByFileIdInAndUserId(fileIds, userId);
+
+        List<FileVO> res = fileConverter.DOList2VOList(historyAccessFiles);
+        return res;
+    }
+
+    @Override
     public List<FileVO> list(FileListReqDTO reqDTO, Long userId) {
         String curDirectory = reqDTO.curDirectory();
         List<FileType> fileTypes = reqDTO.fileTypeList();
@@ -801,6 +820,7 @@ public class FileServiceImpl implements FileService {
                     .toList();
         }
         List<FileVO> resp = fileConverter.DOList2VOList(fileList);
+        redisManager.saveHistory(BizConstant.ACCESS_HISTORY_PREFIX + userId, String.valueOf(reqDTO.parentId()));
         return resp;
     }
 

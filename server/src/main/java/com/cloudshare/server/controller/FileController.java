@@ -80,6 +80,12 @@ public class FileController {
         return Response.success();
     }
 
+    /**
+     * 访问文件夹
+     *
+     * @param reqDTO
+     * @return
+     */
     @PostMapping("/list")
     public Response<List<FileVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
@@ -168,5 +174,10 @@ public class FileController {
     @GetMapping("/stats/size")
     public Response<List<StatsKeyValue>> statsSize() {
         return Response.success(fileService.statsSize());
+    }
+
+    @GetMapping("/access/history")
+    public Response<List<FileVO>> accessHistory() {
+        return Response.success(fileService.accessHistory());
     }
 }

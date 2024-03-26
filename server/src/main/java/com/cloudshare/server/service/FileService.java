@@ -66,4 +66,6 @@ public interface FileService {
     List<StatsKeyValue> statsCount();
 
     List<StatsKeyValue> statsSize();
+
+    List<FileVO> accessHistory();
 }
