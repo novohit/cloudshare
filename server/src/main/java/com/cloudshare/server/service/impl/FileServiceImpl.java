@@ -34,8 +34,8 @@ import com.cloudshare.storage.core.model.MergeChunkContext;
 import com.cloudshare.storage.core.model.ReadContext;
 import com.cloudshare.storage.core.model.StoreChunkContext;
 import com.cloudshare.storage.core.model.StoreContext;
-import com.cloudshare.web.exception.BadRequestException;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BadRequestException;
+import com.cloudshare.server.common.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.BeanUtils;
@@ -191,7 +191,7 @@ public class FileServiceImpl implements FileService {
                         return null;
                     });
                 } catch (DataIntegrityViolationException e) {
-                    throw new BizException(BizConstant.REPEAT_NAME);
+                    throw new BadRequestException(BizConstant.REPEAT_NAME);
                 }
             }
         }
@@ -411,12 +411,12 @@ public class FileServiceImpl implements FileService {
         // 1. 校验下载权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
-            throw new BizException("文件不存在");
+            throw new BadRequestException("文件不存在");
         }
         FileDocument fileDocument = optional.get();
         if (FileType.DIR.equals(fileDocument.getType())) {
             // TODO support dir download
-            throw new BizException("暂不支持文件夹下载");
+            throw new BadRequestException("暂不支持文件夹下载");
         }
         // 2. 返回文件流
         try {
@@ -444,12 +444,12 @@ public class FileServiceImpl implements FileService {
         // 1. 校验下载权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
-            throw new BizException("文件不存在");
+            throw new BadRequestException("文件不存在");
         }
         FileDocument fileDocument = optional.get();
         if (FileType.DIR.equals(fileDocument.getType())) {
             // TODO support dir download
-            throw new BizException("暂不支持文件夹预览");
+            throw new BadRequestException("暂不支持文件夹预览");
         }
         // 2. 返回文件流
         try {
@@ -473,11 +473,11 @@ public class FileServiceImpl implements FileService {
         // 1. 校验权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
-            throw new BizException("文件不存在");
+            throw new BadRequestException("文件不存在");
         }
         FileDocument fileDocument = optional.get();
         if (!FileType.VIDEO.equals(fileDocument.getType()) && !FileType.AUDIO.equals(fileDocument.getType())) {
-            throw new BizException("非法多媒体类型");
+            throw new BadRequestException("非法多媒体类型");
         }
 
         long start = Long.parseLong(range.substring(range.indexOf("=") + 1, range.indexOf("-")));
@@ -587,7 +587,7 @@ public class FileServiceImpl implements FileService {
     public FileVO detail(Long fileId, Long userId) {
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
-            throw new BizException("文件不存在");
+            throw new BadRequestException("文件不存在");
         }
         return fileConverter.DO2VO(optional.get());
     }
@@ -640,7 +640,7 @@ public class FileServiceImpl implements FileService {
                             return null;
                         });
                     } catch (DataIntegrityViolationException e) {
-                        throw new BizException(BizConstant.REPEAT_NAME);
+                        throw new BadRequestException(BizConstant.REPEAT_NAME);
                     }
                 }
             }
@@ -748,7 +748,7 @@ public class FileServiceImpl implements FileService {
     public void checkQuota(Long fileSize) {
         UserInfoRepVO userInfo = userService.getUserInfo();
         if (userInfo.usedQuota() + fileSize > userInfo.totalQuota()) {
-            throw new BizException(BizConstant.SPACE_LIMIT);
+            throw new BadRequestException(BizConstant.SPACE_LIMIT);
         }
 
     }
@@ -804,7 +804,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileVO> list(FileListReqDTO reqDTO, Long userId) {
+    public List<FileVO> list(FileListReqDTO reqDTO, Long userId, boolean accessShare) {
         String curDirectory = reqDTO.curDirectory();
         List<FileType> fileTypes = reqDTO.fileTypeList();
         // 一级文件列表
@@ -819,8 +819,9 @@ public class FileServiceImpl implements FileService {
                     .filter(fileDocument -> fileTypes.contains(fileDocument.getType()))
                     .toList();
         }
+        if (!accessShare)
+            redisManager.saveHistory(BizConstant.ACCESS_HISTORY_PREFIX + userId, String.valueOf(reqDTO.parentId()));
         List<FileVO> resp = fileConverter.DOList2VOList(fileList);
-        redisManager.saveHistory(BizConstant.ACCESS_HISTORY_PREFIX + userId, String.valueOf(reqDTO.parentId()));
         return resp;
     }
 
@@ -871,7 +872,7 @@ public class FileServiceImpl implements FileService {
         for (Long fileId : fileIds) {
             Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
             if (optional.isEmpty()) {
-                throw new BizException("文件不存在");
+                throw new BadRequestException("文件不存在");
             }
             FileDocument dir = optional.get();
             String path = dir.getPath();

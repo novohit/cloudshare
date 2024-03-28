@@ -4,7 +4,7 @@ import com.cloudshare.server.order.model.Order;
 import com.cloudshare.server.order.model.Product;
 import com.cloudshare.server.order.repository.ProductRepository;
 import com.cloudshare.server.order.service.ProductService;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BizException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

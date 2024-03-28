@@ -1,5 +1,6 @@
 package com.cloudshare.server.service.impl;
 
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.cloudshare.common.util.SnowflakeUtil;
 import com.cloudshare.common.util.TokenUtil;
@@ -21,14 +22,14 @@ import com.cloudshare.server.dto.requset.ShareCreateReqDTO;
 import com.cloudshare.server.dto.requset.ShareSaveReqDTO;
 import com.cloudshare.server.dto.response.ShareCreateRespVO;
 import com.cloudshare.server.dto.response.ShareVO;
-import com.cloudshare.server.dto.response.SharerRespVO;
+import com.cloudshare.server.dto.response.ShareInfoVO;
 import com.cloudshare.server.converter.ShareConverter;
 import com.cloudshare.server.enums.ShareStatus;
 import com.cloudshare.server.enums.VisibleType;
 import com.cloudshare.server.model.Share;
 import com.cloudshare.server.repository.ShareRepository;
 import com.cloudshare.server.service.ShareService;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class ShareServiceImpl implements ShareService {
         Long fileId = reqDTO.fileId();
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
-            throw new BizException("文件不存在");
+            throw new BadRequestException("文件不存在");
         }
         Share share = new Share();
         long shareId = SnowflakeUtil.nextId();
@@ -128,11 +129,11 @@ public class ShareServiceImpl implements ShareService {
         Long shareId = reqDTO.shareId();
         Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
-            throw new BizException("分享链接不存在");
+            throw new BadRequestException("分享链接不存在");
         }
         Share share = optional.get();
         if (!share.getCode().equals(reqDTO.code())) {
-            throw new BizException("提取码错误");
+            throw new BadRequestException("提取码错误");
         }
         return TokenUtil.generateAccessToken(shareId);
     }
@@ -141,7 +142,7 @@ public class ShareServiceImpl implements ShareService {
     public Share detail(Long shareId) {
         Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
-            throw new BizException("分享链接不存在");
+            throw new BadRequestException("分享链接不存在");
         }
         return optional.get();
     }
@@ -162,26 +163,28 @@ public class ShareServiceImpl implements ShareService {
         // 访问子目录 校验子目录是否在分享范围里
         boolean valid = fileService.isSubFile(rootFileId, fileId, shareUserId);
         if (!valid) {
-            throw new BizException("无权访问");
+            throw new BadRequestException("无权访问");
         }
         FileVO sub = fileService.detail(fileId, shareUserId);
         if (!FileType.DIR.equals(sub.fileType())) {
-            throw new BizException("目录不存在");
+            throw new BadRequestException("目录不存在");
         }
-        resp = fileService.list(new FileListReqDTO(null, sub.path(), null), shareUserId);
+        resp = fileService.list(new FileListReqDTO(null, sub.path(), null), shareUserId, true);
         return resp;
     }
 
     @Override
-    public SharerRespVO sharer(Long shareId) {
+    public ShareInfoVO getShareInfo(Long shareId) {
         Optional<Share> optional = shareRepository.findByShareId(shareId);
         if (optional.isEmpty()) {
-            throw new BizException("分享不存在");
+            throw new BadRequestException("分享不存在");
         }
         Share share = optional.get();
-        return new SharerRespVO(
+        FileDocument fileDocument = share.getFileDocument();
+        return new ShareInfoVO(
                 shareId,
-                share.getFileDocument().getName(),
+                fileDocument.getName(),
+                fileDocument.getType(),
                 share.getUserId(),
                 share.getUser().getUsername()
         );

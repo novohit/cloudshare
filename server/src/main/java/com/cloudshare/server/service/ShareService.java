@@ -7,7 +7,7 @@ import com.cloudshare.server.dto.requset.ShareCreateReqDTO;
 import com.cloudshare.server.dto.requset.ShareSaveReqDTO;
 import com.cloudshare.server.dto.response.ShareCreateRespVO;
 import com.cloudshare.server.dto.response.ShareVO;
-import com.cloudshare.server.dto.response.SharerRespVO;
+import com.cloudshare.server.dto.response.ShareInfoVO;
 import com.cloudshare.server.model.Share;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +30,7 @@ public interface ShareService {
 
     List<FileVO> access(Long fileId);
 
-    SharerRespVO sharer(Long shareId);
+    ShareInfoVO getShareInfo(Long shareId);
 
     void save(ShareSaveReqDTO reqDTO);
 

@@ -2,7 +2,7 @@ package com.cloudshare.server.order.controller;
 
 import com.cloudshare.server.order.model.Product;
 import com.cloudshare.server.order.service.ProductService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -25,7 +25,7 @@ import java.util.List;
 public interface FileService {
     void createDir(DirCreateReqDTO reqDTO);
 
-    List<FileVO> list(FileListReqDTO reqDTO, Long userId);
+    List<FileVO> list(FileListReqDTO reqDTO, Long userId, boolean accessShare);
 
     void updateDir(DirUpdateReqDTO reqDTO);
 

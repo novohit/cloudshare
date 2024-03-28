@@ -1,6 +1,7 @@
 package com.cloudshare.server.auth;
 
 import com.cloudshare.server.enums.PlanLevel;
+import com.cloudshare.server.enums.RoleEnum;
 
 /**
  * @author novo
@@ -14,6 +15,7 @@ public record UserContext(
         Integer scope,
         PlanLevel plan,
         Long totalQuota,
-        Long usedQuota
+        Long usedQuota,
+        RoleEnum role
 ) {
 }

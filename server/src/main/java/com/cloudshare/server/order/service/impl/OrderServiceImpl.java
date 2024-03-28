@@ -19,7 +19,7 @@ import com.cloudshare.server.order.model.Product;
 import com.cloudshare.server.order.repository.OrderRepository;
 import com.cloudshare.server.order.service.OrderService;
 import com.cloudshare.server.order.service.ProductService;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

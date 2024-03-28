@@ -1,4 +1,4 @@
-package com.cloudshare.web.exception;
+package com.cloudshare.server.common.exception;
 
 import org.springframework.http.HttpStatus;
 

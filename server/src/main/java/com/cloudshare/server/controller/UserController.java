@@ -1,11 +1,14 @@
 package com.cloudshare.server.controller;
 
 import com.cloudshare.server.dto.requset.UserInfoRepVO;
+import com.cloudshare.server.dto.requset.UserListPageReqDTO;
 import com.cloudshare.server.dto.requset.UserLoginReqDTO;
 import com.cloudshare.server.dto.requset.UserRegisterReqDTO;
 import com.cloudshare.server.dto.requset.UserUpdateReqDTO;
+import com.cloudshare.server.dto.response.PageResponse;
+import com.cloudshare.server.model.User;
 import com.cloudshare.server.service.UserService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +46,11 @@ public class UserController {
     public Response<UserInfoRepVO> getUserInfo() {
         UserInfoRepVO repDTO = userService.getUserInfo();
         return Response.success(repDTO);
+    }
+
+    @PostMapping("/list")
+    public Response<PageResponse<User>> list(@Validated @RequestBody UserListPageReqDTO reqDTO) {
+        return Response.success(userService.list(reqDTO));
     }
 
     @PutMapping("/{id}")

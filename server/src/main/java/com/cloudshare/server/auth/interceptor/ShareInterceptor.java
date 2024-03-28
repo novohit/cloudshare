@@ -5,7 +5,7 @@ import com.cloudshare.server.auth.ShareContextThreadHolder;
 import com.cloudshare.server.common.annotation.ShareTokenRequired;
 import com.cloudshare.server.model.Share;
 import com.cloudshare.server.service.ShareService;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BadRequestException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -42,13 +42,13 @@ public class ShareInterceptor implements HandlerInterceptor {
         if (!StringUtils.hasText(shareToken)) {
             shareToken = request.getParameter(SHARE_TOKEN_HEADER);
             if (!StringUtils.hasText(shareToken)) {
-                throw new BizException("Share-Token不存在");
+                throw new BadRequestException("Share-Token不存在");
             }
         }
         Claims claims = TokenUtil.verifyToken(shareToken);
         if (claims == null) {
             log.info("token不合法");
-            throw new BizException("Share-Token不存在");
+            throw new BadRequestException("Share-Token不存在");
         }
         Long shareId = claims.get("user_id", Long.class);
         Share share = shareService.detail(shareId);

@@ -3,7 +3,7 @@ package com.cloudshare.server.controller;
 import com.cloudshare.server.dto.requset.TrashListReqDTO;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.service.TrashService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;

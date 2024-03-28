@@ -5,8 +5,8 @@ import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.model.User;
 import com.cloudshare.server.service.UserService;
-import com.cloudshare.web.enums.BizCodeEnum;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.enums.BizCodeEnum;
+import com.cloudshare.server.common.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 1,
                 user.getPlan(),
                 user.getTotalQuota(),
-                user.getUsedQuota()
+                user.getUsedQuota(),
+                user.getRole()
         );
         BeanUtils.copyProperties(user, userContext);
         log.debug("登录用户 user:[{}]", userContext);

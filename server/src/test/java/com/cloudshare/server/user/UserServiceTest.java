@@ -3,7 +3,7 @@ package com.cloudshare.server.user;
 import com.cloudshare.server.dto.requset.UserLoginReqDTO;
 import com.cloudshare.server.dto.requset.UserRegisterReqDTO;
 import com.cloudshare.server.service.UserService;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.exception.BizException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

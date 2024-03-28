@@ -2,7 +2,7 @@ package com.cloudshare.server.order.controller;
 
 import com.cloudshare.server.order.controller.request.PlaceOrderReqDTO;
 import com.cloudshare.server.order.service.OrderService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

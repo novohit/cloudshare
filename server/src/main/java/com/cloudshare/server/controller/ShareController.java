@@ -9,9 +9,9 @@ import com.cloudshare.server.dto.requset.ShareCreateReqDTO;
 import com.cloudshare.server.dto.requset.ShareSaveReqDTO;
 import com.cloudshare.server.dto.response.ShareCreateRespVO;
 import com.cloudshare.server.dto.response.ShareVO;
-import com.cloudshare.server.dto.response.SharerRespVO;
+import com.cloudshare.server.dto.response.ShareInfoVO;
 import com.cloudshare.server.service.ShareService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,14 +67,14 @@ public class ShareController {
 
     @GetMapping("/access")
     @ShareTokenRequired
-    public Response<List<FileVO>> access(@RequestParam(name = "fileId", required = false) Long fileId) {
+    public Response<List<FileVO>> access(@RequestParam(name = "shareId") Long shareId, @RequestParam(name = "fileId", required = false) Long fileId) {
         List<FileVO> resp = shareService.access(fileId);
         return Response.success(resp);
     }
 
-    @GetMapping("/sharer")
-    public Response<SharerRespVO> sharer(@RequestParam("shareId") Long shareId) {
-        SharerRespVO resp = shareService.sharer(shareId);
+    @GetMapping("/info")
+    public Response<ShareInfoVO> getShareInfo(@RequestParam("shareId") Long shareId) {
+        ShareInfoVO resp = shareService.getShareInfo(shareId);
         return Response.success(resp);
     }
 

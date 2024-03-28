@@ -6,6 +6,8 @@ import com.cloudshare.server.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 /**
  * @author novo
  * @since 2023/10/8
@@ -14,6 +16,8 @@ import org.mapstruct.Mapping;
 public interface UserConverter {
 
     UserInfoRepVO DO2VO(User user);
+
+    List<UserInfoRepVO> DOList2VOList(List<User> user);
 
     @Mapping(target = "rootName", constant = "")
     @Mapping(target = "rootId", constant = "0L")

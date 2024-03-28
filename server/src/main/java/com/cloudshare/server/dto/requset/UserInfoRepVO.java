@@ -1,6 +1,7 @@
 package com.cloudshare.server.dto.requset;
 
 import com.cloudshare.server.enums.PlanLevel;
+import com.cloudshare.server.enums.RoleEnum;
 
 /**
  * @author novo
@@ -15,6 +16,7 @@ public record UserInfoRepVO(
         String rootName,
         PlanLevel plan,
         Long totalQuota,
-        Long usedQuota
+        Long usedQuota,
+        RoleEnum role
 ) {
 }

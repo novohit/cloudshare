@@ -8,10 +8,12 @@ import com.cloudshare.lock.lock.ILock;
 import com.cloudshare.server.auth.UserContext;
 import com.cloudshare.server.auth.UserContextThreadHolder;
 import com.cloudshare.server.dto.requset.UserInfoRepVO;
+import com.cloudshare.server.dto.requset.UserListPageReqDTO;
 import com.cloudshare.server.dto.requset.UserLoginReqDTO;
 import com.cloudshare.server.dto.requset.UserRegisterReqDTO;
 import com.cloudshare.server.dto.requset.UserUpdateReqDTO;
 import com.cloudshare.server.converter.UserConverter;
+import com.cloudshare.server.dto.response.PageResponse;
 import com.cloudshare.server.enums.LoginType;
 import com.cloudshare.server.enums.PlanLevel;
 import com.cloudshare.server.model.User;
@@ -19,13 +21,17 @@ import com.cloudshare.server.model.UserAuth;
 import com.cloudshare.server.repository.UserAuthRepository;
 import com.cloudshare.server.repository.UserRepository;
 import com.cloudshare.server.service.UserService;
-import com.cloudshare.web.enums.BizCodeEnum;
-import com.cloudshare.web.exception.BizException;
+import com.cloudshare.server.common.enums.BizCodeEnum;
+import com.cloudshare.server.common.exception.BizException;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -176,5 +182,13 @@ public class UserServiceImpl implements UserService {
             user.setPlan(planLevel);
             userRepository.save(user);
         }
+    }
+
+    @Override
+    public PageResponse<User> list(UserListPageReqDTO reqDTO) {
+        Pageable pageable = PageRequest.of(reqDTO.page() - 1, reqDTO.size());
+        Page<User> pageResp = userRepository.findAll(pageable);
+        List<User> users = pageResp.get().toList();
+        return new PageResponse<>(pageResp.getTotalElements(), users);
     }
 }

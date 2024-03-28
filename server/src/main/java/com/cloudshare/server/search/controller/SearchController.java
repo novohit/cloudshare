@@ -4,7 +4,7 @@ import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.search.controller.request.SearchReqDTO;
 import com.cloudshare.server.search.controller.response.SearchHistoryResp;
 import com.cloudshare.server.search.service.SearchService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

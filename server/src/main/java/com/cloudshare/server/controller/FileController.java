@@ -15,7 +15,7 @@ import com.cloudshare.server.dto.response.DirTreeNode;
 import com.cloudshare.server.dto.response.FileVO;
 import com.cloudshare.server.dto.response.StatsKeyValue;
 import com.cloudshare.server.service.FileService;
-import com.cloudshare.web.response.Response;
+import com.cloudshare.server.common.response.Response;
 import org.novo.limit.annotation.RateLimit;
 import org.novo.limit.enums.LimitType;
 import org.springframework.http.MediaType;
@@ -89,7 +89,7 @@ public class FileController {
     @PostMapping("/list")
     public Response<List<FileVO>> list(@Validated @RequestBody FileListReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
-        List<FileVO> response = fileService.list(reqDTO, userId);
+        List<FileVO> response = fileService.list(reqDTO, userId, false);
         return Response.success(response);
     }
 
