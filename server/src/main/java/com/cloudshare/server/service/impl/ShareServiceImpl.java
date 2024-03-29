@@ -196,8 +196,8 @@ public class ShareServiceImpl implements ShareService {
         UserContext targetUser = UserContextThreadHolder.getUserContext();
         fileService.copy(
                 new FileMoveOrCopyReqDTO(
-                        reqDTO.parentId(),
                         reqDTO.fileIds(),
+                        reqDTO.parentId(),
                         reqDTO.target()
                 ),
                 sourceId,

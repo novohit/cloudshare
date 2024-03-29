@@ -34,6 +34,8 @@ public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
     Optional<FileDocument> findByFileIdAndUserIdAndDeletedAtIsNull(Long fileId, Long userId);
 
+    List<FileDocument> findByParentIdAndUserIdAndDeletedAtIsNull(Long parentId, Long userId);
+
     List<FileDocument> findByFileIdInAndUserId(List<Long> fileIds, Long userId);
 
     List<FileDocument> findByUserIdAndTypeAndDeletedAtIsNull(Long userId, FileType type);

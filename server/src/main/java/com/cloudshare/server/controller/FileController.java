@@ -56,9 +56,15 @@ public class FileController {
         return Response.success();
     }
 
-    @GetMapping("/dir/tree")
-    public Response<List<DirTreeNode>> dirTree() {
-        List<DirTreeNode> tree = fileService.dirTree();
+    @GetMapping("/tree/all")
+    public Response<List<DirTreeNode>> getAllTreeNode() {
+        List<DirTreeNode> tree = fileService.getAllTreeNode();
+        return Response.success(tree);
+    }
+
+    @GetMapping("/tree/one-layer")
+    public Response<List<FileVO>> getOneLayerTreeNode(@RequestParam("fileId") Long fileId) {
+        List<FileVO> tree = fileService.getOneLayerTreeNode(fileId);
         return Response.success(tree);
     }
 

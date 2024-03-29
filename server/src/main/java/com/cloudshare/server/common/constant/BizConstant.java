@@ -14,7 +14,7 @@ public final class BizConstant {
 
     public static final String DOT = ".";
 
-    public static final String REPEAT_NAME = "重名冲突";
+    public static final String REPEAT_NAME = "文件名重复";
 
     public static final String SPACE_LIMIT = "空间不足";
 

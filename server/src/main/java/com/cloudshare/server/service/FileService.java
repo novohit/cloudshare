@@ -49,7 +49,7 @@ public interface FileService {
 
     void logicallyDelete(FileDeleteReqDTO reqDTO);
 
-    List<DirTreeNode> dirTree();
+    List<DirTreeNode> getAllTreeNode();
 
     FileVO detail(Long fileId, Long userId);
 
@@ -68,4 +68,6 @@ public interface FileService {
     List<StatsKeyValue> statsSize();
 
     List<FileVO> accessHistory();
+
+    List<FileVO> getOneLayerTreeNode(Long fileId);
 }

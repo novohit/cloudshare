@@ -69,6 +69,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author novo
@@ -558,7 +559,7 @@ public class FileServiceImpl implements FileService {
      * @return
      */
     @Override
-    public List<DirTreeNode> dirTree() {
+    public List<DirTreeNode> getAllTreeNode() {
         // TODO set cache
         Long userId = UserContextThreadHolder.getUserId();
         List<FileDocument> list = fileRepository.findByUserIdAndTypeAndDeletedAtIsNull(userId, FileType.DIR);
@@ -614,18 +615,22 @@ public class FileServiceImpl implements FileService {
     public void move(FileMoveOrCopyReqDTO reqDTO) {
         // TODO 性能优化
         Long userId = UserContextThreadHolder.getUserId();
-        List<Long> fileIds = reqDTO.fileIds();
-        for (Long fileId : fileIds) {
-            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        List<Long> sources = reqDTO.sources();
+        for (Long src : sources) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(src, userId);
             if (optional.isPresent()) {
                 FileDocument file = optional.get();
                 String originalPath = file.getPath();
                 String originalCurDirectory = file.getCurDirectory();
                 file.setCurDirectory(reqDTO.target());
-                file.setParentId(reqDTO.parentId());
+                file.setParentId(reqDTO.targetId());
                 if (!FileType.DIR.equals(file.getType())) {
                     file.setPath(reqDTO.target() + BizConstant.LINUX_SEPARATOR + file.getName());
-                    saveFile2DB(file, false);
+                    try {
+                        saveFile2DB(file, false);
+                    } catch (DataIntegrityViolationException e) {
+                        throw new BadRequestException(BizConstant.REPEAT_NAME);
+                    }
                 } else {
                     try {
                         transactionTemplate.execute(status -> {
@@ -640,6 +645,7 @@ public class FileServiceImpl implements FileService {
                             return null;
                         });
                     } catch (DataIntegrityViolationException e) {
+                        log.error("xx", e);
                         throw new BadRequestException(BizConstant.REPEAT_NAME);
                     }
                 }
@@ -649,22 +655,22 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void copy(FileMoveOrCopyReqDTO reqDTO, Long sourceId, UserContext targetUser) {
-        List<Long> fileIds = reqDTO.fileIds();
+        List<Long> sources = reqDTO.sources();
         String target = reqDTO.target();
         Long targetId = targetUser.id();
 
         // TODO 空间检测并发问题
-        Long totalSize = dirsSize(fileIds, targetId);
+        Long totalSize = dirsSize(sources, targetId);
         checkQuota(totalSize);
 
-        for (Long fileId : fileIds) {
-            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, sourceId);
+        for (Long src : sources) {
+            Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(src, sourceId);
             if (optional.isPresent()) {
                 FileDocument file = optional.get();
                 // copy
                 FileDocument copyFile = assembleFileDocument(
                         targetId,
-                        reqDTO.parentId(), // parentId
+                        reqDTO.targetId(), // parentId
                         file.getMd5(),
                         file.getName(),
                         file.getRealName(),
@@ -801,6 +807,16 @@ public class FileServiceImpl implements FileService {
 
         List<FileVO> res = fileConverter.DOList2VOList(historyAccessFiles);
         return res;
+    }
+
+    @Override
+    public List<FileVO> getOneLayerTreeNode(Long fileId) {
+        Long userId = UserContextThreadHolder.getUserId();
+        List<FileDocument> list = fileRepository.findByParentIdAndUserIdAndDeletedAtIsNull(fileId, userId);
+        List<FileDocument> dirs = list.stream()
+                .filter(file -> FileType.DIR.equals(file.getType()))
+                .toList();
+        return fileConverter.DOList2VOList(dirs);
     }
 
     @Override

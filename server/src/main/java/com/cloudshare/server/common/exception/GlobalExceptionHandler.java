@@ -2,6 +2,7 @@ package com.cloudshare.server.common.exception;
 
 import com.cloudshare.server.common.response.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.novo.limit.exception.RateLimitException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,17 +45,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    public Response<Void> exceptionHandler(HttpServletRequest request, Exception e) {
+    public ResponseEntity<Response<Void>> exceptionHandler(HttpServletRequest request, Exception e) {
         String requestUrl = request.getRequestURI();
         String method = request.getMethod();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        log.error("[业务异常] url:[{}],msg:[{}]", requestUrl, e.getMessage());
         if (e instanceof HttpRequestMethodNotSupportedException exception) {
             log.error("[接口请求方式错误] url:[{}] message:[{}]", requestUrl, exception.getMessage());
-            return Response.error(exception.getMessage());
+            httpStatus = HttpStatus.BAD_REQUEST;
         }
-        // TODO 限流异常
-        log.error("[系统异常] url:[{}]", requestUrl, e);
-//        return Response.build(BizCodeEnum.SERVER_ERROR);
-        return Response.error(e.getMessage());
+        if (e instanceof RateLimitException exception) {
+            httpStatus = HttpStatus.BAD_REQUEST;
+            log.error("[系统限流] url:[{}]", requestUrl, e);
+        }
+
+        Response<Void> response = Response.build(500, null, e.getMessage());
+        return new ResponseEntity<>(response, headers, httpStatus);
     }
 
     /**
