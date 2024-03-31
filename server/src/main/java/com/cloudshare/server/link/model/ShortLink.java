@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author novo
@@ -50,4 +52,7 @@ public class ShortLink extends BaseModel implements Serializable {
     private Long pv;
 
     private Long uv;
+
+    @Comment("过期时间，为null永久有效")
+    private LocalDateTime expiredAt;
 }

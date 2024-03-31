@@ -6,6 +6,8 @@ package com.cloudshare.server.dto.requset;
  */
 public record NoticeListPageReqDTO(
         Integer page,
-        Integer size
+        Integer size,
+        String title,
+        String content
 ) {
 }

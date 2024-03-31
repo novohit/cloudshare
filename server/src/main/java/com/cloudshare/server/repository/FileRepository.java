@@ -16,9 +16,11 @@ import java.util.Optional;
  */
 public interface FileRepository extends JpaRepository<FileDocument, Long> {
 
-    List<FileDocument> findByNameContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(String key, String curDirectory, Long userId);
+    List<FileDocument> findByNameContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(String keyword, String curDirectory, Long userId);
 
-    List<FileDocument> findByContentContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(String key, String curDirectory, Long userId);
+    List<FileDocument> findByContentContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(String keyword, String curDirectory, Long userId);
+
+    List<FileDocument> findBySuffixContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(String keyword, String curDirectory, Long userId);
 
     List<FileDocument> findByUserIdAndCurDirectoryAndDeletedAtIsNull(Long userId, String curDirectory);
 

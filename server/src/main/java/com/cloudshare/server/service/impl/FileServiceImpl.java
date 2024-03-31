@@ -59,6 +59,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -164,9 +165,6 @@ public class FileServiceImpl implements FileService {
     public void rename(FileRenameReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String newName = reqDTO.newName();
-        if (reqDTO.oldName().equals(newName)) {
-            return;
-        }
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(reqDTO.fileId(), userId);
         if (optional.isPresent()) {
             FileDocument file = optional.get();
@@ -175,7 +173,11 @@ public class FileServiceImpl implements FileService {
             file.setName(newName);
             if (!FileType.DIR.equals(file.getType())) {
                 file.setPath(originalCurDirectory + BizConstant.LINUX_SEPARATOR + newName);
-                saveFile2DB(file, false);
+                try {
+                    saveFile2DB(file, false);
+                } catch (DataIntegrityViolationException e) {
+                    throw new BadRequestException(BizConstant.REPEAT_NAME);
+                }
             } else {
                 try {
                     transactionTemplate.execute(status -> {
@@ -660,7 +662,7 @@ public class FileServiceImpl implements FileService {
         Long targetId = targetUser.id();
 
         // TODO 空间检测并发问题
-        Long totalSize = dirsSize(sources, targetId);
+        Long totalSize = dirsSize(sources, sourceId);
         checkQuota(totalSize);
 
         for (Long src : sources) {
@@ -802,6 +804,8 @@ public class FileServiceImpl implements FileService {
         String key = BizConstant.ACCESS_HISTORY_PREFIX + userId;
         List<String> history = redisManager.getRecentHistory(key, 10);
         List<Long> fileIds = history.stream()
+                .filter(Objects::nonNull)
+                .filter(x -> !x.equals("null"))
                 .map(Long::parseLong).toList();
         List<FileDocument> historyAccessFiles = fileRepository.findByFileIdInAndUserId(fileIds, userId);
 

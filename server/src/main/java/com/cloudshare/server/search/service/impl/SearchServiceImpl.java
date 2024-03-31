@@ -46,14 +46,19 @@ public class SearchServiceImpl implements SearchService {
     public List<FileVO> search(SearchReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String curDirectory = reqDTO.curDirectory();
+        if ("/".equals(curDirectory)) {
+            curDirectory = "";
+        }
         String keyword = reqDTO.keyword();
         Set<FileDocument> searchResp = new HashSet<>();
 
         saveSearchHistory(userId, keyword);
-        List<FileDocument> namesLike = fileRepository.findByNameContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
-        List<FileDocument> contentLike = fileRepository.findByContentContainingAndCurDirectoryAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
+        List<FileDocument> namesLike = fileRepository.findByNameContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
+        List<FileDocument> contentLike = fileRepository.findByContentContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
+        List<FileDocument> suffixLike = fileRepository.findBySuffixContainingAndPathStartsWithAndUserIdAndDeletedAtIsNull(keyword, curDirectory, userId);
         searchResp.addAll(namesLike);
         searchResp.addAll(contentLike);
+        searchResp.addAll(suffixLike);
 
         List<FileVO> resp = fileConverter.DOList2VOList(searchResp.stream().toList());
         return resp;

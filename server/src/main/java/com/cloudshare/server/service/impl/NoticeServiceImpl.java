@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,14 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public PageResponse<Notice> list(NoticeListPageReqDTO reqDTO) {
         Pageable pageable = PageRequest.of(reqDTO.page() - 1, reqDTO.size());
-        Page<Notice> pageResp = noticeRepository.findAll(pageable);
+        Page<Notice> pageResp = null;
+        if (StringUtils.hasText(reqDTO.title())) {
+            pageResp = noticeRepository.findAllByTitleContaining(pageable, reqDTO.title());
+        } else if (StringUtils.hasText(reqDTO.content())) {
+            pageResp = noticeRepository.findAllByContentContaining(pageable, reqDTO.content());
+        } else {
+            pageResp = noticeRepository.findAll(pageable);
+        }
         List<Notice> notices = pageResp.get().toList();
         return new PageResponse<>(pageResp.getTotalElements(), notices);
     }

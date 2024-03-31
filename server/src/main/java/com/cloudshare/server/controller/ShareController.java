@@ -47,8 +47,8 @@ public class ShareController {
      * @param reqDTO
      * @return
      */
-    @PostMapping
-    public Response<ShareCreateRespVO> create(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
+    @PostMapping("/add")
+    public Response<ShareCreateRespVO> addShare(@Validated @RequestBody ShareCreateReqDTO reqDTO) {
         ShareCreateRespVO resp = shareService.create(reqDTO);
         return Response.success(resp);
     }

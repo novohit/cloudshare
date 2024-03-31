@@ -90,7 +90,7 @@ public class ShareServiceImpl implements ShareService {
         share.setExpiredAt(reqDTO.expiredAt());
         share.setShareStatus(ShareStatus.ACTIVE);
         share.setUrl(shareFrontendUrl + shareId);
-        String shortUrl = shortLinkService.create(shareId, share.getUrl());
+        String shortUrl = shortLinkService.create(shareId, share.getUrl(), share.getExpiredAt());
         if (VisibleType.PUBLIC.equals(reqDTO.visibleType())) {
             share.setVisibleType(VisibleType.PUBLIC);
         } else {
@@ -196,8 +196,8 @@ public class ShareServiceImpl implements ShareService {
         UserContext targetUser = UserContextThreadHolder.getUserContext();
         fileService.copy(
                 new FileMoveOrCopyReqDTO(
-                        reqDTO.fileIds(),
-                        reqDTO.parentId(),
+                        reqDTO.sources(),
+                        reqDTO.targetId(),
                         reqDTO.target()
                 ),
                 sourceId,

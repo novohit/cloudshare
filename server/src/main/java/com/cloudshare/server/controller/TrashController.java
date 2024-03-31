@@ -28,8 +28,8 @@ public class TrashController {
     }
 
     @PostMapping("/list")
-    public Response<List<FileVO>> list(@Validated @RequestBody TrashListReqDTO reqDTO) {
-        return Response.success(trashService.list(reqDTO));
+    public Response<List<FileVO>> list() {
+        return Response.success(trashService.list());
     }
 
     @DeleteMapping("/delete")

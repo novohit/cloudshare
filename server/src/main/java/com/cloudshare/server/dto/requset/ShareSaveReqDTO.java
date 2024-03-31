@@ -9,8 +9,8 @@ import java.util.List;
  * @since 2023/11/1
  */
 public record ShareSaveReqDTO(
-        @NotNull Long parentId,
-        @NotNull List<Long> fileIds,
-        @NotBlank String target // 目标目录
+        @NotNull List<Long> sources,
+        @NotNull Long targetId,
+        @NotNull String target // 目标目录
 ) {
 }

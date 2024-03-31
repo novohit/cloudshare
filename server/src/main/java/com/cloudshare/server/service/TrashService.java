@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface TrashService {
 
-    List<FileVO> list(TrashListReqDTO reqDTO);
+    List<FileVO> list();
 
     void physicallyDelete(List<Long> fileIds);
 

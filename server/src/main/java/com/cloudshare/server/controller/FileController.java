@@ -68,7 +68,7 @@ public class FileController {
         return Response.success(tree);
     }
 
-    @PutMapping("/name")
+    @PutMapping("/rename")
     public Response<Void> rename(@Validated @RequestBody FileRenameReqDTO reqDTO) {
         fileService.rename(reqDTO);
         return Response.success();

@@ -40,9 +40,9 @@ public class TrashServiceImpl implements TrashService {
     }
 
     @Override
-    public List<FileVO> list(TrashListReqDTO reqDTO) {
+    public List<FileVO> list() {
         Long userId = UserContextThreadHolder.getUserId();
-        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNotNull(userId, reqDTO.curDirectory());
+        List<FileDocument> fileList = fileRepository.findByUserIdAndCurDirectoryAndDeletedAtIsNotNull(userId, "");
         List<FileVO> resp = fileConverter.DOList2VOList(fileList);
         return resp;
     }

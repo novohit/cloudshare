@@ -1,6 +1,8 @@
 package com.cloudshare.server.repository;
 
 import com.cloudshare.server.model.Notice;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -9,4 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
+    Page<Notice> findAllByTitleContaining(Pageable pageable, String keyword);
+
+    Page<Notice> findAllByContentContaining(Pageable pageable, String keyword);
 }

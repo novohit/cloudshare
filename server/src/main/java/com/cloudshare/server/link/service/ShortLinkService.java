@@ -4,10 +4,13 @@ import com.cloudshare.server.common.constant.BizConstant;
 import com.cloudshare.server.link.model.ShortLink;
 import com.cloudshare.server.link.repository.ShortLinkRepository;
 import com.google.common.hash.Hashing;
+import org.hibernate.annotations.Comment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
 
 /**
  * @author novo
@@ -32,11 +35,14 @@ public class ShortLinkService {
 
 
     public ShortLink findOneByCode(String code) {
-        return shortLinkRepository.findOneByCode(code);
+        ShortLink link = shortLinkRepository.findOneByCode(code);
+        LocalDateTime expiredAt = link.getExpiredAt();
+        if (expiredAt != null && expiredAt.isBefore(LocalDateTime.now())) return null;
+        return link;
     }
 
 
-    public String create(Long shareId, String url) {
+    public String create(Long shareId, String url, LocalDateTime expiredAt) {
         long murmurHash32 = murmurHash32(url);
         // 62进制转换
         String code62 = encodeToBase62(murmurHash32);
@@ -47,6 +53,7 @@ public class ShortLinkService {
         shortLink.setShareId(shareId);
         shortLink.setPv(0L);
         shortLink.setUv(0L);
+        shortLink.setExpiredAt(expiredAt);
         shortLinkRepository.save(shortLink);
         return shortLink.getShortUrl();
     }
