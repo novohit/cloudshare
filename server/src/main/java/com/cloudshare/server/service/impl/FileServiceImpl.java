@@ -213,6 +213,9 @@ public class FileServiceImpl implements FileService {
 
         checkQuota(size);
 
+        String curDirectory = reqDTO.curDirectory();
+        if (curDirectory.equals("/")) curDirectory = "";
+
         String filename = multipartFile.getOriginalFilename();
         String temp = FileUtil.getSuffix(filename);
         // hutool return suffix have no dot
@@ -242,8 +245,8 @@ public class FileServiceImpl implements FileService {
                     reqDTO.md5(),
                     context.getFileName(),
                     null,
-                    reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + context.getFileName(),
+                    curDirectory,
+                    curDirectory + BizConstant.LINUX_SEPARATOR + context.getFileName(),
                     context.getRealPath(),
                     context.getTotalSize(),
                     FileType.suffix2Type(suffix),
@@ -354,6 +357,8 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void chunkMerge(FileChunkMergeReqDTO reqDTO) {
+        String curDirectory = reqDTO.curDirectory();
+        if (curDirectory.equals("/")) curDirectory = "";
         // 1. 查询分片文件路径
         Long userId = UserContextThreadHolder.getUserId();
         List<FileChunk> chunks = fileChunkRepository.findByMd5AndUserIdAndDeletedAtIsNull(reqDTO.md5(), userId);
@@ -393,8 +398,8 @@ public class FileServiceImpl implements FileService {
                     reqDTO.md5(),
                     reqDTO.fileName(),
                     null,
-                    reqDTO.curDirectory(),
-                    reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
+                    curDirectory,
+                    curDirectory + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
                     context.getRealPath(),
                     totalSize.get(),
                     FileType.suffix2Type(suffix),
