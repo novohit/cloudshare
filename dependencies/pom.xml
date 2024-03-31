@@ -21,6 +21,7 @@
         <freemarker.version>2.3.28</freemarker.version>
         <lombok.version>1.18.24</lombok.version>
         <commons.lang3.version>3.9</commons.lang3.version>
+        <commons.text.version>1.6</commons.text.version>
         <guava.version>31.1-jre</guava.version>
         <hutool.version>5.8.22</hutool.version>
         <commons.math3.version>3.6.1</commons.math3.version>
@@ -107,6 +108,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons.lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons.text.version}</version>
             </dependency>
 
             <dependency>

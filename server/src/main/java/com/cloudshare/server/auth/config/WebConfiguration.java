@@ -67,7 +67,8 @@ public class WebConfiguration implements WebMvcConfigurer {
                         "/share/access",
                         "/share/download/**",
                         "/share/info",
-                        "/**/test*"
+                        "/**/test*",
+                        "/openai/**"
                 )
                 .map(uri -> "/api" + uri)
                 .collect(Collectors.toList());
