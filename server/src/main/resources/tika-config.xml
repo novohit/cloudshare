@@ -1,0 +1,19 @@
+<properties>
+    <encodingDetectors>
+        <encodingDetector class="org.apache.tika.parser.html.HtmlEncodingDetector">
+            <params>
+                <param name="markLimit" type="int">64000</param>
+            </params>
+        </encodingDetector>
+        <encodingDetector class="org.apache.tika.parser.txt.UniversalEncodingDetector">
+            <params>
+                <param name="markLimit" type="int">64001</param>
+            </params>
+        </encodingDetector>
+        <encodingDetector class="org.apache.tika.parser.txt.Icu4jEncodingDetector">
+            <params>
+                <param name="markLimit" type="int">64002</param>
+            </params>
+        </encodingDetector>
+    </encodingDetectors>
+</properties>

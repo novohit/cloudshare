@@ -38,6 +38,8 @@ import com.cloudshare.server.common.exception.BadRequestException;
 import com.cloudshare.server.common.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,6 +51,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +73,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author novo
@@ -98,12 +100,14 @@ public class FileServiceImpl implements FileService {
 
     private final RedisManager redisManager;
 
+    private final Tika tika;
+
 
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
                            TransactionTemplate transactionTemplate, UserService userService,
                            @Qualifier("baseExecutor") ExecutorService baseExecutor,
-                           TextParserStrategyFactory strategyFactory, RedisManager redisManager) {
+                           TextParserStrategyFactory strategyFactory, RedisManager redisManager, Tika tika) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
         this.storageEngine = storageEngine;
@@ -113,20 +117,23 @@ public class FileServiceImpl implements FileService {
         this.baseExecutor = baseExecutor;
         this.strategyFactory = strategyFactory;
         this.redisManager = redisManager;
+        this.tika = tika;
     }
 
     @Override
     public void createDir(DirCreateReqDTO reqDTO) {
         Long userId = UserContextThreadHolder.getUserId();
         String name = reqDTO.fileName();
+        String curDirectory = reqDTO.curDirectory();
+        if (curDirectory.equals("/")) curDirectory = "";
         FileDocument dir = assembleFileDocument(
                 userId,
                 reqDTO.parentId(),
                 null,
                 name,
                 null,
-                reqDTO.curDirectory(),
-                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + name,
+                curDirectory,
+                curDirectory + BizConstant.LINUX_SEPARATOR + name,
                 null,
                 0L,
                 FileType.DIR,
@@ -272,6 +279,8 @@ public class FileServiceImpl implements FileService {
     public Boolean secUpload(FileSecUploadReqDTO reqDTO) {
         UserContext userContext = UserContextThreadHolder.getUserContext();
         Long userId = userContext.id();
+        String curDirectory = reqDTO.curDirectory();
+        if (curDirectory.equals("/")) curDirectory = "";
         List<FileDocument> fileList = fileRepository.findByMd5AndDeletedAtIsNull(reqDTO.md5());
         if (CollectionUtils.isEmpty(fileList)) {
             return false;
@@ -288,8 +297,8 @@ public class FileServiceImpl implements FileService {
                 reqDTO.md5(),
                 reqDTO.fileName(),
                 null,
-                reqDTO.curDirectory(),
-                reqDTO.curDirectory() + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
+                curDirectory,
+                curDirectory + BizConstant.LINUX_SEPARATOR + reqDTO.fileName(),
                 same.getRealPath(),
                 same.getSize(),
                 FileType.suffix2Type(suffix),
@@ -449,6 +458,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void preview(Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
+        redisManager.saveHistory(BizConstant.ACCESS_HISTORY_PREFIX + userId, String.valueOf(fileId));
         // 1. 校验下载权限
         Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(fileId, userId);
         if (optional.isEmpty()) {
@@ -826,6 +836,21 @@ public class FileServiceImpl implements FileService {
                 .filter(file -> FileType.DIR.equals(file.getType()))
                 .toList();
         return fileConverter.DOList2VOList(dirs);
+    }
+
+    @Override
+    public String parse(Long id) {
+        Long userId = UserContextThreadHolder.getUserId();
+        Optional<FileDocument> optional = fileRepository.findByFileIdAndUserIdAndDeletedAtIsNull(id, userId);
+        if (optional.isEmpty()) throw new BadRequestException("文件不存在");
+        FileDocument fileDocument = optional.get();
+        try {
+            return tika.parseToString(new File(fileDocument.getRealPath()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (TikaException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

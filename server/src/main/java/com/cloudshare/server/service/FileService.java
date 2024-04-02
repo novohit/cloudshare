@@ -70,4 +70,6 @@ public interface FileService {
     List<FileVO> accessHistory();
 
     List<FileVO> getOneLayerTreeNode(Long fileId);
+
+    String parse(Long id);
 }

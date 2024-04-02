@@ -141,7 +141,7 @@ public class FileController {
         return Response.success();
     }
 
-    @RateLimit(time = 5, count = 3, limitType = LimitType.IP)
+//    @RateLimit(time = 5, count = 3, limitType = LimitType.IP)
     @GetMapping("/download/{fileId}")
     public void download(@PathVariable("fileId") Long fileId, HttpServletResponse response) {
         Long userId = UserContextThreadHolder.getUserId();
@@ -185,5 +185,16 @@ public class FileController {
     @GetMapping("/access/history")
     public Response<List<FileVO>> accessHistory() {
         return Response.success(fileService.accessHistory());
+    }
+
+    /**
+     * 将文档解析出文本
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/parse/{id}")
+    public Response<String> parse(@PathVariable Long id) {
+        return Response.success(fileService.parse(id));
     }
 }

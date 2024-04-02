@@ -16,13 +16,14 @@ import com.cloudshare.server.converter.UserConverter;
 import com.cloudshare.server.dto.response.PageResponse;
 import com.cloudshare.server.enums.LoginType;
 import com.cloudshare.server.enums.PlanLevel;
+import com.cloudshare.server.enums.RoleEnum;
 import com.cloudshare.server.model.User;
 import com.cloudshare.server.model.UserAuth;
 import com.cloudshare.server.repository.UserAuthRepository;
 import com.cloudshare.server.repository.UserRepository;
 import com.cloudshare.server.service.UserService;
 import com.cloudshare.server.common.enums.BizCodeEnum;
-import com.cloudshare.server.common.exception.BizException;
+import com.cloudshare.server.common.exception.BadRequestException;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -60,11 +61,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long register(UserRegisterReqDTO reqDTO) {
         if (!lock.tryLock(reqDTO.username(), 30)) {
-            throw new BizException(BizCodeEnum.USER_REPEAT);
+            throw new BadRequestException(BizCodeEnum.USER_REPEAT.getMessage());
         }
         try {
             userRepository.findByUsername(reqDTO.username()).ifPresent(user -> {
-                throw new BizException(BizCodeEnum.USER_REPEAT);
+                throw new BadRequestException(BizCodeEnum.USER_REPEAT.getMessage());
             });
             User user = new User();
             BeanUtils.copyProperties(reqDTO, user);
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService {
             user.setSalt(salt);
             user.setPassword(cryptPassword);
             user.setPlan(PlanLevel.FREE);
+            user.setRole(RoleEnum.COMMON);
             user.setTotalQuota(PlanLevel.FREE.getQuota());
             user.setUsedQuota(0L);
             userRepository.save(user);
@@ -85,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean checkUsername(String username) {
         userRepository.findByUsername(username).ifPresent(user -> {
-            throw new BizException(BizCodeEnum.USER_REPEAT);
+            throw new BadRequestException(BizCodeEnum.USER_REPEAT.getMessage());
         });
         return true;
     }
@@ -97,20 +99,20 @@ public class UserServiceImpl implements UserService {
             User user = optional.get();
             String cryptPassword = SecureUtil.md5(user.getSalt() + reqDTO.password());
             if (!cryptPassword.equals(user.getPassword())) {
-                throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
+                throw new BadRequestException(BizCodeEnum.USER_LOGIN_ERROR.getMessage());
             }
             StpUtil.login(user.getId());
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             return tokenInfo.tokenValue;
         }
-        throw new BizException(BizCodeEnum.USER_LOGIN_ERROR);
+        throw new BadRequestException(BizCodeEnum.USER_LOGIN_ERROR.getMessage());
     }
 
     @Override
     public User findById(Long userId) {
         Optional<User> optional = userRepository.findById(userId);
         if (optional.isEmpty()) {
-            throw new BizException(BizCodeEnum.USER_NOT_EXIST);
+            throw new BadRequestException(BizCodeEnum.USER_NOT_EXIST.getMessage());
         }
         return optional.get();
     }
