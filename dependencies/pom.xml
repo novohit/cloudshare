@@ -31,6 +31,7 @@
         <sharding-jdbc.version>4.1.1</sharding-jdbc.version>
         <jwt.version>0.9.1</jwt.version>
         <sa-token.version>1.37.0</sa-token.version>
+        <dynamictp.version>1.1.7</dynamictp.version>
         <fastjson.version>2.0.15</fastjson.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <justauth.version>1.16.4</justauth.version>
@@ -197,6 +198,12 @@
                 <version>${sa-token.version}</version>
             </dependency>
 
+            <!--动态线程池-->
+            <dependency>
+                <groupId>org.dromara.dynamictp</groupId>
+                <artifactId>dynamic-tp-spring-boot-starter-common</artifactId>
+                <version>${dynamictp.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>cn.hutool</groupId>

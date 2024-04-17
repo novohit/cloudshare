@@ -1,5 +1,6 @@
 package com.cloudshare.server;
 
+import org.dromara.dynamictp.core.spring.EnableDynamicTp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
+@EnableDynamicTp
 public class CloudShareApplication {
 
     public static void main(String[] args) {

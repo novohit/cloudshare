@@ -67,6 +67,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -94,7 +95,7 @@ public class FileServiceImpl implements FileService {
 
     private final UserService userService;
 
-    private final ExecutorService baseExecutor;
+    private final ThreadPoolExecutor tikaExecutor;
 
     private final TextParserStrategyFactory strategyFactory;
 
@@ -105,8 +106,7 @@ public class FileServiceImpl implements FileService {
 
     public FileServiceImpl(FileRepository fileRepository, FileConverter fileConverter,
                            StorageEngine storageEngine, FileChunkRepository fileChunkRepository,
-                           TransactionTemplate transactionTemplate, UserService userService,
-                           @Qualifier("baseExecutor") ExecutorService baseExecutor,
+                           TransactionTemplate transactionTemplate, UserService userService, ThreadPoolExecutor tikaExecutor,
                            TextParserStrategyFactory strategyFactory, RedisManager redisManager, Tika tika) {
         this.fileRepository = fileRepository;
         this.fileConverter = fileConverter;
@@ -114,7 +114,7 @@ public class FileServiceImpl implements FileService {
         this.fileChunkRepository = fileChunkRepository;
         this.transactionTemplate = transactionTemplate;
         this.userService = userService;
-        this.baseExecutor = baseExecutor;
+        this.tikaExecutor = tikaExecutor;
         this.strategyFactory = strategyFactory;
         this.redisManager = redisManager;
         this.tika = tika;
@@ -236,7 +236,7 @@ public class FileServiceImpl implements FileService {
             } catch (IOException e) {
                 throw new BizException("文本解析异常");
             }
-        }, baseExecutor);
+        }, tikaExecutor);
 
         // 保存实体
         // 上传文件
@@ -417,6 +417,22 @@ public class FileServiceImpl implements FileService {
             );
             saveFile2DB(fileDocument, true);
             userService.incrementQuota(fileDocument.getSize(), userId);
+            // 异步解析 content
+            tikaExecutor.execute(() -> {
+                try {
+                    File file = new File(context.getRealPath());
+                    String detect = tika.detect(file);
+                    log.info("detect: {}", detect);
+                    String content = tika.parseToString(file);
+                    log.info("文件内容: {}", content);
+                    fileDocument.setContent(content);
+                    saveFile2DB(fileDocument, false);
+                } catch (IOException e) {
+                    throw new BizException("文件路径异常");
+                } catch (TikaException e) {
+                    throw new BizException("文件解析异常");
+                }
+            });
         } catch (IOException e) {
             log.error("文件合并异常", e);
             throw new BizException("文件合并异常");
